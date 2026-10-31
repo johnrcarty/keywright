@@ -103,11 +103,20 @@ rebuild-index action after publishing or changing embedding models, then check t
 report current coverage. A missing, incompatible or unavailable index returns text results with
 a warning. Rechunking existing documents is a separate explicit admin action, followed by reindexing.
 
+Hybrid search ranks reference passages; it does not determine whether the collection can answer
+every question. An unrelated query can still return candidates. Check the cited content before
+using it as evidence; retrieval scores are not confidence in an answer.
+
 The Authentik provisioning helper in `stack/authentik-keywright.py` takes all identities
 and HTTPS origins from environment variables. Its credential export mode is for transfer
 into a protected environment file, never interactive output.
 
 ## Acceptance checklist
+
+The core and knowledge checks below passed on a clean Debian 13 AMD64 VM using candidate
+`10af43c` and the downloaded, pinned prebuilt bundle. The [sanitized acceptance record](https://github.com/johnrcarty/keywright/blob/main/docs/VM_ACCEPTANCE.json)
+records the image, test methods and limits. Treat this checklist as a fresh-install procedure
+for subsequent releases; optional HTTPS and external notification checks were outside that run.
 
 - [ ] Pull the published image and start it with an empty data volume; `/healthz` reports 0.0.1.
 - [ ] Complete administrator setup through the SSH tunnel and log in again.

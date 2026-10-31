@@ -1,0 +1,119 @@
+{
+  "date": "2026-10-31",
+  "source_commit": "10af43cb67973054bc06027aef5f7a1be1d4c53c",
+  "ci_run": "https://github.com/johnrcarty/keywright/actions/runs/41232654011",
+  "installation": {
+    "method": "Downloaded keywright-install bundle; prebuilt image pulled by digest; no source checkout or local application build on the VM",
+    "image": "ghcr.io/johnrcarty/keywright@sha256:f05bba76a2dfb5bf50b6d724d842b168fe59aacefaa2e98e6de6701f85eb4559",
+    "os": "Debian GNU/Linux 13 (trixie)",
+    "architecture": "linux/amd64",
+    "vcpus": 2,
+    "ram_gib": 4,
+    "disk_gib": 24,
+    "docker": "29.9.2",
+    "compose": "5.6.1"
+  },
+  "knowledge": {
+    "postgres_image": "pgvector/pgvector:0.8.2-pg16",
+    "embedding_image": "ollama/ollama@sha256:b2f0122c476bc9fe7ce679d8bb4bd555351e25e2554eefb156f61cb0a89cf429",
+    "embedding_model": "nomic-embed-text",
+    "embedding_model_id": "0a109f422b47",
+    "embedding_service": "Local CPU-only Ollama; synthetic documents only; no paid embedding provider",
+    "initial_coverage": {
+      "current_chunks": 8,
+      "indexed_current_chunks": 8,
+      "compatible_current_chunks": 8,
+      "missing_current_chunks": 0,
+      "model_mismatched_current_chunks": 0,
+      "dimension_mismatched_current_chunks": 0
+    },
+    "restored_coverage": {
+      "current_chunks": 7,
+      "indexed_current_chunks": 7,
+      "compatible_current_chunks": 7,
+      "missing_current_chunks": 0,
+      "model_mismatched_current_chunks": 0,
+      "dimension_mismatched_current_chunks": 0
+    },
+    "relevant_passage_ranks": {
+      "literal_recovery": 1,
+      "recovery_paraphrase": 1,
+      "credentials_excluded": 1,
+      "current_release": 1,
+      "historical_release": 1,
+      "other_project_recovery": 1,
+      "index_freshness": 1
+    },
+    "semantic_probe": "The bicycle passage ranked first for human powered transportation, with no literal query-token overlap",
+    "absent_topic_returned_candidates": 5,
+    "roundtrip_measurement": {
+      "description": "Nine sequential MCP calls including client startup and protocol overhead; small warm sample, not a capacity benchmark",
+      "samples_ms": [
+        467.8,
+        486.0,
+        475.0,
+        481.6,
+        472.4,
+        468.1,
+        502.8,
+        482.7,
+        434.4
+      ],
+      "median_ms": 475.0
+    }
+  },
+  "passed_checks": {
+    "fresh_admin_setup_and_login": "passed",
+    "unauthenticated_mcp_rejected": "passed",
+    "ssh_host_fingerprint_verified": "passed",
+    "ssh_exact_once_execution_and_audit": "passed",
+    "ssh_once_consumed": "passed",
+    "ssh_denial_enforced": "passed",
+    "ssh_revocation_enforced": "passed",
+    "upstream_mcp_once": "passed",
+    "upstream_mcp_revocation": "passed",
+    "agent_token_rotation": "passed",
+    "agent_disable": "passed",
+    "proposal_review_publication": "passed",
+    "fresh_publication_reports_missing_index": "passed",
+    "real_model_hybrid_retrieval": "passed",
+    "hybrid_relevance_scope_and_exact_citations": "passed",
+    "knowledge_collection_permissions": "passed",
+    "revision_visible_before_reindex": "passed",
+    "reindex_restores_current_coverage": "passed",
+    "archive_hidden_before_reindex": "passed",
+    "timed_grant_expiry": "passed",
+    "restored_documents_and_revisions": "passed",
+    "restored_text_and_citations": "passed",
+    "restored_audit_history": "passed",
+    "embedding_outage_text_fallback": "passed",
+    "database_outage_text_fallback": "passed",
+    "knowledge_rule_revocation": "passed",
+    "expired_knowledge_hidden_from_search_list_and_get": "passed",
+    "embedding_model_change_invalidates_vectors": "passed",
+    "embedding_model_change_rebuild": "passed",
+    "original_embedding_model_restored": "passed",
+    "empty_index_rebuilt_from_restored_documents": "passed",
+    "cold_backup_restore_to_new_volume": "passed",
+    "restored_ssh_credentials_and_agent_access": "passed",
+    "restored_collection_permissions": "passed",
+    "restored_semantic_retrieval": "passed",
+    "registry_auth_removed": "passed",
+    "loopback_broker_and_private_dependencies": "passed",
+    "restored_image_digest_verified": "passed"
+  },
+  "test_methods": {
+    "interfaces": "Admin setup, login, resource creation, knowledge publication/review and permission changes used HTTP UI forms. Agent operations used the installed MCP client against the running prebuilt broker.",
+    "ssh_and_mcp": "Dedicated synthetic upstream services; real SSH transport with a verified host key and a test-only client key; real upstream MCP transport.",
+    "expiry": "Published a synthetic operational document, indexed it, then moved only its database retention deadline into the past. Search/list/get excluded it while its old external-index row still existed. VM time was unchanged.",
+    "model_change": "Created an Ollama alias with the same model weights. Changing the configured model name invalidated old vectors; a rebuild restored coverage. The original model setting was restored and rebuilt.",
+    "restore": "Stopped the source broker before archiving its entire data volume. Restored into a new volume and a separate Compose project with a fresh pgvector database. Verified login, revisions, citations, audit history, permissions, SSH keys and a rebuilt semantic index."
+  },
+  "limitations": [
+    "Synthetic small-corpus validation does not establish large-corpus quality or throughput.",
+    "Hybrid retrieval returned five candidates for an absent topic. Ranked references and scores do not establish that a question is answerable.",
+    "VM execution covered AMD64. Native ARM64 prebuilt image and install-bundle checks passed in CI; a full ARM64 VM acceptance run was not performed.",
+    "HTTPS proxy, external notification delivery, OIDC and optional LLM gateway were outside this run.",
+    "No release tag, PyPI publication, public repository visibility or anonymous registry pull was performed."
+  ]
+}
