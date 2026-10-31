@@ -6,8 +6,9 @@ The database, SSH keys and signing secret live in the `keywright-data` volume.
 The core broker needs no external service.
 
 Download the **keywright-install** artifact from a successful image publishing run.
-It contains `compose.yaml`, `image.txt` and `SHA256SUMS`, with the exact image digest
-pinned. Extract it into a dedicated installation directory; no source checkout is needed.
+It contains `compose.yaml`, `image.txt`, `SHA256SUMS`, this guide, and the optional LLM
+and knowledge overlays, schema and environment examples. The broker image is pinned to
+its exact digest. Extract into a dedicated installation directory; no source checkout is needed.
 
 ```bash
 # Private preview only: use a classic GitHub token with read:packages and package access.
@@ -79,9 +80,28 @@ budgets work. PostgreSQL and LiteLLM have no published host ports.
 ## Optional knowledge index
 
 The prebuilt image already includes the database driver. Add `KNOWLEDGE_PG_PASSWORD` to `.env`, and copy `knowledge.env.example` to `knowledge.env`.
-Set the index connection password and a dedicated embedding credential. Then add the
-`knowledge.compose.yml` overlay to the LLM command above. Local text search does not
-require this overlay. Index coverage and retrieval quality need separate verification.
+Set the same database password in `knowledge.env` and `.env` (URL-encode it in the connection
+URL if it contains reserved URL characters), plus the embedding endpoint, model and a dedicated
+embedding credential. With the optional LiteLLM gateway configured above:
+
+```bash
+docker compose -f compose.yaml -f llm.compose.yml -f knowledge.compose.yml up -d --wait
+```
+
+If using an existing compatible embedding endpoint, set its `/v1` base in `knowledge.env`
+and omit `llm.compose.yml`. Local text search needs neither overlay. Index coverage and
+retrieval quality need separate verification. The optional Git import directory is not mounted
+by default; importing a checkout requires an explicit read-only mount.
+
+Knowledge documents remain in the broker's data volume; PostgreSQL holds a derived search
+index. Semantic indexing sends document passages to the configured embedding endpoint, and
+semantic queries send search text there. Choose an endpoint suitable for that data. Provider
+credentials belong in the local environment file, never in documents or agent arguments.
+
+Publishing updates text search immediately. Semantic indexing is manual: use the collection's
+rebuild-index action after publishing or changing embedding models, then check that diagnostics
+report current coverage. A missing, incompatible or unavailable index returns text results with
+a warning. Rechunking existing documents is a separate explicit admin action, followed by reindexing.
 
 The Authentik provisioning helper in `stack/authentik-keywright.py` takes all identities
 and HTTPS origins from environment variables. Its credential export mode is for transfer
@@ -100,6 +120,22 @@ into a protected environment file, never interactive output.
 - [ ] Stop the broker, back up the entire data volume, restore to a second empty volume,
       and verify startup, login and audit records. Treat backups as credentials.
 - [ ] Verify proxy HTTPS and notifications separately if included in release claims.
+
+Knowledge acceptance, using synthetic documents and a disposable index:
+
+- [ ] Create a collection, propose a document through MCP, review it in the UI and verify
+      only published content is searchable. Check exact source-line citations.
+- [ ] Configure the knowledge overlay and embedding endpoint; rebuild and verify current
+      coverage plus genuinely semantic retrieval for a paraphrased question without word overlap.
+- [ ] Publish a revision: verify immediate text discovery and missing/partial semantic coverage;
+      rebuild and check current coverage. Repeat with a changed embedding model.
+- [ ] Check collection permissions and revocation, literal path scoping, expired/archived content
+      and a competing project. No unauthorized or out-of-scope excerpts may be returned.
+- [ ] Stop the embedding service and then the index database separately; verify text fallback
+      and a clear warning without credentials, provider error bodies or private connection details.
+- [ ] Restore the stopped broker's complete volume into a fresh installation, verify documents,
+      review metadata and citations, then rebuild an empty index and repeat retrieval checks.
+- [ ] Record actual-model retrieval quality and cold/warm latency separately from mocked tests.
 
 Record VM identity, addresses and raw logs in a private operations record outside this
 repository. Commit only sanitized results. Stop the broker before copying its SQLite

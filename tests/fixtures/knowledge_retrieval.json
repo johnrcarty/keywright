@@ -1,0 +1,22 @@
+{
+  "description": "Fictional release retrieval cases; no private corpus or provider credentials.",
+  "documents": [
+    {"path": "projects/atlas/recovery.md", "title": "Atlas recovery", "body": "# Atlas recovery\n\n## Restore a backup\n\nRestore the archive into a new empty workspace.\nExisting workspaces cannot receive a restored archive.\nVerify checksums before enabling writes.\n\n## Credentials\n\nAPI tokens are excluded from archives. Register new credentials after recovery.\n"},
+    {"path": "projects/atlas/release.md", "title": "Atlas releases", "body": "# Atlas releases\n\n## Current version 2\n\nVersion 2 releases require manual promotion of tested images.\nPushing a version tag does not publish the application.\n"},
+    {"path": "projects/atlas/history.md", "title": "Atlas version 1 history", "body": "# Atlas version 1 history\n\nVersion 1 automatically published images when a version tag was pushed.\nThis historical procedure does not apply to version 2.\n"},
+    {"path": "projects/atlas/storage.md", "title": "Atlas storage", "body": "# Atlas storage\n\nCanonical documents are stored in the broker data volume.\nThe semantic search index is derived and can be rebuilt from reviewed documents.\nPublishing refreshes text search immediately; semantic indexing requires a manual rebuild.\n"},
+    {"path": "projects/beacon/recovery.md", "title": "Beacon recovery", "body": "# Beacon recovery\n\nRestore the backup archive directly into an existing workspace.\nBeacon uses a separate recovery procedure from other projects.\n"},
+    {"path": "projects/beacon/release.md", "title": "Beacon releases", "body": "# Beacon releases\n\nA version tag automatically publishes Beacon images after tests pass.\n"}
+  ],
+  "queries": [
+    {"id": "literal_recovery", "query": "Atlas restore backup", "path_prefix": null, "expected_path": "projects/atlas/recovery.md", "expected_text": "Restore the archive into a new empty workspace.", "max_rank": 3},
+    {"id": "recovery_paraphrase", "query": "Can I recover saved data into a workspace that already exists?", "path_prefix": "projects/atlas/", "expected_path": "projects/atlas/recovery.md", "expected_text": "Existing workspaces cannot receive a restored archive.", "max_rank": 3},
+    {"id": "credentials_excluded", "query": "Will an archive bring my API tokens back?", "path_prefix": "projects/atlas/", "expected_path": "projects/atlas/recovery.md", "expected_text": "API tokens are excluded from archives.", "max_rank": 3},
+    {"id": "current_release", "query": "How are version 2 releases promoted?", "path_prefix": "projects/atlas/", "expected_path": "projects/atlas/release.md", "expected_text": "Version 2 releases require manual promotion of tested images.", "max_rank": 3},
+    {"id": "historical_release", "query": "How did version 1 publish images?", "path_prefix": "projects/atlas/", "expected_path": "projects/atlas/history.md", "expected_text": "Version 1 automatically published images", "max_rank": 3},
+    {"id": "other_project_recovery", "query": "restore backup existing workspace", "path_prefix": "projects/beacon/", "expected_path": "projects/beacon/recovery.md", "expected_text": "Restore the backup archive directly into an existing workspace.", "max_rank": 1},
+    {"id": "index_freshness", "query": "Does publishing refresh semantic search immediately?", "path_prefix": "projects/atlas/", "expected_path": "projects/atlas/storage.md", "expected_text": "semantic indexing requires a manual rebuild.", "max_rank": 3},
+    {"id": "absent_vocabulary", "query": "photosynthesis chloroplast thylakoid", "path_prefix": "projects/atlas/", "expected_path": null},
+    {"id": "empty_scope", "query": "restore backup", "path_prefix": "projects/missing/", "expected_path": null}
+  ]
+}

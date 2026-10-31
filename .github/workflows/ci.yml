@@ -18,6 +18,18 @@ jobs:
       fail-fast: false
       matrix:
         python: ["3.12", "3.13", "3.14"]
+    services:
+      knowledge-postgres:
+        image: pgvector/pgvector:0.8.2-pg16
+        env:
+          POSTGRES_USER: knowledge
+          POSTGRES_DB: knowledge
+          POSTGRES_PASSWORD: isolated-ci-only
+        ports:
+          - 5432/tcp
+        options: >-
+          --health-cmd "pg_isready -U knowledge -d knowledge"
+          --health-interval 5s --health-timeout 5s --health-retries 12
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -29,6 +41,8 @@ jobs:
       - name: Install source packages
         run: python -m pip install ./client ".[dev,knowledge]" ./router build
       - name: Run server, client and router tests
+        env:
+          KNOWLEDGE_TEST_PG_URL: postgresql://knowledge:isolated-ci-only@127.0.0.1:${{ job.services.knowledge-postgres.ports['5432'] }}/knowledge
         run: python -m pytest -q
       - name: Verify topology layout
         run: node --test tests/test_topology_layout.cjs
@@ -178,23 +192,13 @@ jobs:
           digest=$(docker buildx imagetools inspect "$IMAGE:$SHA_TAG" --format '{{json .Manifest}}' | python3 -c 'import json,sys; print(json.load(sys.stdin)["digest"])')
           [[ "$digest" =~ ^sha256:[0-9a-f]{64}$ ]]
           echo "digest=$digest" >> "$GITHUB_OUTPUT"
-          export KEYWRIGHT_PIN="$IMAGE@$digest"
-          mkdir -p install
-          python3 - <<'PYINSTALL'
-          import os
-          from pathlib import Path
-          source = Path("deploy/compose.yaml").read_text()
-          source = source.replace("${KEYWRIGHT_IMAGE:-ghcr.io/johnrcarty/keywright:0.0.1-preview}", os.environ["KEYWRIGHT_PIN"])
-          assert os.environ["KEYWRIGHT_PIN"] in source, "Compose default was not pinned"
-          Path("install/compose.yaml").write_text(source)
-          Path("install/image.txt").write_text(os.environ["KEYWRIGHT_PIN"] + "\n")
-          PYINSTALL
-          (cd install && sha256sum compose.yaml image.txt > SHA256SUMS)
+          python3 scripts/build-install-bundle.py "$IMAGE@$digest" install
           printf '### Prebuilt broker\n\n`%s:%s`\n\n`%s@%s`\n' "$IMAGE" "$TAG" "$IMAGE" "$digest" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         with:
           name: keywright-install
           path: install/
+          include-hidden-files: true # Only allowlisted files, including .env.example, enter install/.
           retention-days: 90
 
   verify-published-image:
@@ -222,4 +226,32 @@ jobs:
       - name: Pull the published manifest and verify the install bundle
         run: |
           (cd install && sha256sum -c SHA256SUMS)
+          python3 - <<'PYCONFIG'
+          import json, os, shutil, subprocess, tempfile
+          from pathlib import Path
+          with tempfile.TemporaryDirectory() as temporary:
+              root = Path(temporary) / "install"
+              shutil.copytree("install", root)
+              for name in (".env", "knowledge.env", "litellm.env"):
+                  shutil.copyfile(root / (name + ".example"), root / name)
+              env = dict(os.environ, KNOWLEDGE_PG_PASSWORD="isolated-test-only",
+                         PG_PASSWORD="isolated-test-only", LITELLM_MASTER_KEY="isolated-test-only",
+                         LITELLM_SALT_KEY="isolated-test-only")
+              for overlays in (("knowledge.compose.yml",), ("llm.compose.yml", "knowledge.compose.yml")):
+                  command = ["docker", "compose", "-f", "compose.yaml"]
+                  for overlay in overlays:
+                      command.extend(["-f", overlay])
+                  result = subprocess.run(command + ["config", "--format", "json"],
+                                          cwd=root, env=env, capture_output=True, text=True, check=True)
+                  services = json.loads(result.stdout)["services"]
+                  assert services["keywright"]["image"] == (root / "image.txt").read_text().strip()
+                  for name, service in services.items():
+                      assert "build" not in service
+                      if name != "keywright":
+                          assert not service.get("ports")
+                      for volume in service.get("volumes", []):
+                          if volume["type"] == "bind":
+                              assert Path(volume["source"]).is_file()
+          print("Downloaded knowledge and LLM configurations verified without a source checkout")
+          PYCONFIG
           bash scripts/smoke-image.sh "${{ needs.image-meta.outputs.image }}@${{ needs.publish-image.outputs.digest }}" "${{ needs.image-meta.outputs.version }}" always install/compose.yaml
