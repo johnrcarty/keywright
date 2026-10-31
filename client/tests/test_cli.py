@@ -2,6 +2,7 @@
 phases of a gated call (ask, wait, execute once)."""
 import asyncio
 import json
+import re
 import threading
 import time
 
@@ -92,18 +93,7 @@ def test_delayed_approval_then_one_execution(env, seeded, fake_ssh, capsys):
 
     t = threading.Thread(target=worker)
     t.start()
-    with httpx.Client(base_url=env, headers={"Origin": env}) as http:
-        http.post("/ui/login", data={"password": "adminpass123"})
-        rid = None
-        for _ in range(40):
-            page = http.get("/ui").text
-            if "journalctl -n 5" in page:
-                rid = page.split("/ui/requests/")[1].split('"')[0]
-                break
-            time.sleep(0.1)
-        assert rid
-        r = http.post(f"/ui/requests/{rid}/decide", data={"scope": "once", "extent": "exact"}, follow_redirects=False)
-        assert r.status_code == 303
+    _approve_first_pending(env, "journalctl -n 5", extent="exact")
     t.join(timeout=30)
     assert result["code"] == 0
     assert fake_ssh == [("127.0.0.1", "journalctl -n 5", "root")]
@@ -219,8 +209,12 @@ def _approve_first_pending(env, needle, **decision) -> str:
         http.post("/ui/login", data={"password": "adminpass123"})
         for _ in range(60):
             page = http.get("/ui").text
-            if needle in page:
-                rid = page.split("/ui/requests/")[1].split('"')[0]
+            # Activity can mention the operation before its pending card is rendered.
+            # Select the matching actionable card, never a substring of the whole page.
+            cards = re.findall(r'<article\b[^>]*\bdata-request="([^"]+)"[^>]*>(.*?)</article>', page, re.S)
+            rid = next((rid for rid, card in cards if needle in card
+                        and f'action="/ui/requests/{rid}/decide"' in card), None)
+            if rid:
                 break
             time.sleep(0.1)
         else:
