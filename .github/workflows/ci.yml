@@ -1,9 +1,13 @@
-name: test and build
+name: test build and publish
 on:
   push:
     branches: [main]
+    tags: ["v*"]
   pull_request:
   workflow_dispatch:
+concurrency:
+  group: keywright-${{ github.ref }}
+  cancel-in-progress: false
 permissions:
   contents: read
 jobs:
@@ -49,3 +53,173 @@ jobs:
         with:
           name: distributions-python-${{ matrix.python }}
           path: dist/
+
+  image-meta:
+    needs: test
+    if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      image: ${{ steps.meta.outputs.image }}
+      version: ${{ steps.meta.outputs.version }}
+      tag: ${{ steps.meta.outputs.tag }}
+      sha_tag: ${{ steps.meta.outputs.sha_tag }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: meta
+        name: Validate image version and select channel
+        run: |
+          python3 - <<'PYMETA'
+          import os, re, tomllib
+          from pathlib import Path
+          versions = [tomllib.loads(Path(p).read_text())["project"]["version"]
+                      for p in ("pyproject.toml", "client/pyproject.toml", "router/pyproject.toml")]
+          version = versions[0]
+          assert len(set(versions)) == 1, "Server, client and router versions must match"
+          assert re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", version), "Use a numeric release version"
+          ref = os.environ["GITHUB_REF"]
+          if ref.startswith("refs/tags/"):
+              assert ref == f"refs/tags/v{version}", "Tag must match package versions"
+              tag = version
+          else:
+              tag = version + "-preview"
+          values = {"image": "ghcr.io/" + os.environ["GITHUB_REPOSITORY"].lower(),
+                    "version": version, "tag": tag, "sha_tag": "sha-" + os.environ["GITHUB_SHA"]}
+          with open(os.environ["GITHUB_OUTPUT"], "a") as out:
+              for key, value in values.items():
+                  print(f"{key}={value}", file=out)
+          PYMETA
+
+  container:
+    needs: image-meta
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    env:
+      IMAGE: ${{ needs.image-meta.outputs.image }}
+      CANDIDATE: ${{ needs.image-meta.outputs.image }}:${{ needs.image-meta.outputs.sha_tag }}-${{ matrix.arch }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4
+      - name: Build native image
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7
+        with:
+          context: .
+          file: deploy/Dockerfile
+          platforms: linux/${{ matrix.arch }}
+          load: true
+          tags: ${{ env.CANDIDATE }}
+          labels: |
+            org.opencontainers.image.version=${{ needs.image-meta.outputs.tag }}
+            org.opencontainers.image.revision=${{ github.sha }}
+          cache-from: type=gha,scope=broker-${{ matrix.arch }}
+          cache-to: type=gha,mode=max,scope=broker-${{ matrix.arch }}
+      - name: Test image through standalone Compose
+        run: bash scripts/smoke-image.sh "$CANDIDATE" "${{ needs.image-meta.outputs.version }}" never
+      - name: Sign in to GHCR
+        uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish tested architecture and record its digest
+        run: |
+          docker push "$CANDIDATE"
+          mkdir -p digests
+          docker image inspect --format '{{index .RepoDigests 0}}' "$CANDIDATE" > "digests/${{ matrix.arch }}.txt"
+          grep -Eq '^ghcr.io/.+@sha256:[0-9a-f]{64}$' "digests/${{ matrix.arch }}.txt"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: digest-${{ matrix.arch }}
+          path: digests/*.txt
+
+  publish-image:
+    needs: [image-meta, container]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      digest: ${{ steps.publish.outputs.digest }}
+    env:
+      IMAGE: ${{ needs.image-meta.outputs.image }}
+      TAG: ${{ needs.image-meta.outputs.tag }}
+      SHA_TAG: ${{ needs.image-meta.outputs.sha_tag }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4
+      - uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: digest-*
+          path: digests
+          merge-multiple: true
+      - id: publish
+        name: Publish manifest and pin the installation file
+        run: |
+          test -s digests/amd64.txt && test -s digests/arm64.txt
+          mapfile -t images < <(cat digests/amd64.txt digests/arm64.txt)
+          docker buildx imagetools create --tag "$IMAGE:$SHA_TAG" --tag "$IMAGE:$TAG" "${images[@]}"
+          digest=$(docker buildx imagetools inspect "$IMAGE:$SHA_TAG" --format '{{json .Manifest}}' | python3 -c 'import json,sys; print(json.load(sys.stdin)["digest"])')
+          [[ "$digest" =~ ^sha256:[0-9a-f]{64}$ ]]
+          echo "digest=$digest" >> "$GITHUB_OUTPUT"
+          export KEYWRIGHT_PIN="$IMAGE@$digest"
+          mkdir -p install
+          python3 - <<'PYINSTALL'
+          import os
+          from pathlib import Path
+          source = Path("deploy/compose.yaml").read_text()
+          source = source.replace("${KEYWRIGHT_IMAGE:-ghcr.io/johnrcarty/keywright:0.0.1-preview}", os.environ["KEYWRIGHT_PIN"])
+          assert os.environ["KEYWRIGHT_PIN"] in source, "Compose default was not pinned"
+          Path("install/compose.yaml").write_text(source)
+          Path("install/image.txt").write_text(os.environ["KEYWRIGHT_PIN"] + "\n")
+          PYINSTALL
+          (cd install && sha256sum compose.yaml image.txt > SHA256SUMS)
+          printf '### Prebuilt broker\n\n`%s:%s`\n\n`%s@%s`\n' "$IMAGE" "$TAG" "$IMAGE" "$digest" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: keywright-install
+          path: install/
+          retention-days: 90
+
+  verify-published-image:
+    needs: [image-meta, publish-image]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      packages: read
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: keywright-install
+          path: install
+      - name: Pull the published manifest and verify the install bundle
+        run: |
+          (cd install && sha256sum -c SHA256SUMS)
+          bash scripts/smoke-image.sh "${{ needs.image-meta.outputs.image }}@${{ needs.publish-image.outputs.digest }}" "${{ needs.image-meta.outputs.version }}" always install/compose.yaml

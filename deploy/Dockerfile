@@ -5,8 +5,10 @@ COPY pyproject.toml README.md ./
 COPY client ./client
 COPY keywright_server ./keywright_server
 # Both packages from this tree; the server must never resolve the client from PyPI here.
-ARG KEYWRIGHT_EXTRAS=""
+ARG KEYWRIGHT_EXTRAS="knowledge"
 RUN pip install --no-cache-dir ./client ".${KEYWRIGHT_EXTRAS:+[$KEYWRIGHT_EXTRAS]}" && kw version && keywright-server --help >/dev/null
+LABEL org.opencontainers.image.source="https://github.com/johnrcarty/keywright" \
+      org.opencontainers.image.description="Self-hosted SSH and MCP credential broker for AI agents"
 ENV KW_DATA_DIR=/data KW_PORT=8700
 VOLUME /data
 EXPOSE 8700

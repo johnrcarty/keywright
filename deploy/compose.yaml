@@ -1,12 +1,10 @@
-# Core broker only. Optional services use separate Compose overlays.
+# Prebuilt broker. This file is sufficient for a core installation.
+name: keywright
 services:
   keywright:
-    build:
-      context: ..
-      dockerfile: deploy/Dockerfile
-    image: keywright:dev
+    image: ${KEYWRIGHT_IMAGE:-ghcr.io/johnrcarty/keywright:0.0.1-preview}
     ports:
-      - "${KW_BIND_ADDRESS:-127.0.0.1}:8700:8700"
+      - "${KW_BIND_ADDRESS:-127.0.0.1}:${KW_HTTP_PORT:-8700}:8700"
     environment:
       KW_PUBLIC_URL: ${KW_PUBLIC_URL:-http://localhost:8700}
       KW_TRUSTED_PROXIES: ${KW_TRUSTED_PROXIES:-}

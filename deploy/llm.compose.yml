@@ -3,7 +3,7 @@
 # from exactly one place. Agents get a Keywright token and a base URL, never a provider key.
 #
 #   cp .env.example .env && cp litellm.env.example litellm.env   # then fill both in
-#   docker compose -f compose.yaml -f llm.compose.yml up -d --build
+#   docker compose -f compose.yaml -f llm.compose.yml up -d
 #
 # LiteLLM's budgets are read from its database; without one the proxy serves past every limit.
 # Postgres is therefore not optional, and litellm.yaml fails closed when spend cannot be verified.

@@ -1,10 +1,7 @@
-# Optional overlay: docker compose -f compose.yaml -f llm.compose.yml -f knowledge.compose.yml up -d --build
+# Optional overlay: docker compose -f compose.yaml -f llm.compose.yml -f knowledge.compose.yml up -d
 # Set KNOWLEDGE_PG_PASSWORD in .env and configure knowledge.env from knowledge.env.example.
 services:
   keywright:
-    build:
-      args:
-        KEYWRIGHT_EXTRAS: knowledge
     env_file: [knowledge.env]
     depends_on:
       knowledge-postgres: { condition: service_healthy }

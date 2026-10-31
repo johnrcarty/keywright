@@ -310,7 +310,7 @@ authorization rule. Markdown is displayed as escaped text in the admin UI.
 
 Without extra services, SQLite FTS5 provides ranked text retrieval. For hybrid retrieval:
 
-1. Install the optional driver (`pip install '.[knowledge]'`) and provision a dedicated
+1. The prebuilt image includes the driver (source installs use `pip install '.[knowledge]'`). Provision a dedicated
    PostgreSQL database with pgvector. Apply `deploy/knowledge-schema.sql` as its owner.
    The runtime database role needs only SELECT, INSERT and DELETE on `knowledge_search_chunks`.
 2. Add an embedding model alias to your LiteLLM configuration. Issue a dedicated virtual key
@@ -325,10 +325,10 @@ For the existing Compose deployment, copy `knowledge.env.example` to `knowledge.
 credentials and embedding settings, set `KNOWLEDGE_PG_PASSWORD` in `.env`, then run from `deploy`:
 
 ```bash
-docker compose -f docker-compose.yml -f knowledge.compose.yml up -d --build
+docker compose -f compose.yaml -f llm.compose.yml -f knowledge.compose.yml up -d
 ```
 
-The overlay adds a private pgvector service and installs the driver in Keywright's image. It
+The overlay adds a private pgvector service using the prebuilt broker image. It
 does not publish the database port or alter LiteLLM's PostgreSQL volume. If using Git import in
 Docker, bind-mount the chosen checkout read-only at the configured Git root. Initialize the SQL
 schema explicitly when using an existing database volume.
@@ -736,7 +736,7 @@ verified and never sets `allow_requests_on_db_unavailable`.
 cd deploy
 cp .env.example .env                 # PG_PASSWORD, LITELLM_MASTER_KEY, LITELLM_SALT_KEY (set once)
 cp litellm.env.example litellm.env   # the real provider keys: rotate them first, this host only
-docker compose -f compose.yaml -f llm.compose.yml up -d --build
+docker compose -f compose.yaml -f llm.compose.yml up -d
 ```
 
 Then in the admin UI: **Resources → + LLM gateway**, URL `http://litellm:4000`, the master key,

@@ -4,16 +4,34 @@ Give AI agents temporary access to infrastructure without handing them your cred
 Keywright is a self-hosted broker for SSH hosts and MCP tools, with human approval,
 scoped access, revocation and an audit trail.
 
-**v0.0.1 is in preparation.** This repository is an unreleased source preview. Package
-publishing and a tagged release are pending installation, security and licensing review.
+**v0.0.1 is in preparation.** Prebuilt preview images are published to GitHub Container
+Registry for Linux x86-64 and ARM64. The repository and image remain private during
+release preparation; the stable release, public availability and licensing review are pending.
 
-## Start a local preview
+## Install the prebuilt broker
 
-Docker with the Compose plugin is required. From this checkout:
+You need Docker Engine with the Compose plugin. No Git checkout, Python installation
+or local image build is needed.
 
-```bash
-docker compose -f deploy/compose.yaml up -d --build
-```
+1. Download the **keywright-install** artifact from a successful
+   [test build and publish workflow](https://github.com/johnrcarty/keywright/actions/workflows/ci.yml).
+   Extract it into a dedicated installation directory. Its `compose.yaml` pins the exact
+   multi-platform image digest; `SHA256SUMS` covers the installation files.
+2. For the private preview, sign in with a GitHub personal access token (classic) that has
+   `read:packages` and access to this package. Enter the token at Docker's password prompt:
+   ```bash
+   docker login ghcr.io -u YOUR_GITHUB_USERNAME
+   ```
+3. In the installation directory:
+   ```bash
+   sha256sum -c SHA256SUMS
+   docker compose up -d --wait
+   ```
+
+The source copy at `deploy/compose.yaml` also works on its own; it follows
+`ghcr.io/johnrcarty/keywright:0.0.1-preview` unless `KEYWRIGHT_IMAGE` selects another tag
+or digest. The install artifact is the reproducible choice for testing a particular build.
+When the image becomes public, registry login will no longer be required.
 
 Open <http://localhost:8700/ui> and set the administrator password. The default port is
 bound to loopback. For a remote VM, use an SSH tunnel first:
@@ -38,7 +56,13 @@ needs no cloud account, model provider, identity provider or external database.
 
 ## Develop from source
 
-Python 3.12 or newer and [uv](https://docs.astral.sh/uv/) are required:
+For a local Docker build, clone the repository and explicitly add the development overlay:
+
+```bash
+docker compose -f deploy/compose.yaml -f deploy/build.compose.yaml up -d --build
+```
+
+For direct Python development, Python 3.12 or newer and [uv](https://docs.astral.sh/uv/) are required:
 
 ```bash
 uv venv

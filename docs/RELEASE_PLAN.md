@@ -9,7 +9,9 @@ Completed in the initial migration:
 - Selected source, tests and generic configuration without operational reports or history.
 - Replaced live knowledge-corpus dependencies with synthetic fixtures.
 - Added a broker-only Compose path with loopback binding and optional service overlays.
-- Added test/package-build CI. No package publishing workflow is enabled yet.
+- Added test/package-build CI and prebuilt broker image publishing for AMD64 and ARM64.
+- Standard Compose installations pull images; local builds use an explicit development overlay.
+- Image installation bundles pin the manifest digest. Python package publishing remains pending.
 
 Before tagging or making the repository public:
 
@@ -21,7 +23,8 @@ Before tagging or making the repository public:
 - [ ] Add a security reporting route and contribution guidance.
 - [ ] Review shared-knowledge retrieval and experimental chunking before claiming support.
 - [ ] Run real disposable PostgreSQL/pgvector tests for hybrid-retrieval support.
-- [ ] Confirm package-name access and trusted publishing, then add a tested publish workflow.
+- [ ] Confirm Python package-name access and trusted publishing, then add a tested PyPI workflow.
+- [ ] Approve public repository/package visibility and verify anonymous image pulls.
 - [ ] Freeze the source commit, record artifact hashes, and write release notes.
 
 LLM gateways, OIDC, inventory, semantic advice, knowledge and mail are optional.
