@@ -1,0 +1,40 @@
+# Local configuration and credentials
+.env
+.env.*
+*.env
+*.env.*
+!**/.env.example
+!**/*.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+# Runtime and local environments
+.venv/
+venv/
+data/
+*.db
+*.db-*
+*.sqlite*
+*.log
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+# Build and local tooling
+dist/
+build/
+*.egg-info/
+.idea/
+.vscode/
+.DS_Store
+# Operational captures belong outside the source repository
+reports/
+artifacts/
+backups/
+*.tar.gz
+*.zip

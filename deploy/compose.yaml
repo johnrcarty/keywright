@@ -1,0 +1,17 @@
+# Core broker only. Optional services use separate Compose overlays.
+services:
+  keywright:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    image: keywright:dev
+    ports:
+      - "${KW_BIND_ADDRESS:-127.0.0.1}:8700:8700"
+    environment:
+      KW_PUBLIC_URL: ${KW_PUBLIC_URL:-http://localhost:8700}
+      KW_TRUSTED_PROXIES: ${KW_TRUSTED_PROXIES:-}
+    volumes:
+      - keywright-data:/data
+    restart: unless-stopped
+volumes:
+  keywright-data: {}

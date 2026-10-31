@@ -1,0 +1,41 @@
+{% extends "base.html" %}{% from "_inventory_forms.html" import field, allocation_form, remove %}
+{% block title %}{{ subnet.name if subnet else 'Add subnet' }} · Keywright{% endblock %}{% block body %}
+{% include "_infrastructure_nav.html" %}
+<div class="inventory-heading"><h1>{{ subnet.name if subnet else 'Add subnet' }}</h1><a class="small" href="/ui/inventory/networks">All subnets</a></div>
+<p class="page-intro">Record the network’s allocation plan. Changes here do not configure your router or DHCP server.</p>
+<details class="card" {{ 'open' if not subnet or values }}><summary style="cursor:pointer">{{ 'Network settings · ' ~ subnet.cidr if subnet else 'Network settings' }}</summary>
+<form method="post" action="/ui/inventory/networks" class="inventory-form">
+<input type="hidden" name="id" value="{{ subnet.id if subnet else '' }}">
+{{ field('name','Network name',values,subnet.name if subnet else '',required=true) }}
+{{ field('cidr','Subnet (CIDR)',values,subnet.cidr if subnet else '',required=true,help='IPv4 or IPv6, for example 192.168.1.0/24.') }}
+{{ field('scope','Address space',values,subnet.scope if subnet else 'default',help='Use a separate name for isolated networks that reuse the same IP range.') }}
+{{ field('site','Site / location',values,subnet.site if subnet else '') }}
+{{ field('vlan','VLAN (optional)',values,subnet.vlan if subnet else '',type='number') }}
+{{ field('gateway','Gateway (optional)',values,subnet.gateway if subnet else '') }}
+{{ field('dhcp_start','DHCP pool start (optional)',values,subnet.dhcp_start if subnet else '') }}
+{{ field('dhcp_end','DHCP pool end (optional)',values,subnet.dhcp_end if subnet else '') }}
+<div class="full"><label for="subnet-notes">Notes</label><textarea id="subnet-notes" name="notes" maxlength="4000">{{ values.get('notes',subnet.notes if subnet else '') }}</textarea></div>
+<div class="full form-actions"><button class="btn p">{{ 'Save subnet' if subnet else 'Create subnet' }}</button></div>
+</form></details>
+{% if subnet %}{% set back='/ui/inventory/networks/' ~ subnet.id %}
+<div class="inventory-facts"><span>Usable addresses <b>{{ summary.capacity }}</b></span><span>Allocations <b>{{ summary.recorded }}</b></span><span>DHCP pool <b>{{ summary.pool_size if subnet.dhcp_start else 'Not recorded' }}</b></span><span>Unrecorded outside pool <b>{{ summary.unrecorded }}</b></span></div>
+<div class="inventory-note">Unrecorded does not mean available. Confirm DHCP reservations and active leases before assigning an address. Offline devices retain their allocations.</div>
+<h2>Recorded allocations</h2>
+<div class="card">
+{% if subnet.gateway %}<p class="small"><b>Gateway</b> <code>{{ subnet.gateway }}</code> · excluded from unrecorded ranges</p>{% endif %}
+{% if subnet.dhcp_start %}<p class="small"><b>DHCP pool</b> <code>{{ subnet.dhcp_start }} – {{ subnet.dhcp_end }}</code> · live leases not imported</p>{% endif %}
+{% if summary.rows %}<table class="data-table inventory-table" role="table"><thead><tr><th>Address</th><th>Allocation</th><th>Device / interface</th><th>Owner / purpose</th><th>Updated</th></tr></thead><tbody>
+{% for allocation in summary.rows %}<tr><td data-label="Address" class="mono">{{ allocation.address }}</td><td data-label="Allocation">{{ states[allocation.state] }}</td><td data-label="Device / interface">{% if allocation.interface_id %}{% set iface=interface_map[allocation.interface_id] %}<a href="/ui/inventory/assets/{{ iface.asset_id }}">{{ asset_map[iface.asset_id].name }}</a><small>{{ iface.name }}</small>{% else %}<span class="mut">Not linked</span>{% endif %}</td><td data-label="Owner / purpose">{{ allocation.label or '—' }}{% if allocation.notes %}<small>{{ allocation.notes }}</small>{% endif %}</td><td data-label="Updated" class="small mut">{{ allocation.updated_at.strftime('%Y-%m-%d %H:%M') }} UTC</td></tr>{% endfor %}
+</tbody></table>{% else %}<p class="mut">No individual allocations recorded.</p>{% endif %}
+</div>
+<details class="card" {{ 'open' if not summary.rows or (allocation_values and not allocation_values.get('id')) }}><summary style="cursor:pointer">Add allocation</summary>{{ allocation_form(subnet,none,allocation_values if allocation_values and not allocation_values.get('id') else {},interfaces,asset_map,states) }}</details>
+{% if summary.rows %}<details class="inventory-section" {{ 'open' if allocation_values and allocation_values.get('id') }}><summary>Edit or release an allocation</summary>
+<div class="card">{% for allocation in summary.rows %}<details class="inventory-editor" {{ 'open' if allocation_values and allocation_values.get('id')==allocation.id }}><summary><span class="mono">{{ allocation.address }}</span> · {{ states[allocation.state] }}{% if allocation.label %} · {{ allocation.label }}{% endif %}</summary>
+{{ allocation_form(subnet,allocation,allocation_values if allocation_values and allocation_values.get('id')==allocation.id else {},interfaces,asset_map,states) }}
+<div class="inventory-delete">{{ remove('allocation',allocation.id,back,'Release allocation record') }}<p class="help">Only release this record after the address has been released on the device or DHCP server.</p></div>
+</details>{% endfor %}</div></details>{% endif %}
+<details class="inventory-section"><summary>Unrecorded address ranges ({{ summary.unrecorded }} addresses)</summary><div class="card"><p class="mut small">Excludes recorded allocations, gateway, DHCP pool, and protocol-reserved addresses. Availability is unverified.</p>
+{% for start,end in summary.gaps %}<div class="allocation-range">{{ start }}{% if start!=end %} – {{ end }}{% endif %}</div>{% else %}<p class="mut">No unrecorded ranges outside the DHCP pool.</p>{% endfor %}</div></details>
+<div class="inventory-delete">{{ remove('subnet',subnet.id,back,'Remove subnet') }}<p class="help">Remove its allocations first. This does not change the network configuration.</p></div>
+{% endif %}
+{% endblock %}

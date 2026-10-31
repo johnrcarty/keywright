@@ -1,0 +1,36 @@
+{% extends "base.html" %}{% block title %}Approval friction{% endblock %}{% block body %}
+<h1>Approval friction</h1>
+<p class="page-intro">Find recurring requests, time spent waiting for decisions, and calls that keep failing. <a href="/ui/requests">Requests</a> · <a href="/ui/audit">Audit log</a> · <a href="/ui/policies">Rules</a></p>
+<form method="get" class="card grid" role="search">
+<div><label for="friction-start">From (UTC)</label><input id="friction-start" type="date" name="start" value="{{ filters.start }}" required></div>
+<div><label for="friction-end">Through (UTC)</label><input id="friction-end" type="date" name="end" value="{{ filters.end }}" required></div>
+<div><label for="friction-agent">Agent</label><select id="friction-agent" name="agent"><option value="">Every agent</option>{% for a in agents %}<option value="{{ a.id }}" {{ 'selected' if filters.agent == a.id }}>{{ a.name }}</option>{% endfor %}</select></div>
+<div class="row"><button class="btn p">Show report</button><a class="btn" href="/ui/friction">Last 30 days</a></div>
+</form>
+<section class="card" aria-labelledby="friction-requests">
+<h2 id="friction-requests">Requests · {{ totals.requests }} distinct requests</h2>
+<p>{{ totals.human_approved }} approved by a human · {{ totals.other_approved }} other / unattributed approvals · {{ totals.denied }} denied · {{ totals.pending }} pending · {{ totals.expired }} expired</p>
+<p>Median human decision wait: <b>{{ (median_wait ~ ' s') if median_wait is not none else 'Unknown' }}</b> · {{ wait_samples }} timed decisions.</p>
+<p class="small mut">Counts use request IDs, so repeated polling and approval/execution audit entries do not add requests. Requests were created in the selected dates; statuses are current. Wait times cover completed human approvals and denials, not pending requests or notification delivery time. Pending requests past their expiry are shown as expired without changing them.</p>
+</section>
+<section class="card" aria-labelledby="friction-calls">
+<h2 id="friction-calls">Call evidence · {{ totals.call_records }} records</h2>
+<p>{{ totals.failed }} call errors or failed results · {{ totals.blocked }} policy blocks / refusals · {{ totals.succeeded }} successful results · {{ totals.unknown }} unreported results.</p>
+<p class="small mut">{{ totals.lifecycle }} pending/decision records excluded from result counts. Allowed calls can fail; denied calls are not execution failures. These are recorded outcomes, not transcript analysis or a claim that every failed attempt was captured.</p>
+</section>
+{% if limited %}<div class="card" role="status"><b>Partial sample.</b> At most the newest {{ limit }} requests and {{ limit }} call records are included. Narrow the dates or choose an agent. Suggestions are disabled until both samples fit.</div>{% endif %}
+<p class="small mut">Coverage: {{ coverage.missing_wait }} human decisions missing valid timing; {{ coverage.incomplete_requests }} requests and {{ coverage.incomplete_events }} failed/blocked records lack comparable operation evidence. Incomplete records stay separate. Only Keywright activity is included. Commands, arguments, reasons and error output are omitted from this report.</p>
+<h2>Recurring activity and suggestions</h2>
+<p class="small">Suggestions require at least three human approvals of the identical complete operation for one agent and target. They retain the exact arguments or command and require preview and explicit save. Repetition does not establish safety; recorded failures, denials, hazards, wildcard scopes and incomplete evidence exclude a suggestion.</p>
+{% for group in rows[:50] %}
+<section class="card" aria-label="{{ group.agent }} · {{ group.tool }}">
+<div class="row"><b>{{ group.agent }} · {{ group.resource }}</b><span class="pill">{{ group.tool }}</span></div>
+<p>{{ group.requests|length }} requests · {{ group.statuses.human_approved }} human approvals · {{ group.statuses.denied }} denials · {{ group.statuses.pending }} pending · {{ group.failures }} failed results / errors · {{ group.blocked }} blocks</p>
+{% if group.median_wait is not none %}<p class="small">Median human decision wait: {{ group.median_wait }} s</p>{% endif %}
+<div class="row small">{% for r in group.requests[:3] %}<a href="/ui/requests/{{ r.id }}">Request {{ r.at.strftime('%m-%d %H:%M') }} UTC</a>{% endfor %}{% for e in group.events[:3] %}<a href="/ui/audit?q=%23{{ e.id }}">Audit #{{ e.id }} · {{ e.status }}</a>{% endfor %}</div>
+{% if group.suggestion %}<p>Could have covered <b>{{ group.suggestion.support }} matching approval requests</b> in this sample. Future savings are unknown; approvals may cover different numbers of executions.</p>
+<a class="btn" href="/ui/friction/review/{{ group.suggestion.request_id }}?{{ review_query }}">Review exact-operation suggestion</a>{% endif %}
+</section>
+{% else %}<div class="card"><p>No requests or failed/blocked calls in this selection.</p></div>{% endfor %}
+{% if rows|length > 50 %}<p class="small mut">Showing the 50 busiest groups of {{ rows|length }}. Narrow the dates or select an agent to inspect more.</p>{% endif %}
+{% endblock %}

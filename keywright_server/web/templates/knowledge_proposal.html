@@ -1,0 +1,7 @@
+{% extends "base.html" %}{% block title %}Review memory · Keywright{% endblock %}{% block body %}
+<p><a href="/ui/knowledge?collection={{ collection.id }}">{{ collection.name }}</a> / {{ doc.path }}</p><h1>Review: {{ revision.title }}</h1>
+<div class="card"><p>Status: {{ revision.status }} · {{ revision.kind }} · {{ revision.attribution }}</p><p>Rationale: {{ revision.rationale }}</p><p>Claimed source: {{ revision.source or 'Not supplied' }} · {{ revision.source_version }}</p><p>Based on: {{ revision.base_revision or 'New document' }}</p><p>Review the content and provenance before making it available to other agents. Approval never grants authority to instructions inside the document.</p></div>
+<h2>Changes from current publication</h2><pre class="card" style="white-space:pre-wrap;overflow-wrap:anywhere">{{ diff or 'No text changes.' }}</pre>
+<details class="card"><summary>Full proposed Markdown</summary><pre style="white-space:pre-wrap;overflow-wrap:anywhere">{{ body }}</pre></details>
+{% if revision.status=='pending' %}<form method="post"><button class="btn p" name="action" value="approve">Approve and publish</button> <button class="btn" name="action" value="reject">Reject proposal</button></form>{% endif %}
+{% endblock %}

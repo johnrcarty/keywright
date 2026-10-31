@@ -1,0 +1,51 @@
+# LiteLLM proxy config for the Keywright compose. Provider keys come from litellm.env via
+# os.environ/…; nothing secret lives in this file.
+model_list:
+  - model_name: claude-sonnet-5
+    litellm_params:
+      model: anthropic/claude-sonnet-5
+      api_key: os.environ/ANTHROPIC_API_KEY
+  - model_name: claude-opus-5
+    litellm_params:
+      model: anthropic/claude-opus-5
+      api_key: os.environ/ANTHROPIC_API_KEY
+  - model_name: gpt-5.6
+    litellm_params:
+      model: openai/gpt-5.6
+      api_key: os.environ/OPENAI_API_KEY
+  - model_name: deepseek-chat
+    litellm_params:
+      model: deepseek/deepseek-chat
+      api_key: os.environ/DEEPSEEK_API_KEY
+  - model_name: deepseek-reasoner
+    litellm_params:
+      model: deepseek/deepseek-reasoner
+      api_key: os.environ/DEEPSEEK_API_KEY
+  - model_name: kimi-k2.5
+    litellm_params:
+      model: moonshot/kimi-k2.5
+      api_key: os.environ/MOONSHOT_API_KEY
+  - model_name: kimi-latest
+    litellm_params:
+      model: moonshot/kimi-latest
+      api_key: os.environ/MOONSHOT_API_KEY
+  # Add Gemini, OpenRouter, fal pass-throughs… here. Keywright's "Test connection" refreshes the
+  # model list it offers agents from whatever is listed.
+
+litellm_settings:
+  # Global ceiling across every key, user and model on this proxy, in USD. The last wall.
+  max_budget: 100
+  budget_duration: 30d
+  drop_params: true
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+  database_url: os.environ/DATABASE_URL
+  # Budgets are only as good as the spend they are compared against. When neither the database
+  # nor Redis can answer, refuse (503) instead of serving past the limit.
+  fail_closed_budget_enforcement: true
+  # Never set allow_requests_on_db_unavailable here: it turns every budget into a suggestion.
+  store_model_in_db: false
+  # The admin UI signs in through authentik (GENERIC_* in the compose); the master key stays an
+  # API credential only, not a login.
+  disable_password_login_when_sso_enabled: true

@@ -1,0 +1,6 @@
+{# Destructive-operation flags on a request. `level` decides the tone: high/critical override standing access. #}
+{% set hz = hazards_of(req.detail) %}{% if hz %}{% set level = hazard_level(req.detail) %}
+<div class="hazard {{ level }}"><b>{% if hazard_blocks(level) %}⚠ Flagged destructive ({{ level }}){% else %}Flagged ({{ level }}){% endif %}</b>
+<ul>{% for h in hz %}<li><span class="pill {{ h.severity }}">{{ h.severity }}</span> {{ h.reason }}</li>{% endfor %}</ul>
+<div class="help">{% if hazard_blocks(level) %}Standing rules and timed grants do not cover this. It can be allowed once, for exactly the operation shown, or denied.{% else %}Runs under existing access; recorded in the audit log as flagged.{% endif %}</div></div>
+{% endif %}

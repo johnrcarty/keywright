@@ -1,0 +1,46 @@
+{# One pending request as a tile: who, what, how urgent, and the two or three answers most likely
+   to be right. Everything a decision could turn on is one tap away, never more. Rendered on page
+   load and again over the websocket, so it must not touch `request` or `flash`. #}
+{% set level = hazard_level(req.detail) %}{% set flagged = hazard_blocks(level) %}
+{% set ops = operations(req.detail) %}
+<article class="tile req-tile{{ ' flagged' if flagged }}" id="req-{{ req.id }}" data-request="{{ req.id }}">
+<details class="tile-open">
+<summary>
+<div class="tile-head"><span class="tile-dot" aria-hidden="true"></span><b>{{ req.agent.name }}</b>
+{% if level %}<span class="pill {{ level }}">{{ 'destructive' if flagged else 'flagged' }} · {{ level }}</span>{% endif %}
+{% if req.semantic and req.semantic.status == 'ok' %}<span class="pill {{ 'ok' if req.semantic.verdict == 'safe' else 'high' if req.semantic.verdict == 'unsafe' else 'medium' if req.semantic.verdict == 'unclear' else '' }}">Jev · {{ req.semantic.verdict }}</span>{% elif req.semantic %}<span class="pill">Jev · no verdict</span>{% endif %}
+<span class="tile-meta mut small"><span class="tile-times"><time data-since="{{ req.created_at.isoformat() }}" datetime="{{ req.created_at.isoformat() }}">{{ req.created_at.strftime('%H:%M:%S') }}</time>{% if req.expires_at %} · <span data-until="{{ req.expires_at.isoformat() }}">expires {{ req.expires_at.strftime('%H:%M') }}</span>{% endif %}</span>
+<span class="tile-chevron" aria-hidden="true">▾</span></span></div>
+{% if ops %}{% set lines = operation_line(ops[0][1]).split('\n') %}
+{# Never shortened: the tile carries approve buttons, so what it shows has to be all of it. A
+   pathological command scrolls inside the tile rather than pushing those buttons off the screen. #}
+<div class="tile-line mono">{{ lines[0] }}</div>
+{% for extra in lines[1:] %}<div class="tile-line mono tile-cont">{{ extra.strip() }}</div>{% endfor %}
+{% if ops|length > 1 %}<div class="small mut">and {{ ops|length - 1 }} more operation{{ '' if ops|length == 2 else 's' }} in this request</div>{% endif %}
+{% else %}<div class="tile-line mono">{% for p in req.patterns[:2] %}{{ p }}{{ ' ' }}{% endfor %}{% if req.patterns|length > 2 %}<span class="mut">+{{ req.patterns|length - 2 }} more</span>{% endif %}</div>{% endif %}
+{% if req.reason %}<div class="tile-reason small">“{{ req.reason }}”</div>{% endif %}
+</summary>
+<div class="tile-body">
+{% include "_hazards.html" %}
+{% if req.semantic %}<div class="tile-field"><div class="tile-label">Jev</div>{% include "_semantic.html" %}</div>{% endif %}
+<div class="tile-field"><div class="tile-label">Permission scopes</div>{% include "_patterns.html" %}</div>
+{% if ops %}<div class="tile-field"><div class="tile-label">Operation{{ '' if ops|length == 1 else 's' }}</div>
+{% for pats, op in ops %}{% with constraints=op %}{% include "_constraints.html" %}{% endwith %}{% endfor %}</div>{% endif %}
+<div class="tile-field small mut">session {{ (req.session_id or 'none')[:24] }} · <a href="/ui/requests/{{ req.id }}">{{ req.id }}</a></div>
+{% with next='/ui', in_detail=true %}{% include "_decide.html" %}{% endwith %}
+</div>
+</details>
+<form method="post" action="/ui/requests/{{ req.id }}/decide" class="tile-quick">
+<input type="hidden" name="next" value="/ui">
+{% if flagged %}<input type="hidden" name="extent" value="exact">
+<button class="btn ok sm" name="scope" value="once">Allow once (exact)</button>
+<button class="btn bad sm" name="scope" value="deny">Deny</button>
+<span class="small mut">Destructive · open to read the flags</span>
+{% else %}
+<button class="btn ok sm" name="scope" value="once">Allow once</button>
+<button class="btn sm" name="scope" value="ttl">1 hour</button>
+<button class="btn bad sm" name="scope" value="deny">Deny</button>
+<span class="small mut">Open for other durations, broader scope, or a deny reason</span>
+{% endif %}
+</form>
+</article>

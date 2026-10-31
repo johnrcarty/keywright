@@ -1,0 +1,6 @@
+{% extends "base.html" %}{% block title %}Audit{% endblock %}{% block body %}
+<h1>Audit log</h1>
+<p class="page-intro">Access decisions and operations across your infrastructure. <a href="/ui/friction">Review approval friction</a>.</p>
+<form method="get" class="row toolbar" role="search"><input type="text" name="q" value="{{ q }}" placeholder="Search agent, tool, pattern, or detail…" aria-label="Filter audit log"><button class="btn">Filter</button>{% if q %}<a class="btn" href="/ui/audit">Clear</a>{% endif %}</form>
+<div class="card activity-list">{% for e in rows %}{% include "_activity_row.html" %}{% else %}<p class="mut collection-empty">No matching audit events.</p>{% endfor %}</div>
+{% endblock %}

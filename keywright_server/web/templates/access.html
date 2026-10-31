@@ -1,0 +1,119 @@
+{% extends "base.html" %}{% block title %}Access{% endblock %}{% block body %}
+<style>
+.acc-pick{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}.acc-pick .field{min-width:180px;flex:1}
+.acc-group{margin-top:14px}.acc-group-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-bottom:6px}
+.acc-group-head h2{margin:0;font-size:16px;text-transform:capitalize}
+.acc-row{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:space-between;padding:9px 0;border-top:1px solid var(--line)}
+.acc-row.changed{background:rgba(90,169,255,.07)}
+.acc-name{min-width:0;flex:1 1 240px}.acc-name b{word-break:break-all}.acc-name code{font-size:11px;word-break:break-all}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;flex:0 0 auto}
+.seg label{margin:0;padding:6px 11px;font-size:13px;cursor:pointer;color:var(--mut);border-left:1px solid var(--line)}
+.seg label:first-of-type{border-left:0}.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg input:checked+span{color:var(--fg);font-weight:600}
+.seg label:has(input[value=allow]:checked){background:rgba(46,204,113,.16)}
+.seg label:has(input[value=deny]:checked){background:rgba(231,76,60,.18)}
+.seg label:has(input[value=ask]:checked){background:rgba(90,169,255,.12)}
+.seg input:focus-visible+span{outline:2px solid var(--acc);outline-offset:2px}
+.acc-bulk{display:flex;gap:4px;flex-wrap:wrap}
+.acc-save{position:sticky;bottom:0;z-index:5;display:flex;gap:10px;align-items:center;justify-content:space-between;padding:10px 0;background:var(--bg)}
+@media (max-width:700px){.acc-save{bottom:62px}}
+</style>
+<h1>Access</h1>
+<p class="page-intro">Everything a server offers, and what one agent may do with each. <b>Allow</b> and <b>Deny</b> are standing rules; <b>Ask</b> means no rule, so the resource default decides (usually a prompt on your phone). Saving writes only what changed.</p>
+
+{% if ag %}
+<section class="card" aria-label="Agent settings">
+<div class="row access-heading"><b>{{ ag.name }}</b>{% if ag.disabled %}<span class="pill deny">disabled</span>{% else %}<span class="pill ok">active</span>{% endif %}</div>
+<p class="small mut">Token <span class="mono">{{ ag.token_prefix }}…</span> · Last seen {{ ag.last_seen_at.strftime('%m-%d %H:%M') if ag.last_seen_at else 'never' }}</p>
+{% if ag.note %}<p class="small">{{ ag.note }}</p>{% endif %}
+<div class="row">
+<form method="post" action="/ui/agents/{{ ag.id }}/rotate" onsubmit="return confirm('Rotate token? The old one stops working immediately.')"><button class="btn sm">Rotate token</button></form>
+<form method="post" action="/ui/agents/{{ ag.id }}/delete" onsubmit="return confirm('Delete agent and all its grants/rules?')"><button class="btn sm bad">Delete agent</button></form>
+</div>
+</section>
+{% endif %}
+
+<form method="get" action="/ui/access" class="card acc-pick">
+<div class="field"><label for="acc-res">Resource</label><select id="acc-res" name="resource" onchange="if(this.form.scope)this.form.scope.disabled=true;this.form.submit()">
+{% for r in resources %}<option value="{{ r.id }}" {{ 'selected' if res and r.id == res.id }}>{{ r.kind|upper }} · {{ r.name }}</option>{% endfor %}</select></div>
+<div class="field"><label for="acc-agent">Agent</label><select id="acc-agent" name="agent" onchange="this.form.submit()">
+<option value="">Every agent</option>{% for a in agents %}<option value="{{ a.id }}" {{ 'selected' if ag and a.id == ag.id }}>{{ a.name }}</option>{% endfor %}</select></div>
+{% if res and res.kind == 'mcp' %}<div class="field"><label for="acc-scope">Scope <span class="mut">(optional)</span></label>
+<input id="acc-scope" type="text" name="scope" value="{{ scope }}" placeholder="{{ (arg_keys[0] ~ '=value') if arg_keys else 'set argument keys on the resource first' }}"></div>{% endif %}
+<button class="btn">Show</button>
+{% if res and res.kind == 'mcp' %}<button class="btn" name="refresh" value="1">Refresh tool list</button>{% endif %}
+</form>
+{% if res and res.kind == 'mcp' %}<p class="small mut">Scope narrows each rule to calls with that argument (for example <code>account_name=agents</code>), on the tools that take it. Keys: {{ arg_keys|join(', ') or 'none' }}. Resource default: <b>{{ res.default_mode }}</b>.</p>{% endif %}
+
+{% if not resources %}<div class="card"><p class="mut">No MCP servers or LLM gateways yet. <a href="/ui/resources">Add one</a>.</p></div>{% endif %}
+{% if error %}<div class="card"><b style="color:var(--bad)">{{ error }}</b></div>{% endif %}
+
+{% if drift %}
+<div class="card" role="status">
+<b>Tool changes on {{ res.name }}</b> <span class="small mut">since the baseline of {{ (res.config.tools_seen_at or '')[:16] }}, found {{ (drift.at or '')[:16] }}</span>
+{% if drift.added %}<div class="small">New: {% for t in drift.added %}<code>{{ t }}</code> {% endfor %}<span class="mut">(no rule covers them, so they ask)</span></div>{% endif %}
+{% if drift.removed %}<div class="small">Removed: {% for t in drift.removed %}<code>{{ t }}</code> {% endfor %}</div>{% endif %}
+{% for c in drift.changed %}<div class="small">Changed: <code>{{ c.tool }}</code>{% if c.new_args %} · new arguments <b>{{ c.new_args|join(', ') }}</b> <span class="mut">(not checked by any rule until listed in the resource's argument keys)</span>{% endif %}{% if c.dropped_args %} · dropped {{ c.dropped_args|join(', ') }}{% endif %}</div>{% endfor %}
+<form method="post" action="/ui/resources/{{ res.id }}/tools/accept" style="margin-top:8px"><input type="hidden" name="agent" value="{{ ag.id if ag else '' }}"><button class="btn sm">I've reviewed these; make today's list the baseline</button></form>
+</div>
+{% endif %}
+
+{% if groups %}
+<form method="post" action="/ui/access" id="acc-form">
+<input type="hidden" name="resource" value="{{ res.id }}"><input type="hidden" name="agent" value="{{ ag.id if ag else '' }}"><input type="hidden" name="scope" value="{{ scope }}">
+{% for group, rows in groups.items() %}
+<section class="card acc-group" aria-labelledby="g-{{ loop.index }}">
+<div class="acc-group-head"><h2 id="g-{{ loop.index }}">{{ group }} <span class="mut small">{{ rows|length }}</span></h2>
+{% if group != 'gone' %}<div class="acc-bulk" data-group="{{ loop.index }}"><span class="small mut">All:</span>{% for s in ['allow','ask','deny'] %}<button type="button" class="btn sm" data-set="{{ s }}">{{ s|capitalize }}</button>{% endfor %}</div>{% endif %}</div>
+{% set gi = loop.index %}
+{% for r in rows %}
+<div class="acc-row" data-group="{{ gi }}" data-initial="{{ r.state }}">
+<div class="acc-name"><b>{{ r.name }}</b>
+{% if r.flag == 'new' %} <span class="pill pending">new</span>{% elif r.flag == 'changed' %} <span class="pill high">changed</span>{% elif r.flag == 'gone' %} <span class="pill revoked">gone</span>{% endif %}
+{% if r.description %}<div class="small mut">{{ r.description }}</div>{% endif %}
+<div><code>{{ r.pattern }}</code></div>
+{% if r.new_args %}<div class="small" style="color:var(--warn)">New arguments: {{ r.new_args|join(', ') }}</div>{% endif %}
+{% if r.everyone and r.everyone != 'ask' %}<div class="small">Every-agent rule: <span class="pill {{ r.everyone }}">{{ r.everyone }}</span></div>{% endif %}
+{% for c in r.covered_by %}<div class="small">Also decided by <code>{{ c }}</code></div>{% endfor %}
+{% if r.other_rules %}<div class="small mut">{{ r.other_rules }} other rule(s) on this tool (qualified or constrained), <a href="/ui/policies">see Rules</a></div>{% endif %}
+</div>
+<div class="seg" role="radiogroup" aria-label="{{ r.name }}">
+{% for s in ['allow','ask','deny'] %}<label><input type="radio" name="s:{{ r.name }}" value="{{ s }}" {{ 'checked' if r.state == s }}><span>{{ s|capitalize }}</span></label>{% endfor %}
+</div>
+</div>
+{% endfor %}
+</section>
+{% endfor %}
+<div class="acc-save"><span class="small mut" id="acc-count" role="status">No changes</span><button class="btn p">Save changes</button></div>
+</form>
+{% endif %}
+{% endblock %}
+{% block scripts %}
+<script>
+(function () {
+  var form = document.getElementById('acc-form');
+  if (!form) return;
+  var count = document.getElementById('acc-count');
+  function update() {
+    var n = 0;
+    form.querySelectorAll('.acc-row').forEach(function (row) {
+      var picked = row.querySelector('input:checked');
+      var changed = picked && picked.value !== row.dataset.initial;
+      row.classList.toggle('changed', !!changed);
+      if (changed) n++;
+    });
+    count.textContent = n ? n + ' change' + (n === 1 ? '' : 's') + ' to save' : 'No changes';
+  }
+  form.addEventListener('change', update);
+  form.querySelectorAll('.acc-bulk').forEach(function (bulk) {
+    bulk.addEventListener('click', function (e) {
+      var s = e.target.dataset && e.target.dataset.set;
+      if (!s) return;
+      form.querySelectorAll('.acc-row[data-group="' + bulk.dataset.group + '"] input[value="' + s + '"]')
+        .forEach(function (input) { input.checked = true; });
+      update();
+    });
+  });
+})();
+</script>
+{% endblock %}

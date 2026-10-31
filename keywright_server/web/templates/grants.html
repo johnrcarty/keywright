@@ -1,0 +1,61 @@
+{% extends "base.html" %}{% block title %}Grants{% endblock %}{% block body %}
+<style>
+.gr-agent{padding:0;overflow:hidden}
+.gr-agent>summary{list-style:none;cursor:pointer;display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:space-between;padding:14px 16px}
+.gr-agent>summary::-webkit-details-marker{display:none}
+.gr-agent>summary h2{margin:0;font-size:17px}
+.gr-agent>summary .gr-sub{font-size:13px;color:var(--mut)}
+.gr-agent>summary::after{content:'▾';color:var(--mut);margin-left:auto}.gr-agent:not([open])>summary::after{content:'▸'}
+.gr-host{border-top:1px solid var(--line);padding:10px 16px 12px}
+.gr-host-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:6px}
+.gr-host-head b{font-size:15px}
+.gr-appr{display:flex;flex-wrap:wrap;gap:8px 14px;justify-content:space-between;align-items:flex-start;padding:10px 12px;margin-top:8px;border:1px solid var(--line);border-radius:var(--r)}
+.gr-appr.ended,.gr-appr.revoked{opacity:.62}
+.gr-body{min-width:0;flex:1 1 260px}
+.gr-meta{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;font-size:13px}
+.gr-paths{margin-top:6px}.gr-paths code{display:block;font-size:12px;word-break:break-all;margin-top:2px}
+.gr-reason{font-size:13px;color:var(--mut);margin-top:6px}
+.gr-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-bottom:12px}
+.gr-tabs{display:inline-flex;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.gr-tabs a{padding:6px 12px;font-size:13px;color:var(--mut)}.gr-tabs a.on{color:var(--fg);font-weight:600;background:rgba(90,169,255,.12)}
+</style>
+<h1>Grants</h1>
+<p class="page-intro">Temporary approvals, by agent and by the host or server they reach, newest first. Revoking one does not remove standing rules or open defaults, or stop a running operation. <a href="/ui">All access sources</a> · <a href="/ui/access">Standing rules by tool</a>.</p>
+
+<div class="gr-toolbar">
+<div class="gr-tabs" role="group" aria-label="Which grants"><a href="/ui/grants" class="{{ 'on' if not history }}">Active{% if not history %} · {{ active_total }}{% endif %}</a><a href="/ui/grants?show=all" class="{{ 'on' if history }}">History</a></div>
+{% if active_total %}<form method="post" action="/ui/grants/revoke-all" onsubmit="return confirm('Revoke every active grant, for every agent?')"><button class="btn bad sm">Revoke all active</button></form>{% endif %}
+</div>
+
+{% for a in groups %}
+<details class="card gr-agent" open>
+<summary><div><h2>{{ a.name }}{% if a.agent and a.agent.disabled %} <span class="pill locked">Suspended</span>{% endif %}</h2>
+<div class="gr-sub">{{ a.active }} active · {{ a.hosts|length }} host{{ '' if a.hosts|length == 1 else 's' }} · last approval {{ a.latest.strftime('%m-%d %H:%M') }}</div></div>
+{% if a.active %}<form method="post" action="/ui/grants/revoke-all" onsubmit="return confirm('Revoke every active grant for {{ a.name }}?')" onclick="event.stopPropagation()"><input type="hidden" name="agent_id" value="{{ a.agent_id }}"><button class="btn sm">Revoke all for {{ a.name }}</button></form>{% endif %}
+</summary>
+{% for h in a.hosts %}
+<section class="gr-host" aria-label="{{ a.name }} on {{ h.name }}">
+<div class="gr-host-head"><span class="pill">{{ h.kind|upper }}</span><b>{{ h.name }}</b><span class="small mut">{{ h.active }} active · last {{ h.latest.strftime('%m-%d %H:%M') }}</span></div>
+{% for ap in h.approvals %}
+<div class="gr-appr {{ ap.state }}">
+<div class="gr-body">
+<div class="gr-meta"><span class="pill {{ 'ok' if ap.state == 'active' else ('revoked' if ap.state == 'revoked' else '') }}">{{ ap.label }}</span>
+<span>{{ ap.approved_at.strftime('%m-%d %H:%M') }}</span>
+{% if ap.state == 'active' %}<b>{{ ap.remaining }}</b>{% else %}<span class="mut">{{ 'revoked' if ap.state == 'revoked' else 'used up / expired' }}</span>{% endif %}
+{% if ap.uses %}<span class="mut">{{ ap.uses|sum }} use{{ '' if ap.uses|sum == 1 else 's' }} left</span>{% endif %}
+{% if ap.session %}<span class="mut mono small">session {{ ap.session[:12] }}</span>{% endif %}</div>
+<div class="gr-paths">{% for g in ap.grants[:4] %}<code>{{ g.pattern }}</code>{% endfor %}
+{% if ap.grants|length > 4 %}<details><summary class="small">{{ ap.grants|length - 4 }} more path{{ '' if ap.grants|length == 5 else 's' }}</summary>{% for g in ap.grants[4:] %}<code>{{ g.pattern }}</code>{% endfor %}</details>{% endif %}</div>
+{% for g, c in ap.constraints if c %}<details class="small"><summary>{{ constraint_label(c) }}</summary>{% with constraints=c %}{% include "_constraints.html" %}{% endwith %}</details>{% endfor %}
+{% if ap.request %}<div class="gr-reason">{{ ap.request.reason[:200] }} · <a href="/ui/requests/{{ ap.request.id }}">approval</a></div>{% endif %}
+</div>
+{% if ap.revoke %}<form method="post" action="{{ ap.revoke }}"><input type="hidden" name="next" value="/ui/grants{{ '?show=all' if history }}"><button class="btn sm">Revoke</button>{% if ap.elsewhere %}<div class="small mut">also revokes it on {{ ap.elsewhere }} other host{{ '' if ap.elsewhere == 1 else 's' }}</div>{% endif %}</form>{% endif %}
+</div>
+{% endfor %}
+</section>
+{% endfor %}
+</details>
+{% else %}
+<div class="card"><p class="mut">{% if history %}No grants yet. Approving a request creates them.{% else %}No active grants. Standing rules and resource defaults still apply; <a href="/ui/grants?show=all">see history</a>.{% endif %}</p></div>
+{% endfor %}
+{% endblock %}

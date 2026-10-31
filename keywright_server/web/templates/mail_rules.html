@@ -1,0 +1,24 @@
+{% extends 'base.html' %}{% block title %}Email rules · Keywright{% endblock %}
+{% block body %}{% include '_mail_style.html' %}
+<h1>Email rules</h1><p class="page-intro">Match incoming messages and choose what happens next. The first enabled matching rule runs, in priority order.</p>
+{% include '_mail_nav.html' %}
+<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr))">
+<section aria-label="Saved email rules">
+{% for entry in rules %}<div class="card mail-rule"><div class="row"><h2>{{ entry.name }}</h2><span class="pill {{ 'ok' if entry.enabled }}">{{ 'Enabled' if entry.enabled else 'Paused' }}</span></div>
+<p>{{ 'From '+entry.sender if entry.sender else 'Any sender' }}{% if entry.subject %} · Subject contains “{{ entry.subject }}”{% endif %}</p>
+<p>{{ {'pdf':'Send PDF attachments to Budget','mark_read':'Mark as read','move':'Move to folder'}.get(entry.action) }}{% if entry.action == 'move' %}: {{ entry.target }}{% endif %}</p>
+<div class="row"><span class="mut">Priority {{ entry.position }}</span><a href="?edit={{ entry.id }}" class="btn sm">Edit</a><form method="post" action="/ui/mail/rules/{{ entry.id }}/toggle"><button class="btn sm">{{ 'Pause' if entry.enabled else 'Enable' }}</button></form></div></div>
+{% else %}<div class="card mail-empty"><strong>Give incoming mail a job</strong>Add your electric-bill rule to deliver its PDFs to Budget.</div>{% endfor %}
+</section>
+<form class="card mail-config" method="post" action="/ui/mail/rules/save"><h2>{{ 'Edit rule' if rule else 'New rule' }}</h2>
+<input type="hidden" name="id" value="{{ rule.id if rule else '' }}">
+<label>Rule name<input name="name" required maxlength="120" placeholder="Electric bill" value="{{ rule.name if rule else '' }}"></label>
+<label>From address<input name="sender" maxlength="320" placeholder="billing@utility.example" value="{{ rule.sender if rule else '' }}"></label><p class="help">Use an address or a pattern such as *@utility.example.</p>
+<label>Subject contains<input name="subject" maxlength="200" placeholder="Your electric bill" value="{{ rule.subject if rule else '' }}"></label><p class="help">When both filters are set, both must match.</p>
+<label>Action<select name="action">{% for value,label in [('pdf','Send PDFs to Budget'),('mark_read','Mark as read'),('move','Move to folder')] %}<option value="{{ value }}" {{ 'selected' if rule and rule.action == value }}>{{ label }}</option>{% endfor %}</select></label>
+<label>Destination folder <span class="mut">(for Move to folder)</span><input name="target" maxlength="200" value="{{ rule.target if rule else '' }}" placeholder="Notifications"></label>
+<label>Priority<input type="number" name="position" min="0" max="9999" value="{{ rule.position if rule else 100 }}"></label><p class="help">Lower numbers run first.</p>
+<label class="inline"><input type="checkbox" name="enabled" {{ 'checked' if not rule or rule.enabled }}> Enable this rule</label>
+<p class="help">PDF delivery marks the message read after Budget confirms receipt. Existing messages require Run rules; editing a rule does not resend completed deliveries.</p>
+<div class="row"><button class="btn p">Save rule</button>{% if rule %}<a class="btn" href="/ui/mail/rules">New rule</a>{% endif %}</div>
+</form></div>{% endblock %}

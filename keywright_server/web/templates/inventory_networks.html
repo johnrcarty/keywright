@@ -1,0 +1,12 @@
+{% extends "base.html" %}{% block title %}IP allocations · Keywright{% endblock %}{% block body %}
+{% include "_infrastructure_nav.html" %}
+<div class="inventory-heading"><h1>IP allocations</h1><a class="btn p" href="/ui/inventory/networks/new">Add subnet</a></div>
+<p class="page-intro">Track assigned, reserved, planned, and excluded addresses in each network.</p>
+{% if subnets %}<div class="card"><table class="data-table inventory-table" role="table"><thead><tr><th>Subnet</th><th>Network</th><th>VLAN / site</th><th>Recorded</th><th>DHCP pool</th><th>Unrecorded outside pool</th></tr></thead><tbody>
+{% for subnet in subnets %}{% set counts=summaries[subnet.id] %}<tr>
+<td data-label="Subnet" class="wide"><a href="/ui/inventory/networks/{{ subnet.id }}"><b>{{ subnet.name }}</b></a><small>Address space: {{ subnet.scope }}</small></td><td data-label="Network" class="mono">{{ subnet.cidr }}</td><td data-label="VLAN / site">{{ subnet.vlan if subnet.vlan else 'No VLAN' }}<small>{{ subnet.site or 'No site' }}</small></td>
+<td data-label="Recorded">{{ counts.recorded }}<small>{{ 'Gateway recorded' if subnet.gateway else 'Gateway not recorded' }}</small></td><td data-label="DHCP pool">{{ counts.pool_size if subnet.dhcp_start else 'Not recorded' }}</td><td data-label="Unrecorded outside pool">{{ counts.unrecorded }}<small>Availability unverified</small></td>
+</tr>{% endfor %}</tbody></table></div>
+{% else %}<div class="card collection-empty"><h2>No subnets recorded</h2><p class="mut">Add your network and its DHCP pool, then record static addresses and reservations.</p><a class="btn" href="/ui/inventory/networks/new">Add your first subnet</a></div>{% endif %}
+<div class="inventory-note">Manual records only. Unrecorded addresses may still be in use. These counts do not include live DHCP leases or device discovery.</div>
+{% endblock %}

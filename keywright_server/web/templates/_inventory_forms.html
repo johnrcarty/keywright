@@ -1,0 +1,36 @@
+{% macro field(name, label, values, fallback='', prefix='', type='text', required=false, help='', maxlength=160) %}
+<div><label for="{{ prefix }}{{ name }}">{{ label }}</label><input id="{{ prefix }}{{ name }}" name="{{ name }}" type="{{ type }}" value="{{ values.get(name, fallback) or '' }}" maxlength="{{ maxlength }}" {{ 'required' if required }} {% if help %}aria-describedby="{{ prefix }}{{ name }}-help"{% endif %}>{% if help %}<div class="help" id="{{ prefix }}{{ name }}-help">{{ help }}</div>{% endif %}</div>
+{% endmacro %}
+{% macro interface_form(asset, item, values, assets, media) %}
+{% set prefix=(item.id if item else 'new-interface') ~ '-' %}
+<form method="post" action="/ui/inventory/interfaces" class="inventory-form">
+<input type="hidden" name="id" value="{{ item.id if item else '' }}"><input type="hidden" name="asset_id" value="{{ asset.id }}">
+{{ field('name','Interface name',values,item.name if item else '',prefix,required=true,help='For example: eth0, wlan0, or vmbr0.') }}
+<div><label for="{{ prefix }}medium">Connection type</label><select id="{{ prefix }}medium" name="medium">{% for key,label in media.items() %}<option value="{{ key }}" {{ 'selected' if values.get('medium',item.medium if item else 'unknown')==key }}>{{ label }}</option>{% endfor %}</select></div>
+{{ field('mac','MAC address (optional)',values,item.mac if item else '',prefix) }}
+<div><label for="{{ prefix }}attached">Connected to (optional)</label><select id="{{ prefix }}attached" name="attached_to_id"><option value="">Not recorded</option>{% for target in assets if target.id!=asset.id %}<option value="{{ target.id }}" {{ 'selected' if values.get('attached_to_id',item.attached_to_id if item else '')==target.id }}>{{ target.name }}</option>{% endfor %}</select><div class="help">Switch, access point, or virtual bridge host.</div></div>
+{{ field('port','Port / SSID / bridge (optional)',values,item.port if item else '',prefix) }}
+<div class="full form-actions"><button class="btn">{{ 'Save interface' if item else 'Add interface' }}</button></div>
+</form>
+{% endmacro %}
+{% macro allocation_form(subnet,item,values,interfaces,asset_map,states) %}
+{% set prefix=(item.id if item else 'new-allocation') ~ '-' %}
+<form method="post" action="/ui/inventory/allocations" class="inventory-form">
+<input type="hidden" name="id" value="{{ item.id if item else '' }}"><input type="hidden" name="subnet_id" value="{{ subnet.id }}">
+{{ field('address','IP address',values,item.address if item else '',prefix,required=true) }}
+<div><label for="{{ prefix }}state">Allocation</label><select id="{{ prefix }}state" name="state">{% for key,label in states.items() %}<option value="{{ key }}" {{ 'selected' if values.get('state',item.state if item else 'reserved')==key }}>{{ label }}</option>{% endfor %}</select></div>
+<div><label for="{{ prefix }}interface">Device / interface</label><select id="{{ prefix }}interface" name="interface_id"><option value="">No interface (reservation or plan)</option>{% for iface in interfaces %}<option value="{{ iface.id }}" {{ 'selected' if values.get('interface_id',item.interface_id if item else '')==iface.id }}>{{ asset_map[iface.asset_id].name }} / {{ iface.name }}</option>{% endfor %}</select><div class="help">Required for assigned addresses. Add interfaces on the device’s inventory page.</div></div>
+{{ field('label','Owner / purpose',values,item.label if item else '',prefix,help='Required when there is no linked interface.') }}
+<div class="full"><label for="{{ prefix }}notes">Notes</label><textarea id="{{ prefix }}notes" name="notes" maxlength="4000">{{ values.get('notes',item.notes if item else '') }}</textarea></div>
+<div class="full form-actions"><button class="btn">{{ 'Save allocation' if item else 'Add allocation' }}</button></div>
+</form>
+{% endmacro %}
+{% macro remove(kind,id,next,label='Remove record') %}
+<form method="post" action="/ui/inventory/{{ kind }}/{{ id }}/delete" onsubmit="return confirm('Remove this inventory record? This does not change the device or network configuration.')"><input type="hidden" name="next" value="{{ next }}"><button class="btn sm bad" type="submit">{{ label }}</button></form>
+{% endmacro %}
+
+{% macro device_kind(id, kinds, selected, label='Device type') %}
+<div class="device-kind" data-device-kind><label for="{{ id }}">{{ label }}</label>
+<select id="{{ id }}" name="kind">{% for key, text in kinds.items() %}<option value="{{ key }}" {{ 'selected' if key==selected }}>{{ text }}</option>{% endfor %}</select>
+</div>
+{% endmacro %}

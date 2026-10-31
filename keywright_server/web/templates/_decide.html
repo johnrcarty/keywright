@@ -1,0 +1,39 @@
+{# Scope is independent of lifetime. Broadening requires an authenticated admin decision. #}
+<form method="post" action="/ui/requests/{{ req.id }}/decide" class="decision-actions">
+<input type="hidden" name="next" value="{{ next or '/ui' }}">
+{% if not in_detail %}{% include "_hazards.html" %}{% endif %}
+{% if hazard_blocks(hazard_level(req.detail)) %}
+<input type="hidden" name="extent" value="exact">
+<button class="btn ok" name="scope" value="once">Allow once (exact operation)</button>
+<div class="decision-deny"><input type="text" name="deny_reason" placeholder="Deny reason (optional)" aria-label="Deny reason (optional)">
+<button class="btn bad" name="scope" value="deny">Deny</button></div>
+<div class="decision-scope row"><button class="btn" name="scope" value="deny_always" onclick="return confirm('Create a standing deny rule for this exact operation?')">Always deny</button><span class="help">Flagged destructive: no timed, session or standing allow is offered.</span></div>
+</form>
+{% else %}
+<div class="decision-scope">
+<label for="extent-{{ req.id }}">What to authorize</label>
+{% if binds_exactly(req.detail) %}
+<select id="extent-{{ req.id }}" name="extent">
+<option value="exact">Exact operation shown above</option>
+<option value="patterns">Listed permission patterns, including other matching arguments</option>
+</select>
+<div class="help">Exact keeps the same command, file contents or tool arguments for every duration{% if operations(req.detail)|length > 1 %}, one grant per operation shown{% endif %}. Pattern access is broader{% if req.detail.user %}; it remains bound to {{ req.detail.user }} on this target{% endif %}.</div>
+{% else %}
+<input type="hidden" name="extent" value="patterns">
+<div>Listed permission patterns, including all matching arguments.</div>
+{% endif %}
+<label>How long to allow it</label>
+</div>
+<button class="btn ok" name="scope" value="once">Allow once</button>
+<button class="btn" name="scope" value="ttl15">15 minutes</button>
+{% if path_scoped(req.detail) %}<button class="btn" name="scope" value="path15" title="Any contents at this path, for 15 minutes">This path, 15 min</button>{% endif %}
+<button class="btn" name="scope" value="ttl30">30 minutes</button>
+<button class="btn" name="scope" value="ttl">1 hour</button>
+{% if req.session_id %}<button class="btn" name="scope" value="session">This session</button>{% endif %}
+<button class="btn" name="scope" value="always" onclick="return confirm('Create a standing allow rule for the selected scope?')">Always allow</button>
+<div class="decision-scope help">{% if req.session_id %}Session access is tied to the client-supplied session ID and expires within {{ session_cap_minutes }} minutes.{% else %}No session ID was provided; use once or timed access.{% endif %} Once applies to each listed permission scope. Expiry and revocation block future calls; running operations continue.</div>
+<div class="decision-deny"><input type="text" name="deny_reason" placeholder="Deny reason (optional)" aria-label="Deny reason (optional)">
+<button class="btn bad" name="scope" value="deny">Deny</button></div>
+<div class="decision-scope row"><button class="btn" name="scope" value="deny_always" onclick="return confirm('Create a standing deny rule for the selected scope?')">Always deny</button><span class="help">Deny rejects this request and suppresses equivalent requests for 10 minutes. Always deny creates a rule.</span></div>
+</form>
+{% endif %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}{% from "_inventory_forms.html" import field, interface_form, remove, device_kind %}
+{% block title %}{{ asset.name if asset else 'Add infrastructure' }} · Keywright{% endblock %}{% block body %}
+{% include "_infrastructure_nav.html" %}
+<div class="inventory-heading"><h1>{{ asset.name if asset else 'Add device or workload' }}</h1><a class="small" href="/ui/inventory">Back to inventory</a></div>
+<p class="page-intro">{{ 'Manage hosting, interfaces, addresses, and linked resources.' if asset else 'Create the host or workload first, then add its interfaces and IP allocations.' }}</p>
+{% if asset %}<div class="inventory-facts"><span>Maintenance <b>Reviewed inventory</b></span><span>Reachability <b>Unknown · not monitored</b></span><span>Updated <b>{{ asset.updated_at.strftime('%Y-%m-%d %H:%M') }} UTC</b></span></div>
+{% if discovery_sources.get(asset.id) %}<div class="card"><h2>Discovery sources</h2>{% for source in discovery_sources[asset.id] %}<p><a href="/ui/inventory/discovery/{{ source.observation.id }}/review">{{ source.resource.name }} · {{ source.observation.data.name }}</a><span class="small mut"> · observed {{ source.observation.last_seen.strftime('%Y-%m-%d %H:%M') }} UTC · reviewed {{ source.link.reviewed_at.strftime('%Y-%m-%d %H:%M') }} UTC</span>{% if source.link.reviewed_data != source.observation.data %}<span class="pill">Needs review</span>{% endif %}</p>{% endfor %}</div>{% endif %}{% endif %}
+<div class="card"><form method="post" action="/ui/inventory/assets" class="inventory-form">
+<input type="hidden" name="id" value="{{ asset.id if asset else '' }}">
+{% if values.get('resource_id') %}<input type="hidden" name="resource_id" value="{{ values.resource_id }}"><p class="full small mut">The selected resource will be linked when this record is created.</p>{% endif %}
+{{ field('name','Name',values,asset.name if asset else '',required=true) }}
+{{ device_kind('asset-kind',kinds,values.get('kind',asset.kind if asset else 'physical'),'Device / workload type') }}
+<div><label for="asset-parent">Hosted on</label><select id="asset-parent" name="parent_id"><option value="">No parent host</option>{% for target in assets if not asset or target.id!=asset.id %}<option value="{{ target.id }}" {{ 'selected' if values.get('parent_id',asset.parent_id if asset else '')==target.id }}>{{ target.name }}</option>{% endfor %}</select><div class="help">The physical host, VM, or container running this workload.</div></div>
+{{ field('site','Site / location',values,asset.site if asset else '') }}
+<div class="full">{{ field('tags','Tags (comma separated)',values,asset.tags if asset else '',maxlength=500) }}</div>
+<div class="full"><label for="asset-notes">Notes</label><textarea id="asset-notes" name="notes" maxlength="4000">{{ values.get('notes',asset.notes if asset else '') }}</textarea></div>
+<div class="full form-actions"><button class="btn p">{{ 'Save record' if asset else 'Create record' }}</button></div>
+</form></div>
+{% if asset %}
+{% set back='/ui/inventory/assets/' ~ asset.id %}
+{% if children %}<h2>Hosted workloads</h2><div class="card row">{% for child in children %}<a href="/ui/inventory/assets/{{ child.id }}">{{ child.name }}</a>{% endfor %}<a class="small" href="/ui/inventory/topology">View topology</a></div>{% endif %}
+<section class="inventory-section"><div class="inventory-heading"><h2>Network interfaces</h2></div>
+<div class="card">
+{% for iface in asset_interfaces %}<details class="inventory-editor" {{ 'open' if interface_values and interface_values.get('id')==iface.id }}><summary><b>{{ iface.name }}</b> <span class="mut">· {{ media[iface.medium] }}{% if iface.attached_to_id %} · {{ asset_map[iface.attached_to_id].name }}{% endif %}{% if iface.port %} · {{ iface.port }}{% endif %}</span></summary>
+{{ interface_form(asset,iface,interface_values if interface_values and interface_values.get('id')==iface.id else {},assets,media) }}
+<div class="inventory-delete">{{ remove('interface',iface.id,back,'Remove interface') }}</div></details>
+{% else %}<p class="mut">No interfaces recorded. Add one to assign this device an IP address.</p>{% endfor %}
+<details class="inventory-editor" {{ 'open' if not asset_interfaces or (interface_values and not interface_values.get('id')) }}><summary>Add interface</summary>{{ interface_form(asset,none,interface_values if interface_values and not interface_values.get('id') else {},assets,media) }}</details>
+</div></section>
+<section class="inventory-section"><div class="inventory-heading"><h2>IP allocations</h2><a class="btn sm" href="/ui/inventory/networks">Manage subnets &amp; allocations</a></div>
+<div class="card">{% if asset_allocations %}<table class="data-table" role="table"><thead><tr><th>Address</th><th>Network</th><th>Interface</th><th>Allocation</th></tr></thead><tbody>
+{% for allocation in asset_allocations %}<tr><td data-label="Address" class="mono"><a href="/ui/inventory/networks/{{ allocation.subnet_id }}">{{ allocation.address }}</a></td><td data-label="Network">{{ subnet_map[allocation.subnet_id].name }}</td><td data-label="Interface">{{ interface_map[allocation.interface_id].name }}</td><td data-label="Allocation">{{ states[allocation.state] }}</td></tr>{% endfor %}
+</tbody></table>{% else %}<p class="mut">No addresses recorded. Open a subnet to reserve or assign an IP to an interface.</p>{% endif %}</div></section>
+<section class="inventory-section"><h2>Linked resources</h2><div class="card">
+{% for resource in asset_resources %}<div class="row access-heading"><a href="/ui/resources/{{ resource.id }}">{{ resource.name }}</a><span class="pill">{{ resource.kind|upper }}</span>{{ remove('link',resource.id,back,'Unlink') }}</div>{% else %}<p class="mut">No resources linked. Inventory records do not grant agent access.</p>{% endfor %}
+{% if unlinked_resources %}<form method="post" action="/ui/inventory/links" class="row"><input type="hidden" name="asset_id" value="{{ asset.id }}"><div style="flex:1"><label for="link-resource">Existing resource</label><select id="link-resource" name="resource_id" required>{% for resource in unlinked_resources %}<option value="{{ resource.id }}">{{ resource.name }} ({{ resource.kind|upper }})</option>{% endfor %}</select></div><button class="btn" style="align-self:end">Link resource</button></form>{% endif %}
+</div></section>
+<div class="inventory-delete">{{ remove('asset',asset.id,back,'Remove from inventory') }}<p class="help">Remove or reassign interfaces, child workloads, and resource links first. This does not delete the actual device.</p></div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}{% include "_device_kind_picker.html" %}{% endblock %}

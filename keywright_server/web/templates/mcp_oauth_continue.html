@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Sign in · Keywright{% endblock %}
+{% block body %}
+<div class="card">
+<h1>Opening sign-in</h1>
+<p>Continue to connect {{ resource_name }}.</p>
+<p><a id="oauth-continue" class="btn p" href="{{ authorization_url }}" rel="noreferrer">Continue to sign in</a></p>
+<p class="help">If sign-in does not open automatically, use the button above.</p>
+<p><a href="/ui/resources/{{ resource_id }}">Back to resource</a></p>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>window.location.replace(document.getElementById('oauth-continue').href);</script>
+{% endblock %}

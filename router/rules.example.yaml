@@ -1,0 +1,79 @@
+# Keywright router rules. Copy to ./rules.yaml on the VM.
+# Check with: keywright-router check --config ./rules.yaml
+# Preview: keywright-router dry-run --config ./rules.yaml
+#
+# Every call below is made with the router's own Keywright token, so Keywright's rules for the
+# agent `mail-router` decide what actually happens: a call it may not make without asking puts
+# a prompt on the phone, and the message waits for the answer (up to pending_hours).
+
+keywright:
+  url: http://keywright:8700        # stack-internal; KW_URL overrides. The token is KW_TOKEN, env only.
+
+email:
+  server: email                     # the Keywright MCP resource that fronts mcp-email-server
+  account: agents                   # account_name inside mcp-email-server
+  mailbox: INBOX
+  poll_seconds: 60
+  done_folder: Routed               # handled mail is marked read and filed here; omit to leave it in place
+
+llm:                                # only called when a rule reaches a `label` test or an `llm:` draft
+  gateway: litellm                  # the Keywright LLM gateway resource name
+  model: deepseek-chat
+  labels: [question, notification, invoice, spam]   # "unclear" is always added
+
+pending_hours: 6                    # give up on a step nobody approved after this long
+
+# Rules run top to bottom; every matching rule's actions run, until a rule with `stop: true`.
+# Conditions: from / to (address globs), subject / body (substring), subject_matches /
+# body_matches (regex), has_attachment, label; combine with all / any / not.
+# Actions: reply {text|llm}, send {to, subject, text|llm}, forward {to, note}, mcp {tool, args},
+#          attention "message", move "Folder", mark_read.
+# Templates: {{from}} {{to}} {{subject}} {{date}} {{body}} {{label}} {{email_id}} {{rule}}.
+# Addresses in send/forward `to` and mcp tool names are literals: mail never picks them.
+rules:
+  - name: spam
+    when: {label: spam}
+    do:
+      - move: Junk
+    stop: true
+
+  - name: notifications
+    when:
+      any:
+        - from: ["*@github.com", "*@notifications.*"]
+        - label: notification
+    do:
+      - move: Notifications
+    stop: true
+
+  - name: questions-for-owner
+    when:
+      all:
+        - label: question
+        - not: {from: "*@home.example"}
+    do:
+      - attention: "agents@ got a question from {{from}}: {{subject}}"
+      # Drafted by the model and sent to the sender; Keywright asks before it goes unless the
+      # recipient is allowed for mail-router, so leave it commented until the rules are trusted.
+      # - reply: {llm: "Acknowledge the question briefly and say the owner will follow up."}
+
+  - name: invoices
+    when:
+      all:
+        - label: invoice
+        - has_attachment: true
+    do:
+      - forward: {to: owner@home.example, note: "Invoice routed by the mail router ({{rule}})."}
+
+  # Example of acting outside mail: a Home Assistant call through the brokered ha-mcp server.
+  # Tool names are the brokered form <server>__<tool>; list them with `kw tools`.
+  # - name: garage-from-owner
+  #   when:
+  #     all:
+  #       - from: owner@home.example
+  #       - subject_matches: "(?i)^close garage$"
+  #   do:
+  #     - mcp: {tool: "ha-mcp__ha_call_service", args: {domain: cover, service: close_cover, entity_id: cover.garage}}
+
+# Actions for mail no rule claimed. Empty: such mail is left unread in the inbox.
+unmatched: []

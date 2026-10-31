@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Mail · Keywright{% endblock %}
+{% block body %}
+{% include '_mail_style.html' %}
+<div class="mail-heading"><div><h1>Mail</h1><p class="mut">{{ cfg.account }} · {{ cfg.mailbox }}{% if cfg.last_sync %} · Last sync {{ cfg.last_sync[:16]|replace('T',' ') }} UTC{% endif %}</p></div><form method="post" action="/ui/mail/sync"><button class="btn">Refresh inbox</button></form></div>
+{% include '_mail_nav.html' %}
+{% if not cfg.resource %}<div class="card">Connect your mailbox to browse messages and run rules. <a href="/ui/mail/settings">Set up connection</a></div>{% endif %}
+{% if cfg.sync_error %}<div class="err" role="alert">{{ cfg.sync_error }} <a href="/ui/requests">View access requests</a></div>{% endif %}
+{% if not cfg.enabled %}<p class="mut">Automatic processing is paused. You can refresh the inbox and run rules on individual messages.</p>{% endif %}
+<div class="mail-shell {{ 'has-selection' if message }}">
+<aside class="mail-rail" aria-label="Message filters">
+<a href="/ui/mail" class="{{ 'active' if not status and view != 'history' }}">Inbox <span class="mail-count">{{ counts.values()|sum }}</span></a>
+<a href="/ui/mail?view=history" class="{{ 'active' if view == 'history' }}">All indexed mail</a>
+<h2>Processing</h2>
+{% for key in ['unprocessed','pending','done','failed'] %}<a href="/ui/mail?status={{ key }}" class="{{ 'active' if status == key }}">{{ statuses[key] }} <span class="mail-count">{{ counts.get(key,0) }}</span></a>{% endfor %}
+</aside>
+<section class="mail-list" aria-label="Messages">
+<form class="mail-search" method="get"><input type="hidden" name="status" value="{{ status }}"><input type="hidden" name="view" value="{{ view }}"><input name="q" value="{{ q }}" aria-label="Search sender or subject" placeholder="Search mail"><button class="btn sm">Search</button></form>
+{% for row in messages %}
+<a class="mail-message {{ 'selected' if selected == row.id }}" href="/ui/mail?selected={{ row.id }}&amp;status={{ status }}&amp;q={{ q|urlencode }}&amp;view={{ view }}&amp;page={{ page }}">
+<span class="mail-sender">{{ row.sender }}</span><span class="mail-subject">{{ row.subject or '(No subject)' }}</span>
+<span class="mail-meta"><span class="pill mail-status-{{ row.status }}">{{ statuses.get(row.status,row.status) }}</span>{% if row.attachments %}<span>{{ row.attachments|length }} attachment{{ 's' if row.attachments|length != 1 }}</span>{% endif %}<time>{{ row.date[:10] }}</time></span>
+</a>
+{% else %}<div class="mail-empty"><strong>No messages here</strong>{{ 'Try another search or filter.' if q or status else 'Refresh to load your inbox.' }}</div>{% endfor %}
+<div class="row mail-page"><span class="mut">{{ total }} messages · {{ page }}/{{ pages }}</span><span>{% if page > 1 %}<a href="?page={{ page-1 }}&amp;status={{ status }}&amp;q={{ q|urlencode }}&amp;view={{ view }}">Previous</a>{% endif %} {% if page < pages %}<a href="?page={{ page+1 }}&amp;status={{ status }}&amp;q={{ q|urlencode }}&amp;view={{ view }}">Next</a>{% endif %}</span></div>
+</section>
+<section class="mail-reader" aria-label="Message details">
+{% if message %}
+<a class="btn mail-reader-back" href="/ui/mail?status={{ status }}&amp;q={{ q|urlencode }}&amp;view={{ view }}&amp;page={{ page }}">Back to messages</a>
+<h2>{{ message.subject or '(No subject)' }}</h2><span class="pill mail-status-{{ message.status }}">{{ statuses.get(message.status,message.status) }}</span>
+{% if not message.present %}<span class="pill">No longer in {{ cfg.mailbox }}</span>{% endif %}
+<dl><dt>From</dt><dd>{{ message.sender }}</dd><dt>To</dt><dd>{{ message.recipients|join(', ') }}</dd><dt>Date</dt><dd>{{ message.date }}</dd></dl>
+<div class="mail-result">
+{% if message.plan %}<strong>{{ message.plan.name }}</strong>{% else %}<strong>Processing status</strong>{% endif %}
+<p>{{ message.note or 'No rule has been run on this message.' }}</p>
+{% for filename, receipt in message.receipts.items() %}{% if receipt is mapping %}<p><span class="pill ok">Delivered</span> {{ filename }} · Budget document #{{ receipt.id }}</p>{% endif %}{% endfor %}
+{% if message.request_id %}<p><a href="/ui/requests/{{ message.request_id }}">View approval request</a></p>{% endif %}
+{% if message.status != 'done' %}<form method="post" action="/ui/mail/{{ message.id }}/run"><button class="btn {{ 'p' if message.status == 'failed' }}">{{ 'Retry' if message.status == 'failed' else 'Check approval' if message.status == 'pending' else 'Run rules' }}</button></form>{% endif %}
+</div>
+{% if message.attachments %}<div class="mail-attachments"><strong>Attachments</strong>{% for name in message.attachments %}<div class="mail-attachment"><span>{{ name }}</span>{% if name.lower().endswith('.pdf') %}<a class="btn sm" href="/ui/mail/{{ message.id }}/attachment?name={{ name|urlencode }}">Download PDF</a>{% endif %}</div>{% endfor %}</div>{% endif %}
+<pre class="mail-body">{{ message.body if message.body is not none else 'Message body is unavailable. Check access permissions and refresh.' }}</pre>
+{% else %}<div class="mail-empty"><strong>Your inbox, with a delivery trail</strong>Select a message to read it, view attachments, and check what its rules have done.</div>{% endif %}
+</section>
+</div>
+{% endblock %}

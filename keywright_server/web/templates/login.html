@@ -1,0 +1,9 @@
+{% extends "base.html" %}{% set hide_nav = True %}{% block title %}Keywright login{% endblock %}{% block body %}
+<div class="card auth-card"><h1 class="brand">{{ icon('shield') }}Keywright</h1><p class="mut small">Sign in to the administration console.</p>
+{% if logged_out and oidc_enabled %}<p class="small">Signed out of Keywright. Your Authentik session may still be active.</p>{% endif %}
+{% if oidc_enabled %}<p><a class="btn p" href="/ui/oidc/login?next={{ next|urlencode }}">Sign in with Authentik</a></p>{% endif %}
+{% if password_enabled %}<form method="post" action="/ui/login"><input type="hidden" name="next" value="{{ next }}">
+<input type="text" name="username" value="admin" autocomplete="username" hidden>
+<label for="admin-password">Admin password</label><input id="admin-password" type="password" name="password" autocomplete="current-password" autofocus required>
+<div style="margin-top:12px"><button class="btn p">Log in</button></div></form>{% endif %}</div>
+{% endblock %}

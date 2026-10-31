@@ -1,0 +1,22 @@
+{% extends "base.html" %}{% block title %}Hosting topology · Keywright{% endblock %}{% block body %}
+{% include "_infrastructure_nav.html" %}
+<div class="inventory-heading"><h1>Hosting topology</h1><a class="btn" href="/ui/inventory/assets/new">Add device or workload</a></div>
+<p class="page-intro">Physical hosts, their virtual machines, containers, and services. Select a record to manage its connections and addresses.</p>
+{% if tree %}<div class="row" style="margin-bottom:12px"><button class="btn sm" id="expand-tree" type="button" hidden>Expand all</button><button class="btn sm" id="collapse-tree" type="button" hidden>Collapse all</button></div>
+<div class="inventory-tree" aria-label="Hosting relationships">
+{% for node in tree %}<div class="tree-row" id="tree-{{ node.asset.id }}" data-node="{{ node.asset.id }}" data-ancestors="{{ node.ancestors|join(' ') }}" style="--depth:{{ node.depth }}">
+<div class="tree-name">{% if node.children %}<button type="button" class="tree-toggle" aria-expanded="true" aria-label="Toggle workloads on {{ node.asset.name }}" hidden>−</button>{% else %}<span class="tree-spacer"></span>{% endif %}<a href="/ui/inventory/assets/{{ node.asset.id }}"><b>{{ node.asset.name }}</b></a></div>
+<span class="tree-meta">{{ kinds[node.asset.kind] }}</span><span class="tree-meta">{{ node.asset.site or 'No site recorded' }}</span>
+</div>{% endfor %}</div>
+{% else %}<div class="card collection-empty"><h2>No hosting relationships yet</h2><p class="mut">Add a host, then choose it in the “Hosted on” field of a VM, container, or service.</p><a class="btn" href="/ui/inventory/assets/new">Add a host</a></div>{% endif %}
+<div class="inventory-note">This view shows hosting relationships. Wired, Wi-Fi, and virtual connections are recorded on each device’s interfaces.</div>
+{% endblock %}
+{% block scripts %}<script>
+(function(){
+ const rows=Array.from(document.querySelectorAll('[data-node]'));
+ const closed=new Set();
+ function update(){rows.forEach(row=>{row.hidden=row.dataset.ancestors.split(' ').some(id=>closed.has(id)); const b=row.querySelector('button');if(b){b.setAttribute('aria-expanded',String(!closed.has(row.dataset.node)));b.textContent=closed.has(row.dataset.node)?'+':'−';}});}
+ rows.forEach(row=>{const b=row.querySelector('button');if(b){b.hidden=false;b.addEventListener('click',()=>{const id=row.dataset.node;closed.has(id)?closed.delete(id):closed.add(id);update();});}});
+ ['expand','collapse'].forEach(action=>{const b=document.getElementById(action+'-tree');if(!b)return;b.hidden=false;b.addEventListener('click',()=>{closed.clear();if(action==='collapse')rows.filter(r=>r.querySelector('button')).forEach(r=>closed.add(r.dataset.node));update();});});
+})();
+</script>{% endblock %}

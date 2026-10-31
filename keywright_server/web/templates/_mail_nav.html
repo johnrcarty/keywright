@@ -1,0 +1,5 @@
+<div class="row mail-tabs" aria-label="Mail navigation">
+<a class="btn {{ 'p' if request.url.path == '/ui/mail' }}" href="/ui/mail">Inbox</a>
+<a class="btn {{ 'p' if request.url.path == '/ui/mail/rules' }}" href="/ui/mail/rules">Email rules</a>
+<a class="btn {{ 'p' if request.url.path == '/ui/mail/settings' }}" href="/ui/mail/settings">Connection</a>
+</div>

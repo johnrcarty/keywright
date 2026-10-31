@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}LLM usage · Keywright{% endblock %}
+{% macro number(value) %}{{ '{:,}'.format(value) }}{% endmacro %}
+{% macro counts(t) %}
+<td data-label="Requests">{{ number(t.requests) }}</td>
+<td data-label="Input">{{ number(t.input) }}</td>
+<td data-label="Output">{{ number(t.output) }}</td>
+<td data-label="Total tokens">{{ number(t.total) }}</td>
+<td data-label="Coverage">{{ number(t.reported) }}/{{ number(t.requests) }} reported{% if t.partial %}<div class="help">{{ t.partial }} partial</div>{% endif %}</td>
+<td data-label="Errors">{{ number(t.errors) }}</td>
+{% endmacro %}
+{% macro headings(first) %}<thead><tr><th>{{ first }}</th><th>Requests</th><th>Input</th><th>Output</th><th>Total tokens</th><th>Coverage</th><th>Errors</th></tr></thead>{% endmacro %}
+{% block body %}
+<h1>LLM usage</h1>
+<p class="page-intro">Track model activity across providers and see which agents and gateway keys drive it.</p>
+<form method="get" action="/ui/usage" class="card">
+  <div class="grid">
+    <div><label for="usage-start">From (UTC)</label><input id="usage-start" type="date" name="start" value="{{ filters.start }}" required></div>
+    <div><label for="usage-end">Through (UTC)</label><input id="usage-end" type="date" name="end" value="{{ filters.end }}" required></div>
+    {% for dimension, label in [('provider', 'Provider / gateway'), ('model', 'Model'), ('agent', 'Agent'), ('key', 'Gateway key')] %}
+    <div><label for="usage-{{ dimension }}">{{ label }}</label><select id="usage-{{ dimension }}" name="{{ dimension }}">
+      <option value="">All {{ {'provider': 'providers / gateways', 'model': 'models', 'agent': 'agents', 'key': 'gateway keys'}[dimension] }}</option>
+      {% for value, name in options[dimension] %}<option value="{{ value }}" {{ 'selected' if filters[dimension] == value }}>{{ name }}</option>{% endfor %}
+      {% if filters[dimension] and filters[dimension] not in dict(options[dimension]) %}<option value="{{ filters[dimension] }}" selected>Selected {{ label | lower }} (no usage in this period)</option>{% endif %}
+    </select></div>
+    {% endfor %}
+  </div>
+  <div class="row"><button class="btn p">Apply filters</button><a class="btn" href="/ui/usage">Reset</a><span class="mut">Dates are inclusive. Ranked by reported tokens, then requests.</span></div>
+</form>
+<div class="grid stats">
+  <div class="card"><div class="mut">Requests</div><div class="stat">{{ number(totals.requests) }}</div><div class="help">{{ totals.errors }} errors</div></div>
+  <div class="card"><div class="mut">Reported tokens</div><div class="stat">{{ number(totals.total) }}</div><div class="help">{{ number(totals.input) }} input · {{ number(totals.output) }} output</div></div>
+  <div class="card"><div class="mut">Provider / gateways</div><div class="stat">{{ providers | length }}</div><div class="help">{{ models | length }} model names</div></div>
+  <div class="card"><div class="mut">Requests with usage</div><div class="stat">{{ totals.reported }} / {{ totals.requests }}</div><div class="help">{{ totals.unreported }} unreported · {{ totals.partial }} partial</div></div>
+</div>
+<p class="help">Usage observed by the Keywright proxy, including failed upstream attempts. Denied requests and model listings are excluded. Missing usage is unknown, not zero; totals include only reported counts. Input includes cache reads and writes. Older streams, compressed responses, and streams without usage may be unreported. Direct provider calls and provider billing costs are not included.</p>
+{% if totals.requests %}
+<h2>Providers → models</h2>
+<p class="mut">Each provider is a configured gateway. The same model stays separate under each gateway.</p>
+{% for p in providers %}
+<details class="card usage-provider" {{ 'open' if filters.provider or providers | length == 1 }}>
+  <summary><strong>{{ p.name }}</strong><span>{{ number(p.totals.total) }} tokens · {{ number(p.totals.requests) }} requests</span></summary>
+  <p><a href="{{ usage_url(provider=p.id, key='') }}">Focus on {{ p.name }}</a></p>
+  <table class="data-table">{{ headings('Model') }}<tbody>
+    {% for m in p.models.values() | sort(attribute='totals.total', reverse=true) %}
+    <tr><td data-label="Model" class="wide"><a href="{{ usage_url(provider=p.id, model=m.name, key='') }}">{{ m.name }}</a></td>{{ counts(m.totals) }}</tr>
+    {% endfor %}
+  </tbody></table>
+</details>
+{% endfor %}
+<h2>Models across selected providers</h2>
+<div class="card"><table class="data-table">{{ headings('Model') }}<tbody>
+{% for name, t in models %}<tr><td data-label="Model" class="wide"><a href="{{ usage_url(model=name, key='') }}">{{ name }}</a></td>{{ counts(t) }}</tr>{% endfor %}
+</tbody></table></div>
+<h2>Keys driving usage</h2>
+<div class="card"><table class="data-table">{{ headings('Gateway key / agent') }}<tbody>
+{% for k in keys %}<tr><td data-label="Gateway key / agent" class="wide">
+  <a href="{{ usage_url(key=k.id) }}">{{ k.alias }}</a><div>{{ k.agent }} · {{ k.provider }}</div>
+  <div class="help">{{ k.models | sort | join(', ') }}</div>{% if not k.key_id.startswith('legacy:') %}<div class="help">{{ k.key_id }}</div>{% endif %}
+</td>{{ counts(k.totals) }}</tr>{% endfor %}
+</tbody></table></div>
+<h2>Daily usage (UTC)</h2>
+<div class="card"><table class="data-table">{{ headings('Date') }}<tbody>
+{% for day, t in days | reverse %}<tr><td data-label="Date"><a href="{{ usage_url(start=day, end=day) }}">{{ day }}</a></td>{{ counts(t) }}</tr>{% endfor %}
+</tbody></table></div>
+<details class="card"><summary>Recent requests · latest {{ recent | length }} matching calls</summary>
+<table class="data-table"><thead><tr><th>Time (UTC)</th><th>Provider / model</th><th>Agent / key</th><th>Tokens</th><th>Result</th></tr></thead><tbody>
+{% for event in recent %}<tr>
+  <td data-label="Time (UTC)"><a href="/ui/audit?q=%23{{ event.id }}">{{ event.ts.strftime('%Y-%m-%d %H:%M:%S') }}</a></td>
+  <td data-label="Provider / model">{{ event.provider }}<div>{{ event.model }}</div></td>
+  <td data-label="Agent / key">{{ event.agent }}<div class="help">{{ event.alias }}</div></td>
+  <td data-label="Tokens">{{ number(event.total) if event.total is not none else 'Unreported' }}</td>
+  <td data-label="Result"><span class="pill {{ event.decision }}">{{ event.decision }}</span></td>
+</tr>{% endfor %}</tbody></table></details>
+{% else %}
+<div class="card"><h2>No usage in this selection</h2><p>Try a wider date range or clear the filters. Model calls through Keywright will appear here after their responses finish.</p></div>
+{% endif %}
+<style>
+.usage-provider>summary{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;cursor:pointer;min-height:36px;align-items:center}
+.usage-provider>summary strong::before{content:'▸';display:inline-block;margin-right:8px}.usage-provider[open]>summary strong::before{content:'▾'}
+input[type=date]{width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:var(--r);background:var(--bg);color:var(--fg);font:inherit}
+@media(max-width:900px){input[type=date]{font-size:16px}}
+</style>
+{% endblock %}

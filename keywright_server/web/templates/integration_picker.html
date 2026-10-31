@@ -1,0 +1,47 @@
+{% extends "base.html" %}{% from "_icons.html" import icon %}
+{% block title %}Add a resource · Keywright{% endblock %}
+{% block body %}
+{% include "_integration_style.html" %}
+<div class="integration-page">
+<a class="integration-back" href="/ui/resources">{{ icon('chevron') }} Resources</a>
+<div class="integration-heading"><div><h1>Add a resource</h1><p>Choose an integration. We'll guide you through the connection.</p></div></div>
+<form class="integration-search" method="get" action="/ui/resources/new" role="search">
+{{ icon('search') }}<input type="search" name="q" id="integration-search" value="{{ query }}" placeholder="Search integrations…" aria-label="Search integrations" autocomplete="off">
+<noscript><button class="btn">Search</button></noscript>
+</form>
+{% for title, entries, custom in [('Integrations', presets, false), ('Custom connections', generics, true)] %}
+<section class="integration-group {{ 'integration-custom' if custom else '' }}" aria-label="{{ title }}" {% if not entries | selectattr('matches') | list %}hidden{% endif %}>
+<h2>{{ title }}</h2>
+<div class="integration-list">
+{% for entry in entries %}{% set item = entry.item %}
+<a class="integration-choice" data-integration data-search="{{ item.search_text }}" href="/ui/resources/new?{{ 'kind=' ~ item.kind if custom else 'integration=' ~ item.id }}" {% if not entry.matches %}hidden{% endif %}>
+<span class="integration-mark {{ item.icon }}">{% if item.icon == 'notion' %}N{% else %}{{ icon(item.icon) }}{% endif %}</span>
+<div class="integration-copy"><strong>{{ item.title }}</strong><p>{{ item.description }}</p></div>
+<span class="integration-method">{{ item.badge }}</span><span class="integration-arrow">{{ icon('chevron') }}</span>
+</a>
+{% endfor %}
+</div>
+</section>
+{% endfor %}
+<div class="integration-empty" id="integration-empty" {% if matches %}hidden{% endif %}><h2>No matching integrations</h2><p>Try a different name, or use a custom connection.</p><a class="btn" href="/ui/resources/new">Show all connections</a></div>
+<p class="integration-count" id="integration-count" role="status" aria-live="polite">{{ matches }} connection{{ '' if matches == 1 else 's' }} available</p>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+(function () {
+  var search = document.getElementById('integration-search');
+  var items = Array.from(document.querySelectorAll('[data-integration]'));
+  function filter() {
+    var terms = search.value.toLowerCase().trim().split(/\s+/).filter(Boolean);
+    var count = 0;
+    items.forEach(function (item) { item.hidden = !terms.every(function (term) { return item.dataset.search.includes(term); }); if (!item.hidden) count++; });
+    document.querySelectorAll('.integration-group').forEach(function (group) { group.hidden = !Array.from(group.querySelectorAll('[data-integration]')).some(function (item) { return !item.hidden; }); });
+    document.getElementById('integration-empty').hidden = count !== 0;
+    document.getElementById('integration-count').textContent = count + ' connection' + (count === 1 ? '' : 's') + ' available';
+  }
+  search.addEventListener('input', filter);
+  search.form.addEventListener('submit', function (event) { event.preventDefault(); filter(); });
+})();
+</script>
+{% endblock %}

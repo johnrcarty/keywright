@@ -1,0 +1,50 @@
+<section class="card connection-guide" aria-labelledby="connect-heading">
+<h2 id="connect-heading" style="margin-top:0">Connect an agent</h2>
+<p class="small mut">Run these commands on the machine where your agent runs.{% if not new_token %} Replace <code>kw_YOUR_AGENT_TOKEN</code> with your saved token.{% endif %}</p>
+<details {% if new_token %}open{% endif %}>
+<summary>Any agent: the <code>kw</code> command (recommended)</summary>
+<p class="small">Works from any shell, waits out phone approvals, and scopes "this session" approvals per conversation. Install the client, store the token, set the agent up:</p>
+<pre>pipx install keywright
+kw login {{ mcp_url | shellquote }} --paste   # then paste the token on its own line
+kw setup claude-code      # or: kw setup codex
+kw setup check</pre>
+<p class="small mut">Agents then run <code>kw resources</code>, <code>kw run &lt;host&gt; -r "why" -- &lt;command&gt;</code>, <code>kw put</code>, <code>kw get</code> and <code>kw tool</code>. <code>kw guide</code> prints the full agent guide.</p>
+</details>
+<details>
+<summary>Codex over MCP</summary>
+<p class="small">Export the token, then register Keywright:</p>
+<pre>export KEYWRIGHT_TOKEN={{ (new_token or 'kw_YOUR_AGENT_TOKEN') | shellquote }}
+codex mcp add keywright \
+  --url {{ mcp_url | shellquote }} \
+  --bearer-token-env-var KEYWRIGHT_TOKEN</pre>
+<p class="small">In <code>~/.codex/config.toml</code>, set <code>tool_timeout_sec = 180</code> in the Keywright section to leave time for phone approvals. The section should look like this:</p>
+<pre>[mcp_servers.keywright]
+url = {{ mcp_url | tojson }}
+bearer_token_env_var = "KEYWRIGHT_TOKEN"
+tool_timeout_sec = 180</pre>
+<p class="small mut">Start Codex from the shell where <code>KEYWRIGHT_TOKEN</code> is exported. Set it again in new shells, or supply it through your environment manager. For the IDE extension, the variable must be available to the IDE process. Use <code>/mcp</code> in Codex to check the connection.</p>
+<p class="small"><a href="https://developers.openai.com/codex/mcp/" target="_blank" rel="noreferrer">Codex MCP documentation ↗</a></p>
+</details>
+<details>
+<summary>Claude Code over MCP</summary>
+<pre>claude mcp add --transport http keywright \
+  {{ mcp_url | shellquote }} \
+  --header {{ ('Authorization: Bearer ' ~ (new_token or 'kw_YOUR_AGENT_TOKEN')) | shellquote }}</pre>
+</details>
+{% if gateways %}
+<details>
+<summary>LLM calls through Keywright <span class="small mut">(no provider key on the agent's machine)</span></summary>
+<p class="small">Point the SDK or the agent at a gateway with the same token; every call names a model, and the model is what you approve. <code>kw llm &lt;gateway&gt;</code> prints these lines from a stored profile.</p>
+{% for g in gateways %}<pre># {{ g.name }}: {{ (g.config.models or []) | join(', ') or 'no models listed yet' }}
+export ANTHROPIC_BASE_URL={{ (public_url ~ '/llm/' ~ g.name) | shellquote }}
+export ANTHROPIC_AUTH_TOKEN={{ (new_token or 'kw_YOUR_AGENT_TOKEN') | shellquote }}
+export OPENAI_BASE_URL={{ (public_url ~ '/llm/' ~ g.name ~ '/v1') | shellquote }}
+export OPENAI_API_KEY={{ (new_token or 'kw_YOUR_AGENT_TOKEN') | shellquote }}</pre>{% endfor %}
+<p class="small mut">Unset the real <code>ANTHROPIC_API_KEY</code> / <code>OPENAI_API_KEY</code> there, and rotate them: a key that was ever on the agent's machine is spent.</p>
+</details>
+{% endif %}
+<details>
+<summary>Other MCP clients</summary>
+<p class="small">Use streamable HTTP at <code>{{ mcp_url }}</code> with an <code>Authorization: Bearer &lt;agent token&gt;</code> header.</p>
+</details>
+</section>

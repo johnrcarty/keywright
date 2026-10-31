@@ -1,0 +1,10 @@
+{# Everything waiting on the human. The websocket replaces pieces of this by id, and replaces the
+   whole thing after a reconnect, so every id here has to stay stable. #}
+<h2 id="nudges-heading"{% if not nudges %} hidden{% endif %}>Needs you
+<span class="pill pending" data-count="nudges">{{ nudges|length }}</span></h2>
+<div id="nudge-list">{% for n in nudges %}{% include "_nudge_card.html" %}{% endfor %}</div>
+
+<h2>Pending requests <span class="pill" data-count="pending">{{ pending|length }}</span>
+<span class="live-state" id="live-state" hidden></span></h2>
+<div id="pending-list">{% for req in pending %}{% include "_request_card.html" %}{% endfor %}</div>
+<div class="card mut" id="pending-empty"{% if pending %} hidden{% endif %}>Nothing waiting.</div>

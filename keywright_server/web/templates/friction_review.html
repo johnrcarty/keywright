@@ -1,0 +1,21 @@
+{% extends "base.html" %}{% block title %}Review exact-operation rule{% endblock %}{% block body %}
+<h1>Review exact-operation suggestion</h1>
+<p class="page-intro"><a href="{{ back }}">Back to approval friction</a></p>
+<section class="card">
+<h2>{{ proposal.agent }} · {{ proposal.resource }} · {{ proposal.tool }}</h2>
+<p>This proposes {{ rule_count }} standing allow rule(s) for <b>only this agent and the exact recorded operation</b>, including its target identity, SSH account, command, file digest or all MCP arguments as applicable. The duration becomes permanent until revoked; the operation scope stays exact.</p>
+<p><b>Review the operation before saving:</b> <a href="/ui/requests/{{ proposal.request_id }}" target="_blank" rel="noopener">Open the original approval</a>. Commands and arguments are kept on that existing detail page.</p>
+<p>{{ proposal.support }} matching human approvals in the selected report. Supporting requests:</p>
+<div class="row small">{% for id in proposal.examples %}<a href="/ui/requests/{{ id }}" target="_blank" rel="noopener">{{ id }}</a>{% endfor %}</div>
+<p class="small">This is an estimate of historical requests covered, not guaranteed future prompts avoided. Deny rules and destructive-operation checks remain authoritative. Access settings and evidence are checked again when saving.</p>
+</section>
+<section class="card" aria-labelledby="preview-title">
+<h2 id="preview-title">Rule preview · not saved</h2>
+{% include "_policy_preview_results.html" %}
+</section>
+<form method="post" class="card">
+<input type="hidden" name="token" value="{{ token }}">
+<p>Save only after reviewing the original operation and this preview. This review expires in 10 minutes.</p>
+<button class="btn p">Save exact-operation rule(s)</button> <a class="btn" href="{{ back }}">Cancel</a>
+</form>
+{% endblock %}

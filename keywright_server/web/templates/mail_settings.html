@@ -1,0 +1,19 @@
+{% extends 'base.html' %}{% block title %}Mail connection · Keywright{% endblock %}
+{% block body %}{% include '_mail_style.html' %}<h1>Mail connection</h1><p class="page-intro">Connect the agents mailbox and its PDF delivery destination.</p>{% include '_mail_nav.html' %}
+<form class="card mail-config" method="post">
+<h2>Mailbox</h2><div class="grid">
+<label>Email resource<select name="resource" required><option value="">Choose resource</option>{% for res in resources %}<option value="{{ res.id }}" {{ 'selected' if cfg.resource == res.id }}>{{ res.name }}</option>{% endfor %}</select></label>
+<label>Agent for mailbox access<select name="agent" required><option value="">Choose agent</option>{% for agent in agents %}<option value="{{ agent.id }}" {{ 'selected' if cfg.agent == agent.id }}>{{ agent.name }}</option>{% endfor %}</select></label>
+<label>Account name<input name="account" value="{{ cfg.account }}" required maxlength="200"></label>
+<label>Mailbox folder<input name="mailbox" value="{{ cfg.mailbox }}" required maxlength="200"></label>
+</div><p class="help">Mailbox operations use this agent’s existing Keywright permissions. Reading a message here does not mark it read.</p>
+<h2>Budget delivery</h2>
+<label>Budget server URL<input type="url" name="budget_url" placeholder="http://budget-server:8099" value="{{ cfg.budget_url or '' }}"></label>
+<label>Document delivery token<input type="password" name="budget_token" autocomplete="new-password" placeholder="{{ 'Saved — leave blank to keep' if cfg.budget_token else 'ba_docs_…' }}"></label>
+<p class="help">Create this token in Budget → Settings → Document inbox. PDFs are stored as received. Each attachment can be up to 5 MiB.</p>
+<h2>Automatic processing</h2>
+<label class="inline"><input type="checkbox" name="enabled" {{ 'checked' if cfg.enabled }}> Refresh and run email rules every minute</label>
+<p class="help">The first sync only loads your inbox. New arrivals after that can run automatically. Existing messages can be processed with Run rules.</p>
+<p class="help">These email rules are separate from the legacy YAML router. Pause overlapping legacy rules before enabling automatic processing.</p>
+<button class="btn p">Save connection</button>
+</form>{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "base.html" %}{% block title %}Agents{% endblock %}{% block body %}
+<style>
+.agent-create>summary{cursor:pointer;min-height:40px;padding:8px 0;color:var(--acc);font-weight:600}
+.agent-create{margin-bottom:12px}.agent-create .toolbar{margin:8px 0 16px}
+.agent-list{list-style:none;margin:0 0 16px;padding:0 12px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r)}
+.agent-item{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.agent-item:last-child{border-bottom:0}.agent-info{flex:1;min-width:0}
+.agent-heading{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}.agent-heading b{font-size:14px;overflow-wrap:anywhere}
+.agent-meta{display:flex;flex-wrap:wrap;gap:0 12px;margin-top:3px;color:var(--mut);font-size:12px}.agent-meta .mono{font-size:12px}
+.agent-note{margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--mut);font-size:12px}
+.agent-actions{display:flex;gap:6px;flex-shrink:0}
+@media(max-width:600px){.agent-actions{flex-direction:column;gap:4px}.agent-actions .btn{width:100%;min-height:40px}.agent-item{padding:10px 0;gap:10px}}
+</style>
+<h1>Agents <span class="small mut">{{ rows|length }}</span></h1>
+<p class="page-intro">Manage agent access and connect your MCP clients.</p>
+{% if new_token %}
+<div class="card token">
+<b>New token · shown once</b>
+<pre>{{ new_token }}</pre>
+<div class="small mut">Save this token now. Creating or rotating a token is the only time it is shown.</div>
+</div>
+{% include "_agent_setup.html" %}
+{% endif %}
+<details class="agent-create" {{ 'open' if not rows }}><summary>New agent</summary>
+<form method="post" action="/ui/agents" class="row toolbar">
+<div class="field"><label for="agent-name">Agent name</label><input id="agent-name" type="text" name="name" placeholder="e.g. ai-vm-codex" required></div>
+<div class="field"><label for="agent-note">Note <span class="mut">(optional)</span></label><input id="agent-note" type="text" name="note" placeholder="What this agent is used for"></div>
+<button class="btn p">Create agent</button></form>
+</details>
+{% if rows %}
+<ul class="agent-list" aria-label="Agents">
+{% for a in rows %}
+<li class="agent-item">
+<div class="agent-info">
+<div class="agent-heading"><b>{{ a.name }}</b>{% if a.disabled %}<span class="pill deny">disabled</span>{% else %}<span class="pill ok">active</span>{% endif %}</div>
+<div class="agent-meta"><span>Seen {{ a.last_seen_at.strftime('%m-%d %H:%M') if a.last_seen_at else 'never' }}</span><span class="mono" aria-label="Token prefix">{{ a.token_prefix }}…</span></div>
+{% if a.note %}<div class="agent-note" title="{{ a.note }}">{{ a.note }}</div>{% endif %}
+</div>
+<div class="agent-actions">
+<a class="btn sm" href="/ui/access?agent={{ a.id }}" aria-label="Access for {{ a.name }}">Access</a>
+{% if a.disabled %}<form method="post" action="/ui/agents/{{ a.id }}/enable"><button class="btn sm" aria-label="Enable {{ a.name }}">Enable</button></form>
+{% else %}<form method="post" action="/ui/agents/{{ a.id }}/disable"><button class="btn sm" aria-label="Disable {{ a.name }}">Disable</button></form>{% endif %}
+</div>
+</li>
+{% endfor %}
+</ul>
+{% else %}<p class="mut">No agents yet. Create one above to get a connection token.</p>{% endif %}
+{% if not new_token %}{% include "_agent_setup.html" %}{% endif %}
+{% endblock %}

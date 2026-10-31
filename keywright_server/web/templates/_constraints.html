@@ -1,0 +1,6 @@
+{% if constraints.host %}<div>Host: <b>{{ constraints.host }}</b>{% if constraints.user %} · as <code>{{ constraints.user }}</code>{% endif %}</div>{% endif %}
+{% if constraints.server %}<div>Server: <b>{{ constraints.server }}</b>{% if constraints.tool %} · <code>{{ constraints.tool }}</code>{% endif %}</div>{% endif %}
+{% if constraints.command %}<pre>$ {{ constraints.command }}</pre>{% endif %}
+{% if constraints.to_path %}<div>Output {{ 'appended to' if constraints.append else 'written to' }} <b>{{ constraints.to_host }}</b> <code>{{ constraints.to_path }}</code>{% if constraints.to_user %} as <code>{{ constraints.to_user }}</code>{% endif %} · not returned to the agent</div>{% endif %}
+{% if constraints.sha256 %}<div>Write <code>{{ constraints.path }}</code> · {{ constraints.bytes }} bytes · sha256 <code>{{ constraints.sha256[:16] }}…</code></div>{% elif constraints.path %}<div>Read <code>{{ constraints.path }}</code></div>{% endif %}
+{% if 'arguments' in constraints %}<pre>{{ constraints.arguments | redact | tojson(indent=2) }}</pre>{% endif %}

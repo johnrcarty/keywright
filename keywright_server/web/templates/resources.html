@@ -1,0 +1,76 @@
+{% extends "base.html" %}{% from "_icons.html" import icon %}
+{% block title %}Resources{% endblock %}{% block body %}
+{% include "_infrastructure_nav.html" %}
+<div class="collection-heading">
+<h1>Resources</h1>
+<a class="btn p" href="/ui/resources/new">+ Add resource</a>
+</div>
+<p class="page-intro collection-intro">Manage the systems and endpoints your agents can reach.</p>
+{% if rows %}
+<form method="get" class="resource-organize row">
+<label for="resource-sort">Sort</label><select id="resource-sort" name="sort">{% for key,label in [('type','Type'),('name','Name'),('ip','IP address')] %}<option value="{{ key }}" {{ 'selected' if sort==key }}>{{ label }}</option>{% endfor %}</select>
+<label for="resource-group">Group</label><select id="resource-group" name="group">{% for key,label in [('none','None'),('host','Inventory host'),('network','Network')] %}<option value="{{ key }}" {{ 'selected' if group==key }}>{{ label }}</option>{% endfor %}</select><button class="btn sm">Apply</button>
+</form>
+<div id="resource-filters" hidden>
+<div class="resource-tabs" role="group" aria-label="Filter by resource type">
+{% for kind, label in [('all', 'All'), ('ssh', 'SSH'), ('mcp', 'MCP'), ('llm', 'LLM')] %}<button type="button" data-kind="{{ kind }}" aria-pressed="{{ 'true' if kind == 'all' else 'false' }}">{{ label }}</button>{% endfor %}
+</div>
+<div class="resource-search">{{ icon('search') }}<input type="search" id="resource-search" placeholder="Search resources…" aria-label="Search resources" autocomplete="off"></div>
+</div>
+{% endif %}
+<div class="resource-list">
+{% for r in rows %}
+{% if group!='none' and loop.changed(resource_groups[r.id]) %}<div class="resource-group-heading" data-group-heading="{{ resource_groups[r.id] }}">{{ resource_groups[r.id] }}</div>{% endif %}
+<article class="resource-card" data-group="{{ resource_groups[r.id] }}" data-resource-kind="{{ r.kind }}" data-search="{{ resource_groups[r.id] }} {{ resource_assets[r.id].name if resource_assets.get(r.id) else '' }} {{ r.name }} {{ r.description }} {{ r.kind }} {{ r.default_mode }} {% if r.kind == 'ssh' %}{{ r.config.user }} {{ r.config.host }} {{ r.config.get('port', 22) }}{% else %}{{ r.config.url }}{% endif %}">
+<a class="resource-link" href="/ui/resources/{{ r.id }}">
+<span class="resource-icon {{ r.kind }}">{{ icon(r.kind) }}</span>
+<div class="resource-copy"><h2>{{ r.name }}</h2><div class="resource-endpoint">{{ 'Omada' if r.config.get('adapter') == 'omada' else r.kind | upper }} · {% if r.kind == 'ssh' %}{{ r.config.user }}@{{ r.config.host }}:{{ r.config.get('port', 22) }}{% elif r.kind == 'llm' %}{{ r.config.url }} · {{ (r.config.models or []) | length }} models · ${{ '%.2f' | format((r.config.limits or {}).get('max_budget', 2.0)) }} per lease{% elif r.config.get('adapter') == 'keywright' %}Built-in inventory and topology{% else %}{{ r.config.url }}{% endif %}</div></div>
+<span class="resource-chevron">{{ icon('chevron') }}</span>
+</a>
+<div class="resource-labels">{% if resource_assets.get(r.id) %}<a class="resource-host" href="/ui/inventory/assets/{{ resource_assets[r.id].id }}">{{ resource_assets[r.id].name }}</a>{% endif %}<span class="resource-mode {{ r.default_mode }}"><span aria-hidden="true"></span>{{ {'open': 'Open access', 'approval': 'Approval required', 'locked': 'Locked'}.get(r.default_mode, r.default_mode) }}</span>{% if r.kind == 'mcp' and r.config.tools_drift %}<a class="resource-warning" href="/ui/access?resource={{ r.id }}">Tools changed · review</a>{% endif %}{% if r.kind == 'ssh' and not r.config.host_key %}<span class="resource-warning">Host key not pinned</span>{% endif %}{% if r.kind == 'llm' %}<span class="pill">Billable</span>{% if (r.config.health or {}).get('db') != 'connected' %}<span class="resource-warning">Budget enforcement unavailable · no key will be minted</span>{% endif %}{% endif %}</div>
+{% if r.description %}<p class="resource-description">{{ r.description }}</p>{% endif %}
+<details class="resource-actions action-menu"><summary aria-label="Actions for {{ r.name }}">{{ icon('more') }}</summary><div class="action-menu-items"><a href="/ui/resources/{{ r.id }}">Edit resource</a><a href="{{ '/ui/inventory/assets/' ~ resource_assets[r.id].id if resource_assets.get(r.id) else '/ui/inventory/assets/new?resource=' ~ r.id }}">{{ 'View inventory' if resource_assets.get(r.id) else 'Add to inventory' }}</a>{% if r.kind in ('mcp', 'llm') %}<a href="/ui/access?resource={{ r.id }}">Edit access</a>{% endif %}<form method="post" action="/ui/resources/{{ r.id }}/probe"><button type="submit">Test connection</button></form></div></details>
+</article>
+{% else %}<div class="collection-empty card">{{ icon('mcp') }}<h2>No resources yet</h2><p class="mut">Choose an integration or set up a custom connection.</p><a class="btn p" href="/ui/resources/new">+ Add resource</a></div>{% endfor %}
+</div>
+<div id="resource-empty" class="collection-empty card" hidden><h2>No matching resources</h2><p class="mut">Try a different name, endpoint, or resource type.</p><button type="button" class="btn" id="resource-reset">Clear filters</button></div>
+{% if rows %}<p class="resource-count mut small" id="resource-count" role="status">Showing {{ rows|length }} resource{{ '' if rows|length == 1 else 's' }}</p>{% endif %}
+<details class="resource-help"><summary>About resource access</summary><p class="small mut">Default <b>open</b> = allowed &amp; audited, <b>approval</b> = ask, <b>locked</b> = only explicit rules. Access modes do not indicate connection health. Use “Test connection” in a resource’s menu to check connectivity.</p><p class="small mut">Permission paths: <code>ssh/&lt;name&gt;/exec/&lt;command&gt;[/&lt;subcommand&gt;]</code>, <code>mcp/&lt;name&gt;/tools/&lt;tool&gt;</code> and <code>llm/&lt;name&gt;/model/&lt;model&gt;</code>.</p></details>
+{% endblock %}
+{% block scripts %}
+<script>
+(function () {
+  var controls = document.getElementById('resource-filters');
+  if (!controls) return;
+  controls.hidden = false;
+  var search = document.getElementById('resource-search');
+  var cards = Array.from(document.querySelectorAll('[data-resource-kind]'));
+  var buttons = Array.from(controls.querySelectorAll('[data-kind]'));
+  var kind = 'all';
+  function filter() {
+    var query = search.value.trim().toLowerCase();
+    var count = 0;
+    cards.forEach(function (card) {
+      var matches = (kind === 'all' || card.dataset.resourceKind === kind) && card.dataset.search.toLowerCase().includes(query);
+      card.hidden = !matches;
+      if (matches) count++;
+      else card.querySelector('details').open = false;
+    });
+    document.querySelectorAll('[data-group-heading]').forEach(function (heading) { heading.hidden = !cards.some(function (card) { return !card.hidden && card.dataset.group === heading.dataset.groupHeading; }); });
+    buttons.forEach(function (button) { button.setAttribute('aria-pressed', String(button.dataset.kind === kind)); });
+    document.getElementById('resource-count').textContent = 'Showing ' + count + ' of ' + cards.length + ' resource' + (cards.length === 1 ? '' : 's');
+    document.getElementById('resource-empty').hidden = count !== 0;
+  }
+  buttons.forEach(function (button) { button.addEventListener('click', function () { kind = button.dataset.kind; filter(); }); });
+  search.addEventListener('input', filter);
+  document.getElementById('resource-reset').addEventListener('click', function () { kind = 'all'; search.value = ''; filter(); search.focus(); });
+})();
+document.querySelectorAll('.action-menu').forEach(function (menu) {
+  menu.addEventListener('toggle', function () {
+    if (menu.open) document.querySelectorAll('.action-menu').forEach(function (other) { if (other !== menu) other.open = false; });
+  });
+  menu.addEventListener('keydown', function (event) { if (event.key === 'Escape') { menu.open = false; menu.querySelector('summary').focus(); } });
+  document.addEventListener('click', function (event) { if (!menu.contains(event.target)) menu.open = false; });
+});
+</script>
+{% endblock %}

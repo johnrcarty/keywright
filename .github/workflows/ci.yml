@@ -1,0 +1,50 @@
+name: test and build
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install source packages
+        run: python -m pip install ./client ".[dev,knowledge]" ./router build
+      - name: Run server, client and router tests
+        run: python -m pytest -q
+      - name: Verify topology layout
+        run: node --test tests/test_topology_layout.cjs
+      - name: Build distributions
+        run: |
+          python -m build client --outdir dist
+          python -m build . --outdir dist
+          python -m build router --outdir dist
+      - name: Smoke-test installed wheels outside the checkout
+        run: |
+          python -m venv /tmp/kw-wheel-test
+          /tmp/kw-wheel-test/bin/pip install dist/*.whl
+          cd /tmp
+          /tmp/kw-wheel-test/bin/kw version
+          /tmp/kw-wheel-test/bin/keywright-server --help
+          /tmp/kw-wheel-test/bin/keywright-router --help
+          status=0
+          /tmp/kw-wheel-test/bin/kw hazards "git push --force" || status=$?
+          test "$status" -eq 2
+          /tmp/kw-wheel-test/bin/python -c "import sys, keywright.cli; assert 'mcp' not in sys.modules"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: distributions-python-${{ matrix.python }}
+          path: dist/

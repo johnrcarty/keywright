@@ -1,0 +1,53 @@
+# Keywright with LiteLLM as its LLM gateway. Only Keywright is published; LiteLLM and Postgres stay
+# on the private network, so the real provider keys (in litellm.env, on this host only) are reachable
+# from exactly one place. Agents get a Keywright token and a base URL, never a provider key.
+#
+#   cp .env.example .env && cp litellm.env.example litellm.env   # then fill both in
+#   docker compose -f compose.yaml -f llm.compose.yml up -d --build
+#
+# LiteLLM's budgets are read from its database; without one the proxy serves past every limit.
+# Postgres is therefore not optional, and litellm.yaml fails closed when spend cannot be verified.
+services:
+  keywright:
+    depends_on:
+      litellm: { condition: service_healthy }
+
+  litellm:
+    # Pin a version; LiteLLM's own deployment guide says never to run a moving tag.
+    image: ghcr.io/berriai/litellm:v1.101.0
+    command: ["--config", "/app/config.yaml", "--port", "4000"]
+    volumes: ["./litellm.yaml:/app/config.yaml:ro"]
+    env_file: [litellm.env]            # OPENAI_API_KEY, ANTHROPIC_API_KEY, ... : this host only
+    environment:
+      DATABASE_URL: postgresql://litellm:${PG_PASSWORD:?set PG_PASSWORD in .env}@postgres:5432/litellm
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:?set LITELLM_MASTER_KEY in .env}
+      LITELLM_SALT_KEY: ${LITELLM_SALT_KEY:?set LITELLM_SALT_KEY in .env}   # set once, never change
+      LITELLM_LOG: ${LITELLM_LOG:-INFO}
+    # No `ports:`. Keywright reaches it as http://litellm:4000 on the compose network.
+    depends_on:
+      postgres: { condition: service_healthy }
+    healthcheck:
+      # the image ships python but no curl; "healthy" means the database is connected, not just the port open
+      test: ["CMD-SHELL", "python3 -c \"import json,sys,urllib.request; sys.exit(0 if json.load(urllib.request.urlopen('http://localhost:4000/health/readiness', timeout=4)).get('db')=='connected' else 1)\""]
+      interval: 30s
+      timeout: 5s
+      start_period: 60s
+      retries: 3
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16
+    volumes: ["litellm-pg:/var/lib/postgresql/data"]
+    environment:
+      POSTGRES_USER: litellm
+      POSTGRES_DB: litellm
+      POSTGRES_PASSWORD: ${PG_PASSWORD:?set PG_PASSWORD in .env}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U litellm -d litellm"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  litellm-pg: {}

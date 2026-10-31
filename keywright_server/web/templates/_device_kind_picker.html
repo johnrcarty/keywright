@@ -1,0 +1,66 @@
+<style>
+.device-kind{min-width:0}.device-kind.enhanced>select{display:none}.kind-input-row{display:flex;gap:6px}.kind-input-row input{min-width:0;width:100%;flex:1;font-size:16px}.kind-input-row .btn{flex:0 0 44px;min-width:44px;min-height:44px;padding:6px}.kind-results{border:1px solid var(--line);border-radius:6px;background:var(--panel);margin-top:6px;max-height:280px;max-height:min(280px,32svh);overflow:auto;overscroll-behavior:contain}.kind-option{display:block;width:100%;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:11px 12px;min-height:44px;text-align:left;background:transparent;color:var(--fg);font:inherit;cursor:pointer;overflow-wrap:anywhere}.kind-option:last-child{border-bottom:0}.kind-option.active,.kind-option:hover{background:rgba(80,169,255,.15);color:var(--acc)}.kind-option[aria-selected=true]{font-weight:600}.kind-empty{padding:12px;margin:0;color:var(--mut)}.kind-help{margin-top:6px;font-size:12px;color:var(--mut)}
+</style>
+<script>
+(()=>{
+'use strict';
+for(const root of document.querySelectorAll('[data-device-kind]')){
+ const select=root.querySelector('select'),id=select.id;
+ const choices=[...select.options].map(o=>({value:o.value,label:o.textContent}));
+ const make=(tag,cls)=>{const n=document.createElement(tag);if(cls)n.className=cls;return n;};
+ const row=make('div','kind-input-row'),input=make('input'),toggle=make('button','btn');
+ const list=make('div','kind-results'),help=make('div','kind-help');
+ select.id=id+'-native';input.id=id;input.type='text';input.autocomplete='off';input.spellcheck=false;
+ input.setAttribute('role','combobox');input.setAttribute('aria-autocomplete','list');
+ input.setAttribute('aria-expanded','false');input.setAttribute('aria-controls',id+'-options');
+ input.setAttribute('aria-describedby',id+'-help');input.placeholder='Search device types…';
+ list.id=id+'-options';list.setAttribute('role','listbox');list.setAttribute('aria-label','Device types');list.hidden=true;
+ help.id=id+'-help';help.setAttribute('role','status');help.setAttribute('aria-live','polite');
+ toggle.type='button';toggle.textContent='⌄';toggle.setAttribute('aria-label','Browse all device types');
+ row.append(input,toggle);root.append(row,list,help);root.classList.add('enhanced');
+ let filtered=choices,active=-1,editing=false;
+ const selected=()=>choices.find(c=>c.value===select.value)||choices[0];
+ function close(restore=false){
+  list.hidden=true;input.setAttribute('aria-expanded','false');input.removeAttribute('aria-activedescendant');active=-1;
+  if(restore){input.value=selected().label;input.setCustomValidity('');editing=false;}
+  help.textContent=editing?'Choose a matching type, or press Escape to keep '+selected().label+'.':'Type to filter '+choices.length+' device types. Current: '+selected().label+'.';
+ }
+ function choose(choice){select.value=choice.value;select.dispatchEvent(new Event('change',{bubbles:true}));close(true);input.focus({preventScroll:true});}
+ function activate(index){
+  active=index;[...list.querySelectorAll('[role=option]')].forEach((n,i)=>n.classList.toggle('active',i===active));
+  const node=list.children[active];if(node&&filtered.length){input.setAttribute('aria-activedescendant',node.id);node.scrollIntoView({block:'nearest'});}else input.removeAttribute('aria-activedescendant');
+ }
+ function show(query=''){
+  const words=query.toLocaleLowerCase().trim().split(/\s+/).filter(Boolean);
+  filtered=choices.filter(c=>words.every(word=>(c.label+' '+c.value.replaceAll('_',' ')).toLocaleLowerCase().includes(word)));
+  list.replaceChildren();active=-1;input.removeAttribute('aria-activedescendant');
+  for(const [i,choice] of filtered.entries()){
+   const option=make('button','kind-option');option.type='button';option.tabIndex=-1;
+   option.id=id+'-option-'+i;option.setAttribute('role','option');option.setAttribute('aria-selected',String(choice.value===select.value));option.textContent=choice.label;
+   option.addEventListener('pointerdown',e=>e.preventDefault());option.onclick=()=>choose(choice);list.append(option);
+  }
+  if(!filtered.length){const empty=make('p','kind-empty');empty.textContent='No matching types. Try a broader term, or choose Other device.';list.append(empty);}
+  list.hidden=false;input.setAttribute('aria-expanded','true');help.textContent=filtered.length+' matching type'+(filtered.length===1?'':'s')+'. Select one to use it.';
+ }
+ close(true);
+ input.addEventListener('focus',()=>{if(!editing)input.select();});
+ input.addEventListener('click',()=>{if(list.hidden)show(editing?input.value:'');});
+ input.addEventListener('input',()=>{
+  editing=true;input.setCustomValidity('Choose a device type from the matching options.');show(input.value);
+  const exact=choices.find(c=>c.label.toLocaleLowerCase()===input.value.trim().toLocaleLowerCase());
+  if(exact){select.value=exact.value;input.setCustomValidity('');editing=false;select.dispatchEvent(new Event('change',{bubbles:true}));}
+ });
+ input.addEventListener('keydown',e=>{
+  if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+   e.preventDefault();if(list.hidden)show(editing?input.value:'');
+   if(filtered.length)activate(active<0?(e.key==='ArrowDown'?0:filtered.length-1):(active+(e.key==='ArrowDown'?1:-1)+filtered.length)%filtered.length);
+  }else if(e.key==='Enter'&&!list.hidden){e.preventDefault();if(filtered.length)choose(filtered[active<0?0:active]);}
+  else if(e.key==='Escape'){e.preventDefault();close(true);}
+ });
+ toggle.onclick=()=>{if(!list.hidden){close(true);return;}input.focus();input.select();show();};
+ root.addEventListener('focusout',()=>setTimeout(()=>{if(!root.contains(document.activeElement))close();},0));
+ document.addEventListener('pointerdown',e=>{if(!root.contains(e.target))close();});
+ select.form?.addEventListener('reset',()=>setTimeout(()=>close(true),0));
+}
+})();
+</script>

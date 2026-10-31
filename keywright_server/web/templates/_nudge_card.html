@@ -1,0 +1,12 @@
+{# An agent asking for the human in the conversation. Nothing to decide: the answer happens in the
+   conversation, and this card only records that it is still owed. #}
+<article class="tile nudge-tile" id="nudge-{{ n.id }}" data-nudge="{{ n.id }}">
+<div class="tile-head"><span aria-hidden="true">💬</span><b>{{ n.agent.name }} needs you</b>
+<span class="tile-meta mut small"><time data-since="{{ n.created_at.isoformat() }}" datetime="{{ n.created_at.isoformat() }}">{{ n.created_at.strftime('%H:%M:%S') }}</time></span></div>
+<div class="nudge-message">“{{ n.message }}”</div>
+<div class="tile-quick">
+<form method="post" action="/ui/nudges/{{ n.id }}/dismiss"><input type="hidden" name="next" value="/ui">
+<button class="btn sm">Dismiss</button></form>
+<span class="small mut">{{ n.context or 'no location given' }}{% if n.session_id %} · session {{ n.session_id[:24] }}{% endif %}</span>
+</div>
+</article>

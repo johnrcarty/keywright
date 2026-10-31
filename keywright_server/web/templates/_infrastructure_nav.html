@@ -1,0 +1,8 @@
+<div class="infra-nav" aria-label="Infrastructure views">
+<a href="/ui/resources" {{ 'aria-current=page' if request.url.path.startswith('/ui/resources') }}>Resources</a>
+<a href="/ui/inventory" {{ 'aria-current=page' if request.url.path == '/ui/inventory' or '/assets/' in request.url.path }}>Inventory</a>
+<a href="/ui/inventory/map" {{ 'aria-current=page' if request.url.path == '/ui/inventory/map' }}>Network map</a>
+<a href="/ui/inventory/topology" {{ 'aria-current=page' if request.url.path == '/ui/inventory/topology' }}>Topology</a>
+<a href="/ui/inventory/networks" {{ 'aria-current=page' if '/networks' in request.url.path }}>IP allocations</a>
+<a href="/ui/inventory/discovery" {{ 'aria-current=page' if request.url.path.startswith('/ui/inventory/discovery') }}>Discovery</a>
+</div>

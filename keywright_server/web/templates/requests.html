@@ -1,0 +1,9 @@
+{% extends "base.html" %}{% block title %}Requests{% endblock %}{% block body %}
+<h1>Requests</h1>
+<p class="page-intro"><a href="/ui/friction">Approval friction</a> · recurring requests, decision wait times and call failures.</p>
+<div class="card"><table class="data-table" role="table"><thead role="rowgroup"><tr role="row"><th scope="col" role="columnheader">When</th><th scope="col" role="columnheader">Agent</th><th scope="col" role="columnheader">Patterns</th><th scope="col" role="columnheader">Status</th><th scope="col" role="columnheader">Via</th></tr></thead><tbody role="rowgroup">
+{% for r in rows %}<tr role="row"><td role="cell" data-label="When" class="small mut"><div class="cell-value"><a href="/ui/requests/{{ r.id }}">{{ r.created_at.strftime('%m-%d %H:%M:%S') }}</a></div></td><td role="cell" data-label="Agent" class="wide"><div class="cell-value">{{ r.agent.name }}</div></td>
+<td role="cell" data-label="Patterns" class="wide"><div class="cell-value">{% for p in r.patterns %}<code>{{ p }}</code> {% endfor %}<div class="small mut">{{ r.reason }}</div></div></td>
+<td role="cell" data-label="Status"><div class="cell-value">{% if hazard_level(r.detail) %}<span class="pill {{ hazard_level(r.detail) }}">{{ hazard_level(r.detail) }}</span> {% endif %}<span class="pill {{ r.status }}">{{ r.status }}</span>{% if r.decision_scope %} <span class="small mut">{{ r.decision_scope }}</span>{% endif %}</div></td>
+<td role="cell" data-label="Via" class="small mut"><div class="cell-value">{{ r.decided_via or '' }}</div></td></tr>{% endfor %}</tbody></table>{% if not rows %}<p class="mut">No requests yet. Agent access requests will appear here.</p>{% endif %}</div>
+{% endblock %}

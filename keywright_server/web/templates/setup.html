@@ -1,0 +1,8 @@
+{% extends "base.html" %}{% set hide_nav = True %}{% block title %}Keywright setup{% endblock %}{% block body %}
+<div class="card auth-card"><h1 class="brand">{{ icon('shield') }}Set up Keywright</h1>
+<p class="small">Set the admin password for this Keywright. Then add resources, create an agent, and pick a notification driver.</p>
+<form method="post" action="/ui/setup">
+<label>Password (8+ chars)</label><input type="password" name="password" required autofocus>
+<label>Repeat</label><input type="password" name="repeat" required>
+<div style="margin-top:12px"><button class="btn p">Set password</button></div></form></div>
+{% endblock %}

@@ -1,0 +1,198 @@
+{% extends "base.html" %}{% from "_icons.html" import icon %}{% block title %}{{ 'Edit' if res else 'Add' }} {{ preset.title if preset else kind }}{% endblock %}{% block body %}
+{% include "_integration_style.html" %}
+<div class="integration-page integration-form">
+{% if not res %}<a class="integration-back" href="/ui/resources/new">{{ icon('chevron') }} All integrations</a>{% endif %}
+{% if res %}
+{% include "_infrastructure_nav.html" %}
+{% endif %}
+{% if res %}<p class="small mut">Inventory: {% if inventory_asset %}<a href="/ui/inventory/assets/{{ inventory_asset.id }}">{{ inventory_asset.name }}</a>{% else %}<a href="/ui/inventory/assets/new?resource={{ res.id }}">Add this resource to inventory</a> · or link it from an existing inventory record{% endif %}</p>{% endif %}
+
+{% if preset %}
+<div class="integration-intro"><span class="integration-mark {{ preset.icon }}">{% if preset.icon == 'notion' %}N{% else %}{{ icon(preset.icon) }}{% endif %}</span><div><h1>{{ preset.title }}</h1><p>{{ preset.instructions if not res else preset.description }}</p></div></div>
+{% if preset.auth_type == 'oauth' %}<ol class="integration-steps" aria-label="Connection setup"><li {% if not res %}aria-current="step"{% endif %}><span>1</span> Connection details</li><li {% if res %}aria-current="step"{% endif %}><span>2</span> {{ 'Connected' if oauth_status == 'connected' else 'Sign in' }}</li></ol>{% endif %}
+{% else %}<h1>{{ 'Edit' if res else 'Add' }} {{ {'ssh': 'SSH host', 'mcp': 'MCP server', 'llm': 'LLM gateway'}[kind] }}</h1>{% endif %}
+<div class="card"><form method="post" action="/ui/resources">
+<input type="hidden" name="rid" value="{{ res.id if res else '' }}"><input type="hidden" name="kind" value="{{ kind }}">
+<input type="hidden" name="integration" value="{{ preset.id if preset else '' }}">
+<input type="hidden" name="adapter" value="{{ adapter | default('') }}">
+<div class="grid">
+<div><label>Connection name</label><input type="text" name="name" value="{{ res.name if res else preset.default_name if preset else '' }}" required {% if res %}readonly{% endif %}></div>
+<div><label>Agent access</label><select name="default_mode">{% for m, label in [('approval', 'Ask for approval'), ('open', 'Allow by default'), ('locked', 'Require explicit rules')] %}<option value="{{ m }}" {{ 'selected' if res and res.default_mode == m }}>{{ label }}</option>{% endfor %}</select>
+<div class="help">Applies when no access rule or active grant covers an operation.</div></div>
+</div>
+<label>Description <span class="mut">(optional)</span></label><input type="text" name="description" value="{{ res.description if res else '' }}">
+{% if kind == 'ssh' %}
+<div class="grid host-fields">
+<div><label>Host</label><input type="text" name="host" value="{{ res.config.host if res else '' }}" required></div>
+<div><label>Port</label><input type="number" name="port" value="{{ res.config.port if res else 22 }}"></div>
+<div><label>User</label><input type="text" name="user" value="{{ res.config.user if res else 'root' }}"></div>
+</div>
+{% if res %}
+<label>Private key path on the Keywright host</label><input type="text" name="key_path" value="{{ res.config.key_path if res else '' }}" placeholder="{{ keys_dir }}/&lt;name&gt;">
+<div class="help">{% if key and key.exists %}Key present{% if key.pub %}: <code>{{ key.pub }}</code>{% endif %}{% else %}No key yet. Save, then use <b>Generate key</b> below (recommended), or paste one here.{% endif %}</div>
+<details><summary class="small mut" style="cursor:pointer;margin-top:8px">Paste an existing private key instead</summary>
+<textarea name="private_key" placeholder="-----BEGIN OPENSSH PRIVATE KEY-----"></textarea></details>
+{% else %}
+<div class="help" style="margin-top:8px">Save first; then generate a key on this Keywright and enrol it on the host from the same page.</div>
+{% endif %}
+{% if res and res.config.host_key %}<label>Pinned host key</label><code>{{ res.config.host_key }}</code>
+<div class="row" style="margin-top:6px"><label class="inline"><input type="checkbox" name="forget_host_key" value="1"> forget host key (re-pin on next connect)</label></div>{% else %}<div class="help" style="margin-top:8px">Host key not pinned yet: the first successful connection or probe pins it.</div>{% endif %}
+{% elif kind == 'llm' %}
+{% set limits = (res.config.limits if res else {}) or {} %}{% set budget = (res.config.agent_budget if res else {}) or {} %}
+<label>LiteLLM URL <span class="mut">(reachable from this Keywright only; never published to agents)</span></label>
+<input type="url" name="url" value="{{ res.config.url if res else '' }}" placeholder="http://litellm:4000" required>
+<label>Master key <span class="mut">(mints and deletes virtual keys; stored here, shown as ***)</span></label>
+<input type="password" name="master_key" value="{{ '***' if res and res.config.master_key else '' }}" autocomplete="off" placeholder="sk-…" {% if not res %}required{% endif %}>
+<label style="margin-top:8px">Models agents may ask for <span class="mut">(comma or newline separated; <b>Test connection</b> refreshes this from the gateway)</span></label>
+<textarea name="models_text" rows="3" placeholder="claude-sonnet-5, gpt-5.6">{{ (res.config.models or []) | join(', ') if res else '' }}</textarea>
+<div class="help">Each model is a path: <code>llm/{{ res.name if res else 'litellm' }}/model/&lt;model&gt;</code> (slashes in a name become <code>_</code>). A rule on <code>llm/{{ res.name if res else 'litellm' }}/model/*</code> covers them all. Keys are minted by <b>approvals</b>; an <i>open</i> default or a standing allow rule mints nothing until the LLM proxy ships, so keep this on <i>approval</i> for now.</div>
+<h2 style="margin-top:14px">Per-lease ceiling</h2>
+<p class="small mut">Every approval becomes one LiteLLM virtual key with exactly these limits and the lease's lifetime. If the agent goes feral, this is all the money there is.</p>
+<div class="grid">
+<div><label>Max spend (USD)</label><input type="text" name="max_budget" value="{{ limits.get('max_budget', 2.0) if res else 2 }}" required inputmode="decimal"></div>
+<div><label>Requests / minute</label><input type="text" name="rpm_limit" value="{{ limits.get('rpm_limit', 30) if res else 30 }}" inputmode="numeric"></div>
+<div><label>Tokens / minute <span class="mut">(blank = none)</span></label><input type="text" name="tpm_limit" value="{{ limits.get('tpm_limit') or '' if res else '' }}" inputmode="numeric"></div>
+<div><label>Concurrent requests</label><input type="text" name="max_parallel_requests" value="{{ limits.get('max_parallel_requests', 4) if res else 4 }}" inputmode="numeric"></div>
+</div>
+<h2 style="margin-top:14px">Per-agent ceiling</h2>
+<p class="small mut">Each agent is a LiteLLM internal user; all of its keys on this gateway count against this window as well.</p>
+<div class="grid">
+<div><label>Max spend (USD)</label><input type="text" name="agent_max_budget" value="{{ budget.get('max_budget', 10.0) if res else 10 }}" required inputmode="decimal"></div>
+<div><label>Per</label><select name="agent_budget_duration">{% for d, l in [('1h', 'hour'), ('1d', 'day'), ('7d', 'week'), ('30d', '30 days')] %}<option value="{{ d }}" {{ 'selected' if (budget.get('budget_duration', '1d') if res else '1d') == d }}>{{ l }}</option>{% endfor %}</select></div>
+</div>
+<div class="help">Set a global ceiling too, in <code>litellm.yaml</code> (<code>litellm_settings.max_budget</code>), and keep the vendors' own spend limits on. Keywright is a wall, not the only wall.</div>
+{% else %}
+{% if adapter == 'keywright' %}
+<p class="help">Built-in tools for inventory, hosting and network topology, discovery observations, subnets and IP allocations. Agents use the same approval gate and access rules as other resources. No URL or credentials are needed.</p>
+{% elif adapter == 'omada' %}
+<p class="help">In Omada Global View, open <b>Settings → Platform Integration → Open API</b> and create an app in <b>Client</b> mode with access to the sites you want. This connector reads sites, devices and clients.</p>
+<label>Interface Access Address</label><input type="url" name="url" value="{{ res.config.url if res else '' }}" placeholder="https://omada.example:8043" required>
+<div class="help">Copy the address from Open API settings, including its port. Do not include an API path.</div>
+<label>Omada ID</label><input type="text" name="omada_id" value="{{ res.config.omada_id if res else '' }}" required>
+<label>Client ID</label><input type="text" name="client_id" value="{{ res.config.client_id if res else '' }}" required>
+<label>Client Secret</label><input type="password" name="client_secret" value="" autocomplete="new-password" placeholder="{{ 'Leave blank to keep the stored secret' if res else '' }}" {% if not res %}required{% endif %}>
+<div class="help">Stored on Keywright. Agents never receive this credential.</div>
+<label>TLS certificate verification</label><select name="verify_tls"><option value="1" {{ 'selected' if not res or res.config.get('verify_tls', True) }}>Verify certificate (recommended)</option><option value="0" {{ 'selected' if res and not res.config.get('verify_tls', True) }}>Skip verification for a self-signed controller</option></select>
+<label>Custom CA bundle path <span class="mut">(optional, on the Keywright server)</span></label><input type="text" name="ca_bundle" value="{{ res.config.get('ca_bundle', '') if res else '' }}">
+{% else %}
+{% if preset and preset.url %}
+<input type="hidden" name="url" value="{{ preset.url }}"><input type="hidden" name="auth_type" value="{{ preset.auth_type }}">
+<p class="help">You'll authorize access on {{ preset.title }}. Keywright keeps the connection credentials; your agents use the access rules you choose here.</p>
+<details class="integration-advanced"><summary>Advanced connection settings</summary>
+{% else %}
+<label>Streamable HTTP URL</label><input type="url" name="url" value="{{ res.config.url if res else '' }}" required>
+{% endif %}
+{% set oauth = res.config.get('oauth', {}) if res else {} %}
+{% if not (preset and preset.url) %}
+<label>Authentication</label><select name="auth_type">
+<option value="headers" {{ 'selected' if not res or res.config.get('auth_type') != 'oauth' }}>Headers / API token</option>
+<option value="oauth" {{ 'selected' if res and res.config.get('auth_type') == 'oauth' }}>OAuth — connect in your browser</option>
+</select>
+<div class="help">Choose the authentication method required by your server. For OAuth, save and then connect in your browser.</div>
+{% endif %}
+<details style="margin-top:12px"><summary>Advanced OAuth settings</summary>
+<label>Client ID (optional)</label><input name="oauth_client_id" value="{{ oauth.get('client_id', '') }}" autocomplete="off">
+<div class="help">Leave blank for automatic client registration. For a pre-registered client, use the callback <code>{{ oauth_callback }}</code> on your configured public HTTPS URL.</div>
+<label>Client authentication</label><select name="oauth_auth_method">
+{% for method in ['none', 'client_secret_basic', 'client_secret_post'] %}<option value="{{ method }}" {{ 'selected' if oauth.get('token_endpoint_auth_method', 'none') == method }}>{{ method }}</option>{% endfor %}
+</select>
+<label>Client secret (optional; leave blank to keep stored secret)</label><input type="password" name="oauth_client_secret" autocomplete="new-password">
+<label>Scopes (optional, space separated)</label><input name="oauth_scope" value="{{ oauth.get('scope', '') }}">
+<div class="help">Leave blank to use the MCP server's advertised scopes.</div>
+<label>Additional OAuth origins (optional, comma separated)</label><input name="oauth_origins" value="{{ oauth.get('origins', []) | join(', ') }}" placeholder="https://login.example.com">
+<div class="help">The MCP server's origin is trusted by default. Add an origin only when your provider uses a separate authorization server.</div>
+</details>
+<label>Headers (one per line, <code>Name: value</code>; stored secrets show as ***)</label>
+<textarea name="headers">{% if res %}{% for k, v in res.config.headers.items() %}{{ k }}: {{ '***' if ('auth' in k.lower() or 'token' in k.lower() or 'key' in k.lower()) else v }}
+{% endfor %}{% endif %}</textarea>
+{% if preset and preset.url %}</details>{% endif %}
+{% endif %}
+<details class="integration-advanced"><summary>Advanced access settings</summary>
+<label for="result-inspection">MCP result inspection</label>
+{% set inspection_mode = res.config.get('result_inspection', 'off') if res else 'off' %}
+<select id="result-inspection" name="result_inspection_mode">
+<option value="off" {{ 'selected' if inspection_mode == 'off' }}>Off</option>
+<option value="observe" {{ 'selected' if inspection_mode == 'observe' }}>Observe and report</option>
+<option value="redact" {{ 'selected' if inspection_mode == 'redact' }}>Redact detected credentials</option>
+</select>
+<div class="help">Start with Observe to check compatibility: it reports findings and delivers original output. Redact removes configured credentials and recognizable secrets. Suspicious instructions are advisory only. Scanning is local; no external AI receives results. Images, audio, binary resources, linked content and results over 256 KiB cannot be fully inspected and are withheld in Redact mode. Results needing changes to structured data are also withheld to preserve the tool's output schema. The tool has already run when a result is withheld. Findings appear in the audit log and result metadata.</div>
+<label>Argument keys that qualify a call <span class="mut">(comma-separated dotted names, optional)</span></label>
+<input type="text" name="arg_keys" value="{{ (res.config.arg_keys or []) | join(', ') if res else ('site_id' if adapter == 'omada' else '') }}" placeholder="service, entity_id, data.entity_id, identifier">
+<div class="help">Each key present in a call adds a path such as <code>mcp/{{ res.name if res else 'ha' }}/tools/call_service/service=light.turn_on</code>. A rule or grant on the bare tool still covers every call; a deny on one qualifier blocks just that value. Without keys, calls are gated per tool.</div>
+<label style="margin-top:8px">Bundles <span class="mut">(one per line: <code>name: tools/ha_get_*, tools/ha_search</code>; agents request <code>mcp/{{ res.name if res else 'ha' }}/bundle/&lt;name&gt;</code>)</span></label>
+<textarea name="bundles_text" rows="5" placeholder="read-only: tools/ha_get_*, tools/ha_search&#10;destructive: tools/ha_restart, tools/ha_call_service/service=turn_off">{{ bundles_text(res.config.get('bundles')) if res else bundles_text(inventory_bundles) if adapter == 'keywright' else '' }}</textarea>
+<label style="margin-top:8px">Hazard catalog <span class="mut">(one per line: <code>high: tools/ha_manage_app, tools/ha_call_service/service=homeassistant.*</code>; severities medium, high, critical)</span></label>
+<textarea name="hazard_tools_text" rows="3" placeholder="high: tools/ha_manage_app&#10;critical: tools/ha_call_service/service=homeassistant.stop">{{ bundles_text(res.config.get('hazard_tools')) if res else '' }}</textarea>
+<div class="help">A tool whose name says delete, restart, reset… is flagged <b>medium</b> on its own (shown to you; access unchanged). <b>High</b> needs a fresh once-only approval whatever access exists; <b>critical</b> is refused. A qualifier such as <code>service=…</code> needs that argument key listed above.</div>
+<label class="inline" style="margin-top:8px"><input type="checkbox" name="audit_handle" value="1" {{ 'checked' if not res or res.config.get('audit_handle', True) }}> append a <code>[keywright] audit #…</code> line and <code>_meta.keywright</code> to results so agents can cite the approval</label>
+</details>
+{% endif %}
+<div class="integration-actions">{% if preset and preset.auth_type == 'oauth' and not res %}<button class="btn p" name="setup_action" value="connect">Continue to {{ preset.title }}</button><p>Saves this resource, then opens {{ preset.title }} sign-in.</p>{% else %}<button class="btn p">{{ 'Save' if res else 'Add resource' }}</button>{% endif %}</div>
+</form>
+{% if res and kind == 'mcp' and res.config.get('auth_type') == 'oauth' %}
+<h2>OAuth connection</h2>
+<p>Status: <strong>{{ {'connected': 'Connected', 'connecting': 'Sign-in pending', 'needs_reconnect': 'Reconnect required', 'disconnected': 'Disconnected'}.get(oauth_status, 'Disconnected') }}</strong></p>
+<div class="row">
+<form method="post" action="/ui/mcp-oauth/{{ res.id }}/connect"><button class="btn p">{{ 'Reconnect' if oauth_status == 'connected' else 'Connect' }}</button></form>
+<form method="post" action="/ui/mcp-oauth/{{ res.id }}/disconnect"><button class="btn">Disconnect</button></form>
+</div>
+<div class="help">Disconnect removes Keywright's saved tokens. To revoke the provider's authorization too, remove Keywright in the provider's connection settings.</div>
+{% endif %}
+{% if res and kind == 'llm' and leases %}
+<h2>Gateway</h2>
+{% if leases.enforced %}<p class="small"><span class="pill ok">Budgets enforced</span> LiteLLM {{ leases.health.version }} · database connected · checked {{ leases.health.checked_at[:16] | replace('T', ' ') }}</p>
+{% elif leases.health %}<p class="small"><span class="pill deny">Budget enforcement unavailable</span> LiteLLM reports its database <code>{{ leases.health.db }}</code>. Budgets are read from that database; without it the proxy serves past every limit, so no key is minted until it is connected.</p>
+{% else %}<p class="small mut">Not probed yet. <b>Test connection</b> checks the database and refreshes the model list.</p>{% endif %}
+<h2>Active leases</h2>
+{% if leases.leases %}
+<table class="data-table"><thead><tr><th>Agent</th><th>Models</th><th>Spent / ceiling</th><th>Time left</th></tr></thead><tbody>
+{% for k in leases.leases %}<tr><td>{{ k.agent }}</td><td class="small">{{ k.row.models | join(', ') }}</td>
+<td>{% if k.spend %}${{ '%.2f' | format(k.spend.spend) }}{% else %}?{% endif %} / ${{ '%.2f' | format(k.row.limits.max_budget or 0) }}</td>
+<td class="small mut">{{ k.remaining }}{% if k.row.request_id %} · <a href="/ui/requests/{{ k.row.request_id }}">Approval</a>{% endif %}</td></tr>{% endfor %}
+</tbody></table>
+<p class="small"><b>Exposure remaining: ${{ '%.2f' | format(leases.exposure) }}</b> <span class="mut">· what every active lease on this gateway could still spend if it all went wrong right now</span></p>
+{% else %}<p class="small mut">No active leases. Nothing can be spent through this gateway until you approve a request.</p>{% endif %}
+{% endif %}
+{% if res and kind == 'mcp' %}
+<form method="post" action="/ui/resources/{{ res.id }}/suggest-bundles" class="row" style="margin-top:8px"><button class="btn">Suggest bundles from the tool list</button>
+<span class="small mut">groups upstream tools by verb (get/list → read-only, call/run → control, remove/restart → destructive, set/create → config-write); adds only names you don't have</span></form>
+{% endif %}
+{% if res and kind == 'ssh' %}
+<h2>Key &amp; enrolment</h2>
+{% if not (key and key.exists) %}
+<form method="post" action="/ui/resources/{{ res.id }}/keygen" class="row"><button class="btn p">Generate key on this Keywright</button>
+<span class="small mut">ed25519, stored at {{ keys_dir }}/{{ res.name }}, never leaves this machine</span></form>
+{% else %}
+<div class="grid">
+<details class="card enrollment-option">
+<summary>Enrol with a password <span class="small mut">(used once, not stored)</span></summary>
+<form method="post" action="/ui/resources/{{ res.id }}/enroll">
+<label>Log in as <span class="mut">(leave blank for {{ res.config.user }}; set this when root can't SSH with a password)</span></label>
+<input type="text" name="login_user" placeholder="{{ res.config.user }}" autocomplete="off">
+<label>That user's password</label><input type="password" name="password" required autocomplete="off">
+<label>Become {{ res.config.user }} via</label>
+<select name="escalate"><option value="">not needed (logging in as {{ res.config.user }})</option><option value="sudo">sudo</option><option value="su">su -</option></select>
+<label>Root password <span class="mut">(for su; for sudo only if it differs from the login password)</span></label>
+<input type="password" name="root_password" autocomplete="off">
+<label class="inline" style="margin-top:8px"><input type="checkbox" name="restrict" value="1" checked> restrict the key to this Keywright's IP (<code>from=</code>)</label>
+<div style="margin-top:10px"><button class="btn p">Install key &amp; verify</button></div>
+</form>
+<div class="help">Connects once, appends the public key to <code>~/.ssh/authorized_keys</code>, pins the host key, then re-connects with the key to prove it works.</div>
+</details>
+<details class="card enrollment-option" open>
+<summary>Run a command on the host</summary>
+<p class="small mut">As the login user; link valid 30 min.</p>
+<pre style="white-space:pre-wrap">{{ key.enroll_cmd }}</pre>
+<div class="help">Then press <b>Test connection</b> below to pin the host key. Set the Keywright outbound IP in Settings to have this script add a <code>from=</code> restriction.</div>
+</details>
+</div>
+{% endif %}
+{% endif %}
+{% if res %}
+<div class="row" style="margin-top:12px">
+<form method="post" action="/ui/resources/{{ res.id }}/probe"><button class="btn">Test connection</button></form>
+<form method="post" action="/ui/resources/{{ res.id }}/delete" onsubmit="return confirm('Delete this resource?')"><button class="btn bad">Delete</button></form>
+</div>{% endif %}
+</div>
+</div>
+{% endblock %}

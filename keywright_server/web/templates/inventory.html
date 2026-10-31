@@ -1,0 +1,21 @@
+{% extends "base.html" %}{% block title %}Infrastructure inventory · Keywright{% endblock %}{% block body %}
+{% include "_infrastructure_nav.html" %}
+<div class="inventory-heading"><h1>Infrastructure inventory</h1><a class="btn p" href="/ui/inventory/assets/new">Add device or workload</a></div>
+<p class="page-intro">Hosts, devices, and services behind your resources. Group by network, parent host, or connection type.</p>
+<form class="inventory-filters" method="get">
+<div><label for="inventory-q">Search inventory</label><input id="inventory-q" name="q" type="text" value="{{ q }}" placeholder="Name, IP, site, tag, or resource"></div>
+<div><label for="inventory-sort">Sort by</label><select id="inventory-sort" name="sort">{% for key,label in [('name','Name'),('ip','IP address'),('kind','Device type'),('site','Site')] %}<option value="{{ key }}" {{ 'selected' if sort==key }}>{{ label }}</option>{% endfor %}</select></div>
+<div><label for="inventory-group">Group by</label><select id="inventory-group" name="group">{% for key,label in [('none','None'),('host','Parent host'),('network','Network'),('medium','Connection type'),('site','Site'),('kind','Device type')] %}<option value="{{ key }}" {{ 'selected' if group==key }}>{{ label }}</option>{% endfor %}</select></div>
+<button class="btn" type="submit">Apply</button>{% if q or group!='none' or sort!='name' %}<a class="btn" href="/ui/inventory">Reset</a>{% endif %}
+</form>
+{% if rows %}<div class="card"><table class="data-table inventory-table" role="table"><thead><tr><th scope="col">Device / workload</th><th scope="col">Connection</th><th scope="col">Addresses</th><th scope="col">Hosted on</th><th scope="col">Resources</th></tr></thead><tbody>
+{% for row in rows %}{% if group!='none' and loop.changed(row.group) %}<tr class="group-row"><th class="group-label" colspan="5" scope="rowgroup">{{ row.group }}</th></tr>{% endif %}
+<tr><td data-label="Device / workload" class="wide"><a href="/ui/inventory/assets/{{ row.asset.id }}"><b>{{ row.asset.name }}</b></a><small>{{ kinds[row.asset.kind] }}{% if row.asset.site %} · {{ row.asset.site }}{% endif %}</small>{% if row.asset.tags %}<small>{{ row.asset.tags }}</small>{% endif %}</td>
+<td data-label="Connection">{{ row.media|join(', ') or 'Unknown' }}</td>
+<td data-label="Addresses">{% for allocation in row.allocations %}<div><a class="mono" href="/ui/inventory/networks/{{ allocation.subnet_id }}">{{ allocation.address }}</a><small>{{ states[allocation.state] }} · {{ subnet_map[allocation.subnet_id].name }}</small></div>{% else %}<span class="mut">Not recorded</span>{% endfor %}</td>
+<td data-label="Hosted on">{% if row.parent %}<a href="/ui/inventory/assets/{{ row.parent.id }}">{{ row.parent.name }}</a>{% else %}<span class="mut">—</span>{% endif %}</td>
+<td data-label="Resources">{% for resource in row.resources %}<div><a href="/ui/resources/{{ resource.id }}">{{ resource.name }}</a></div>{% else %}<span class="mut">None linked</span>{% endfor %}</td></tr>{% endfor %}
+</tbody></table></div><p class="mut small">{{ rows|length }} of {{ assets|length }} infrastructure records</p>
+{% else %}<div class="card collection-empty"><h2>{{ 'No matching records' if assets else 'Build your infrastructure inventory' }}</h2><p class="mut">{{ 'Try a different search.' if assets else 'Add physical hosts first, then their VMs and containers. Link existing resources to the host or workload they belong to.' }}</p><a class="btn" href="{{ '/ui/inventory' if assets else '/ui/inventory/assets/new' }}">{{ 'Clear search' if assets else 'Add your first host' }}</a></div>{% endif %}
+<div class="inventory-note">Manually maintained inventory. Reachability is not monitored yet; missing observations do not mean a device is offline or its IP is available.</div>
+{% endblock %}

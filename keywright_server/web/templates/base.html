@@ -1,0 +1,198 @@
+{% from "_icons.html" import icon %}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Keywright{% endblock %}</title>
+<style>
+:root{--bg:#101419;--panel:#171c23;--panel-raised:#1d242d;--line:#303945;--fg:#e3e8ef;--mut:#a0acbb;--acc:#8ab4ef;--ok:#70c6a0;--warn:#e4b866;--bad:#ef9191;--r:4px;--button-bg:#315f99;--button-fg:#fff}
+@media (prefers-color-scheme: light){:root{--bg:#f3f5f7;--panel:#fff;--panel-raised:#edf1f5;--line:#ccd3dc;--fg:#202833;--mut:#596777;--acc:#245d9f;--ok:#23734e;--warn:#856009;--bad:#b52f3b;--button-bg:#245d9f;--button-fg:#fff}}
+*{box-sizing:border-box}html{color-scheme:dark light}body{margin:0;background:var(--bg);color:var(--fg);font:13px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+a{color:var(--acc);text-decoration:none}a:hover{text-decoration:underline}
+.site-header{background:var(--panel);border-bottom:1px solid var(--line)}
+nav{display:flex;max-width:1280px;margin:auto;flex-wrap:wrap;gap:4px 12px;align-items:center;padding:0 24px;min-height:54px;background:var(--panel)}
+.brand{display:inline-flex;align-items:center;gap:9px;white-space:nowrap;font-weight:650;letter-spacing:-.02em}.brand .ui-icon{width:20px;height:20px;color:var(--acc)}nav .brand{font-size:15px;margin-right:12px;padding:0;border:0;color:var(--fg)}nav a{padding:17px 8px;color:var(--mut);border-bottom:2px solid transparent}nav a:hover{color:var(--fg);text-decoration:none}nav a.active{color:var(--fg);border-bottom-color:var(--acc)}
+.nav-links{display:flex;flex-wrap:wrap;gap:2px;min-width:0}
+nav form{margin-left:auto}
+main{max-width:1280px;margin:0 auto;padding:24px;overflow-wrap:anywhere;min-width:0}
+h1{font-size:22px;font-weight:600;letter-spacing:-.025em;line-height:1.3;margin:0 0 12px}h2{font-size:15px;font-weight:600;margin:20px 0 8px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;margin-bottom:12px;min-width:0}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top;overflow-wrap:anywhere}
+th{color:var(--mut);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
+code,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px}
+code{background:rgba(127,127,127,.12);padding:1px 5px;border-radius:4px;overflow-wrap:anywhere}
+pre{background:rgba(127,127,127,.12);padding:10px;border-radius:var(--r);overflow:auto;font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere;max-width:100%;line-height:1.6}
+.mut{color:var(--mut)}.small{font-size:13px}
+.btn{display:inline-flex;overflow-wrap:normal;justify-content:center;align-items:center;min-height:32px;text-align:center;border:1px solid var(--line);background:var(--panel);color:var(--fg);padding:5px 10px;border-radius:var(--r);cursor:pointer;font:inherit;font-size:13px}
+.btn:hover{border-color:var(--acc);text-decoration:none;background:var(--panel-raised)}.btn.p{background:var(--button-bg);border-color:var(--button-bg);color:var(--button-fg)}.btn.p:hover{filter:brightness(1.12)}
+.btn.ok{background:transparent;border-color:var(--ok);color:var(--ok)}.btn.ok:hover{background:rgba(112,198,160,.1)}
+.btn.bad{background:transparent;border-color:var(--bad);color:var(--bad)}.btn.bad:hover{background:rgba(239,145,145,.1)}.btn:disabled{opacity:.5;cursor:not-allowed}.btn.sm{min-height:28px;padding:3px 8px;font-size:12px}
+.row>*{min-width:0;max-width:100%}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pill{display:inline-block;white-space:nowrap;padding:1px 6px;border-radius:3px;font-size:12px;border:1px solid var(--line)}
+.pill.open,.pill.allow,.pill.approved,.pill.ok{border-color:var(--ok);color:var(--ok)}
+.pill.approval,.pill.pending{border-color:var(--warn);color:var(--warn)}
+.pill.locked,.pill.deny,.pill.denied,.pill.error,.pill.revoked,.pill.refused,.pill.critical{border-color:var(--bad);color:var(--bad)}
+.pill.high{border-color:var(--bad);color:var(--bad);background:rgba(255,107,107,.12)}.pill.medium{border-color:var(--warn);color:var(--warn)}
+.semantic{border:1px solid var(--mut);border-radius:var(--r);padding:8px 12px;margin:8px 0}.semantic.safe{border-color:var(--ok)}.semantic.unsafe{border-color:var(--bad);background:rgba(255,107,107,.1)}.semantic.unclear{border-color:var(--warn)}.semantic ul{margin:4px 0 0 0;padding-left:0;list-style:none}.semantic li{margin:3px 0}
+.hazard{border:1px solid var(--warn);background:rgba(247,185,40,.1);border-radius:var(--r);padding:8px 12px;margin:8px 0}.hazard.high,.hazard.critical{border-color:var(--bad);background:rgba(255,107,107,.1)}.hazard ul{margin:4px 0 0 0;padding-left:0;list-style:none}.hazard li{margin:3px 0}
+.flash{background:rgba(90,169,255,.12);border:1px solid var(--acc);padding:10px 12px;border-radius:var(--r);margin-bottom:12px}
+.err{background:rgba(255,107,107,.12);border:1px solid var(--bad);padding:10px 12px;border-radius:var(--r);margin-bottom:12px}
+label{display:block;font-size:13px;color:var(--mut);margin:10px 0 4px}
+input[type=text],input[type=password],input[type=url],input[type=number],select,textarea{width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:var(--r);background:var(--bg);color:var(--fg);font:inherit}
+textarea{min-height:90px;font-family:ui-monospace,monospace;font-size:13px}
+.inline{display:inline}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px}
+.stat{font-size:24px;line-height:1.2;font-weight:600;font-variant-numeric:tabular-nums}.help{font-size:12px;color:var(--mut);margin-top:3px}
+
+/* Waiting on you: request tiles and attention cards. A tile is a summary you can act on; the
+   detail behind it is one tap away and never gets in the way of a queue you are clearing. */
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
+.req-tile.flagged{border-color:var(--bad)}
+.tile-open{display:block}.tile-open>summary{list-style:none;cursor:pointer;padding:10px 12px}
+.tile-open>summary::-webkit-details-marker{display:none}
+.tile-open>summary:hover{background:rgba(127,127,127,.05)}
+.tile-head{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:baseline}
+.tile-head>b{min-width:0;overflow-wrap:anywhere}
+.tile-dot{width:8px;height:8px;border-radius:50%;background:var(--warn);flex:0 0 auto;align-self:center}
+.req-tile.flagged .tile-dot{background:var(--bad)}
+/* Times and chevron travel as one unit, so a narrow tile wraps them onto a single row with the
+   chevron still at the edge where a thumb expects it, instead of stranding it on a line of its own. */
+.tile-meta{margin-left:auto;display:flex;gap:8px;align-items:center;white-space:nowrap}
+.tile-chevron{transition:transform .15s ease;color:var(--mut);align-self:center}
+.tile-open[open]>summary .tile-chevron{transform:rotate(180deg)}
+.tile-line{margin-top:7px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;line-height:1.45;overflow-wrap:anywhere;max-height:9em;overflow:auto}
+.tile-cont{margin-top:2px;padding-left:12px;color:var(--mut)}
+.tile-reason{margin-top:4px;color:var(--mut)}
+.tile-body{padding:0 14px 12px;border-top:1px solid var(--line);margin-top:2px}
+.tile-field{margin:12px 0}.tile-label{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);margin-bottom:4px}
+.tile-quick{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 14px;border-top:1px solid var(--line);background:rgba(127,127,127,.04)}
+.tile-quick .small{flex:1 1 140px;min-width:0}
+.tile-open[open]~.tile-quick{display:none}
+.nudge-tile{border-left:3px solid var(--acc)}.nudge-tile>.tile-head{padding:10px 12px 0}
+.nudge-message{padding:6px 14px 10px;overflow-wrap:anywhere}
+/* A tile arriving by itself should be noticed, and one that has just been decided should say so
+   before it goes, so a decision made on the phone reads as an answer and not as a disappearance. */
+@keyframes tile-in{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.tile-new{animation:tile-in .25s ease-out}
+.tile-done>.tile-open{opacity:.5;transition:opacity .4s ease}
+.tile-done .tile-quick,.tile-done .decision-actions{display:none}
+.tile-resolved{padding:10px 14px;border-top:1px solid var(--line);font-size:13px}
+.tile-approved .tile-resolved{color:var(--ok)}.tile-denied .tile-resolved,.tile-expired .tile-resolved{color:var(--mut)}
+.live-state{font-size:11px;font-weight:400;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);vertical-align:middle}
+.live-state::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--mut);margin-right:5px;vertical-align:baseline}
+.live-state.on::before{background:var(--ok)}.live-state.off::before{background:var(--warn)}
+@media(prefers-reduced-motion:reduce){.tile-new{animation:none}.tile-chevron{transition:none}}
+
+.enrollment-option summary{cursor:pointer;font-weight:600;min-height:44px}.enrollment-option{align-self:start}
+.grid>*{min-width:0}.grid>.card{margin-bottom:0}.grid{margin-bottom:14px}
+.stats{grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border:1px solid var(--line);border-radius:var(--r);background:var(--panel)}.stats .card{border:0;border-radius:0;background:transparent}.stats .card+.card{border-left:1px solid var(--line)}.stats .card{padding:10px 12px}.stats .stat{margin-top:4px}
+.page-intro{margin:-4px 0 16px;color:var(--mut)}
+.toolbar{margin-bottom:14px;align-items:end}.toolbar input{flex:1 1 200px}.toolbar .field{flex:1 1 220px}.toolbar label{margin-top:0}
+.data-table th{white-space:nowrap}
+.data-table td[data-label="Time"],.data-table td[data-label="When"],.data-table td[data-label="Created"],.data-table td[data-label="Last seen"]{white-space:nowrap}
+.cell-value{min-width:0}.cell-value .row{gap:6px}.data-table tbody tr:last-child td{border-bottom:0}
+.detail-table{table-layout:fixed}.detail-table th{width:100px}.detail-table pre{margin:0}
+.connection-guide summary{font-weight:600;cursor:pointer;padding:10px 0;min-height:44px}.connection-guide details+details{border-top:1px solid var(--line)}.connection-guide h3{font-size:15px;margin:18px 0 6px}
+.connection-guide pre{margin:8px 0}.connection-guide p{margin:8px 0}
+.token{border-color:var(--ok)}.token pre{user-select:all}
+.decision-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.decision-scope{grid-column:1/-1}.decision-scope label:first-child{margin-top:0}
+.access-heading{justify-content:space-between;margin-bottom:12px}.access-target{border-top:1px solid var(--line);padding:12px 0}
+.access-target:last-child{padding-bottom:0}.access-lease{border-left:3px solid var(--acc);padding:10px 12px;margin:12px 0;background:rgba(90,169,255,.04)}
+.access-lease pre{margin:8px 0}.access-detail summary{cursor:pointer;min-height:36px;padding:6px 0}.access-source{margin:8px 0}
+.decision-deny{grid-column:1/-1;display:flex;gap:8px}.decision-deny input{flex:1;min-width:0}
+label.inline{display:inline-block;min-height:40px;padding:8px 0;max-width:100%}label.inline input{vertical-align:middle;margin-right:5px}
+input,select,textarea{min-width:0;max-width:100%}input[type=checkbox]{flex-shrink:0}
+:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+.skip-link{position:absolute;left:16px;top:-100px;background:var(--panel);padding:12px;z-index:10}.skip-link:focus{top:8px}
+.mobile-nav{display:none}.mobile-more{position:relative}.mobile-more summary{list-style:none;cursor:pointer;text-align:center;font-size:11px;line-height:1.15;padding:8px 2px;min-height:42px;color:var(--mut);border-radius:3px}.mobile-more summary::-webkit-details-marker{display:none}.mobile-more summary .ui-icon{margin:0 auto 3px;width:18px;height:18px}.mobile-more[open] summary,.mobile-more.current summary{color:var(--acc);background:rgba(80,169,255,.12)}.mobile-more-menu{position:absolute;right:0;bottom:52px;width:210px;padding:6px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 10px 30px rgba(0,0,0,.35)}.mobile-more-menu a,.mobile-more-menu button{display:block;width:100%;padding:10px 11px;text-align:left;color:var(--fg);background:transparent;border:0;border-radius:var(--r);font:inherit;font-size:13px}.mobile-more-menu a:hover,.mobile-more-menu button:hover{background:rgba(80,169,255,.12);text-decoration:none}.mobile-more-menu form{margin:4px 0 0;border-top:1px solid var(--line);padding-top:4px}
+@media(max-width:900px){
+  body{padding-bottom:68px} .site-header{position:sticky;top:0;z-index:5}
+  nav{gap:0;padding:8px 14px;min-height:48px}.brand{font-size:15px}
+  nav form{margin-left:auto}nav > form{display:none}
+  .nav-links{display:none}.mobile-nav{position:fixed;z-index:10;bottom:0;left:0;right:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0;padding:6px 4px max(6px,env(safe-area-inset-bottom));background:var(--panel);border-top:1px solid var(--line)}
+  .mobile-nav>a{text-align:center;font-size:11px;line-height:1.15;padding:8px 2px;min-height:42px;color:var(--mut);border-radius:3px}.mobile-nav>a .ui-icon{width:18px;height:18px;margin:0 auto 3px}
+
+  .mobile-nav a.active{color:var(--acc);background:rgba(80,169,255,.12)}
+  main{padding:16px 12px 12px}h1{font-size:20px;line-height:1.2;margin:4px 0 4px}.page-intro{font-size:13px;line-height:1.35;margin:0 0 14px}
+  h2{font-size:15px;margin:17px 0 8px}.card{padding:12px;margin-bottom:10px}.grid{gap:8px;margin-bottom:10px}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:0}.stats .card{padding:10px}.stats .stat{font-size:22px;line-height:1.05;margin-top:3px}.stats .mut{font-size:12px}.stats .small{font-size:12px}.stats .card:nth-child(3){border-left:0}.stats .card:nth-child(n+3){border-top:1px solid var(--line)}
+  .btn,.btn.sm{min-height:40px}.toolbar{align-items:end}.toolbar .field{flex-basis:100%}
+  .access-heading{margin-bottom:7px}.access-lease{padding:9px 10px;margin:9px 0}.access-target{padding:10px 0}.access-target .row{gap:5px}
+  .tile-open>summary{padding:11px 12px}.tile-body{padding:0 12px 11px}.tile-quick{padding:9px 12px;gap:6px}
+  .tile-meta{flex-basis:100%;margin-left:0;justify-content:space-between}.tile-quick .small{flex-basis:100%}
+  .decision-actions{gap:6px}.decision-actions .help{font-size:11px}.decision-actions .decision-scope label{margin-top:7px}
+  input[type=text],input[type=password],input[type=url],input[type=number],select,textarea{font-size:16px}
+  /* Keep table semantics in markup while reflowing each record on small screens. */
+  .data-table,.data-table tbody{display:block;width:100%}
+  .data-table thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+  .data-table tbody tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px;padding:14px 0;border-bottom:1px solid var(--line)}
+  .data-table tbody tr:first-child{padding-top:0}.data-table tbody tr:last-child{border-bottom:0;padding-bottom:0}
+  .data-table td{display:block;min-width:0;padding:0;border:0;font-size:14px}
+  .data-table td::before{content:attr(data-label);display:block;color:var(--mut);font:600 11px/1.5 system-ui,sans-serif;letter-spacing:.04em;text-transform:uppercase;margin-bottom:3px}
+  .data-table td.wide{grid-column:1/-1}.data-table td.actions::before{display:none}
+  .detail-table,.detail-table tbody,.detail-table tr,.detail-table th,.detail-table td{display:block;width:100%}
+  .detail-table th{border:0;padding:10px 0 2px}.detail-table td{padding:0 0 10px}
+  .decision-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .host-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.host-fields>div:first-child{grid-column:1/-1}
+}
+@media(max-width:420px){
+  main{padding-left:10px;padding-right:10px}.card{border-radius:var(--r)}.stats .card{padding:9px 10px}.stats .stat{font-size:21px}
+  .pending-request .row{align-items:flex-start}.pending-request .btn{padding-left:7px;padding-right:7px;font-size:13px}
+}
+.auth-card{max-width:380px;margin:48px auto;padding:24px}.auth-card h1{font-size:20px}.auth-card .btn{width:100%;margin-top:4px}
+{% include "_collections_style.html" %}
+{% include "_inventory_style.html" %}
+</style>
+</head>
+<body>
+{% if not hide_nav %}
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header"><nav aria-label="Main navigation">
+<a class="brand" href="/ui" aria-label="Keywright dashboard">{{ icon('shield') }}<span>Keywright</span></a>
+<div class="nav-links">
+<a href="/ui" class="{{ 'active' if request.url.path == '/ui' }}">Dashboard</a>
+<a href="/ui/requests" class="{{ 'active' if request.url.path.startswith('/ui/requests') }}">Requests</a>
+<a href="/ui/grants" class="{{ 'active' if request.url.path.startswith('/ui/grants') }}">Grants</a>
+<a href="/ui/policies" class="{{ 'active' if request.url.path.startswith('/ui/policies') }}">Rules</a>
+<a href="/ui/access" class="{{ 'active' if request.url.path.startswith('/ui/access') }}">Access</a>
+<a href="/ui/resources" class="{{ 'active' if (request.url.path.startswith('/ui/resources') or request.url.path.startswith('/ui/inventory')) }}">Resources</a>
+<a href="/ui/agents" class="{{ 'active' if request.url.path.startswith('/ui/agents') }}">Agents</a>
+<a href="/ui/knowledge" class="{{ 'active' if request.url.path.startswith('/ui/knowledge') }}">Knowledge</a>
+<a href="/ui/mail" class="{{ 'active' if request.url.path.startswith('/ui/mail') }}">Mail</a>
+<a href="/ui/usage" class="{{ 'active' if request.url.path.startswith('/ui/usage') }}">Usage</a>
+<a href="/ui/audit" class="{{ 'active' if request.url.path.startswith('/ui/audit') }}">Audit</a>
+<a href="/ui/settings" class="{{ 'active' if request.url.path.startswith('/ui/settings') }}">Settings</a>
+</div>
+<form method="post" action="/ui/logout"><button class="btn sm">Log out</button></form>
+</nav></header>
+<nav class="mobile-nav" aria-label="Mobile navigation">
+<a href="/ui" class="{{ 'active' if request.url.path == '/ui' }}">{{ icon('dashboard') }}Dashboard</a>
+<a href="/ui/resources" class="{{ 'active' if (request.url.path.startswith('/ui/resources') or request.url.path.startswith('/ui/inventory')) }}">{{ icon('ssh') }}Resources</a>
+<a href="/ui/requests" class="{{ 'active' if request.url.path.startswith('/ui/requests') }}">{{ icon('requests') }}Requests</a>
+<a href="/ui/audit" class="{{ 'active' if request.url.path.startswith('/ui/audit') }}">{{ icon('activity') }}Activity</a>
+<details class="mobile-more{{ ' current' if request.url.path.startswith('/ui/grants') or request.url.path.startswith('/ui/policies') or request.url.path.startswith('/ui/access') or request.url.path.startswith('/ui/agents') or request.url.path.startswith('/ui/settings') or request.url.path.startswith('/ui/usage') or request.url.path.startswith('/ui/mail') or request.url.path.startswith('/ui/knowledge') }}">
+<summary>{{ icon('more') }}More</summary>
+<div class="mobile-more-menu">
+<a href="/ui/knowledge" class="{{ 'active' if request.url.path.startswith('/ui/knowledge') }}">Knowledge</a>
+<a href="/ui/mail" class="{{ 'active' if request.url.path.startswith('/ui/mail') }}">Mail</a>
+<a href="/ui/usage" class="{{ 'active' if request.url.path.startswith('/ui/usage') }}">Usage</a>
+<a href="/ui/grants" class="{{ 'active' if request.url.path.startswith('/ui/grants') }}">Grants</a>
+<a href="/ui/policies" class="{{ 'active' if request.url.path.startswith('/ui/policies') }}">Rules</a>
+<a href="/ui/access" class="{{ 'active' if request.url.path.startswith('/ui/access') }}">Access</a>
+<a href="/ui/agents" class="{{ 'active' if request.url.path.startswith('/ui/agents') }}">Agents</a>
+<a href="/ui/audit" class="{{ 'active' if request.url.path.startswith('/ui/audit') }}">Audit log</a>
+<a href="/ui/settings" class="{{ 'active' if request.url.path.startswith('/ui/settings') }}">Settings</a>
+<form method="post" action="/ui/logout"><button type="submit">Log out</button></form>
+</div>
+</details>
+</nav>
+{% endif %}
+<main id="main">
+{% if flash %}<div class="flash">{{ flash }}</div>{% endif %}
+{% if error %}<div class="err">{{ error }}</div>{% endif %}
+{% block body %}{% endblock %}
+</main>
+{% block scripts %}{% endblock %}
+</body></html>

@@ -1,0 +1,226 @@
+{% extends "base.html" %}{% block title %}Keywright · Dashboard{% endblock %}{% block body %}
+<div class="dashboard-heading"><h1>Dashboard</h1>
+<p class="page-intro">Requests that need you and agents with active approvals.</p>
+</div>
+<div class="grid stats">
+<div class="card"><div class="mut small">Pending requests</div><div class="stat" data-count="pending">{{ pending|length }}</div></div>
+<div class="card"><div class="mut small">Temporary approvals</div><div class="stat" data-count="leases">{{ lease_count }}</div></div>
+<div class="card"><div class="mut small">Targets / agents</div><div class="stat">{{ target_count }} / {{ agent_count }}</div></div>
+<div class="card"><div class="mut small">Notifier</div><div><b>{{ notifier.driver_id }}</b>
+{% if notifier.last_error %}<div class="small" style="color:var(--bad)">{{ notifier.last_error }}</div>{% elif notifier.driver_id == 'log' %}<div class="small mut">No push channel. <a href="/ui/settings">Configure</a></div>{% endif %}</div></div>
+</div>
+
+{% for r in drifted %}<div class="card" role="status"><b>Tools changed on {{ r.name }}</b>
+<span class="small">{% if r.config.tools_drift.added %}{{ r.config.tools_drift.added|length }} new · {% endif %}{% if r.config.tools_drift.changed %}{{ r.config.tools_drift.changed|length }} changed · {% endif %}{% if r.config.tools_drift.removed %}{{ r.config.tools_drift.removed|length }} removed · {% endif %}<a href="/ui/access?resource={{ r.id }}">review on the Access page</a></span></div>{% endfor %}
+<div id="live">
+{% include "_live.html" %}
+</div>
+
+<div class="activity-heading"><h2>Active approvals</h2><a href="/ui/grants">View all grants</a></div>
+<p class="small mut">Only agents with temporary approvals are shown. Standing rules and target defaults still apply. <a href="/ui/access">Manage access</a></p>
+{% for entry in access_agents if entry.leases %}
+<section class="card" aria-label="Access for {{ entry.agent.name }}">
+<div class="row access-heading"><div><b>{{ entry.agent.name }}</b> <span class="pill">{{ entry.leases|length }} approval{{ 's' if entry.leases|length != 1 else '' }}</span>{% if entry.agent.disabled %} <span class="pill locked">Suspended · new operations blocked</span>{% endif %}</div>
+<form method="post" action="/ui/agents/{{ entry.agent.id }}/{{ 'enable' if entry.agent.disabled else 'disable' }}">
+<input type="hidden" name="next" value="/ui"><button class="btn sm {{ '' if entry.agent.disabled else 'bad' }}">{{ 'Resume agent' if entry.agent.disabled else 'Suspend agent' }}</button></form></div>
+{% for lease in entry.leases %}
+<div class="access-lease">
+<div class="row access-heading"><div><b>{{ 'Retained approval while suspended' if entry.agent.disabled else 'Temporary access' }}</b> · {{ lease.remaining }}{% if lease.scope == 'session' %} · session <code>{{ lease.session_id }}</code>{% elif lease.scope == 'once' %} · once per listed scope{% endif %}</div>
+<form method="post" action="{% if lease.request %}/ui/requests/{{ lease.request.id }}/revoke{% else %}/ui/grants/{{ lease.grants[0].id }}/revoke{% endif %}"><input type="hidden" name="next" value="/ui"><button class="btn sm">Revoke approval</button></form></div>
+<div class="small">{{ lease.label }}</div>
+{% if lease.constraints %}<details class="access-detail"><summary>Operation constraints</summary>{% with constraints=lease.constraints %}{% include "_constraints.html" %}{% endwith %}</details>{% endif %}
+{% for g in lease.grants %}<div><code>{{ g.pattern }}</code></div>{% endfor %}
+{% if lease.request %}<div class="small mut">{{ lease.request.reason }}</div><a class="small" href="/ui/requests/{{ lease.request.id }}">Approval and activity · {{ lease.request.id }}</a>{% endif %}
+</div>
+{% endfor %}
+{% set approved_targets = entry.targets|selectattr('temporary')|list %}
+{% if approved_targets %}<details class="access-detail"><summary>Target access details · {{ approved_targets|length }}</summary>
+<p class="small mut">Deny rules override approvals. Revoking an approval removes only that permission source. Suspending an agent blocks new operations; running operations continue.</p>
+{% for target in approved_targets %}
+<div class="access-target">
+<div class="row"><b>{{ target.resource.name }}</b><span class="pill">{{ target.resource.kind | upper }}</span><span>{{ target.state }}</span>{% if target.has_restrictions %}<span class="pill deny">Deny rules apply</span>{% endif %}</div>
+<div class="small mut">Default: {{ target.resource.default_mode }} · {{ target.temporary }} temporary permission scopes</div>
+{% if target.allows or target.denies %}<details class="access-detail"><summary>{{ target.allows|length }} standing allows · {{ target.denies|length }} denies</summary>
+{% for p in target.denies + target.allows %}<div class="access-source"><span class="pill {{ p.effect }}">{{ p.effect }}</span> <code>{{ p.pattern }}</code><div class="small">{{ constraint_label(p.constraints) }} · {{ 'All agents' if not p.agent_id else 'This agent' }}</div>
+{% if p.constraints %}{% with constraints=p.constraints %}{% include "_constraints.html" %}{% endwith %}{% endif %}</div>{% endfor %}
+<a class="small" href="/ui/policies">Manage standing rules</a></details>{% endif %}
+</div>
+{% endfor %}
+</details>{% endif %}
+</section>
+{% else %}<div class="card mut">No active approvals. Agents will appear here when a temporary approval is granted.</div>{% endfor %}
+
+<div class="activity-heading"><h2>Recent activity</h2><a href="/ui/audit">View all</a></div>
+<div class="card activity-list">{% for e in recent %}{% include "_activity_row.html" %}{% else %}<p class="mut collection-empty">No activity yet.</p>{% endfor %}<a class="btn activity-all" href="/ui/audit">View all activity →</a></div>
+{% endblock %}
+{% block scripts %}
+<script>
+/* Live dashboard. Without this the page is what it always was: server-rendered, correct on load,
+   and stale afterwards. With it, requests arrive as they are made and resolve as they are decided,
+   including when the decision came from a phone and this tab had nothing to do with it.
+   Every mutation still goes through the ordinary forms; this socket only ever reads. */
+(function () {
+  var live = document.getElementById('live');
+  if (!live || !window.WebSocket) return;
+
+  // ---- relative times: rendered absolute so they are right without JS, relative once we are here
+  function since(seconds) {
+    if (seconds < 60) return Math.max(0, Math.round(seconds)) + 's ago';
+    if (seconds < 3600) return Math.round(seconds / 60) + 'm ago';
+    return Math.round(seconds / 3600) + 'h ago';
+  }
+  function until(seconds) {
+    if (seconds <= 0) return 'expired';
+    if (seconds < 90) return 'expires in ' + Math.max(1, Math.round(seconds)) + 's';
+    return 'expires in ' + Math.round(seconds / 60) + 'm';
+  }
+  function clock() {
+    var at = Date.now();
+    live.querySelectorAll('[data-since]').forEach(function (el) {
+      el.textContent = since((at - Date.parse(el.getAttribute('data-since'))) / 1000);
+    });
+    live.querySelectorAll('[data-until]').forEach(function (el) {
+      el.textContent = until((Date.parse(el.getAttribute('data-until')) - at) / 1000);
+    });
+  }
+  setInterval(clock, 5000);
+  clock();
+
+  // ---- counts and the two empty states ----------------------------------------------------
+  function settle(counts) {
+    if (counts) {
+      Object.keys(counts).forEach(function (key) {
+        document.querySelectorAll('[data-count="' + key + '"]').forEach(function (el) {
+          el.textContent = counts[key];
+        });
+      });
+    }
+    var heading = document.getElementById('nudges-heading');
+    if (heading) heading.hidden = !document.querySelector('#nudge-list .nudge-tile');
+    var empty = document.getElementById('pending-empty');
+    if (empty) empty.hidden = !!document.querySelector('#pending-list .req-tile');
+  }
+
+  function add(listId, domId, html) {
+    var list = document.getElementById(listId);
+    if (!list || document.getElementById(domId)) return;
+    var holder = document.createElement('div');
+    holder.innerHTML = html;
+    var tile = holder.firstElementChild;
+    if (!tile) return;
+    tile.classList.add('tile-new');
+    list.insertBefore(tile, list.firstChild);
+    clock();
+  }
+
+  function drop(domId) {
+    var tile = document.getElementById(domId);
+    if (tile) tile.remove();
+    settle(null);
+  }
+
+  /* A decided request says how it was decided before it goes. Its buttons are disabled first:
+     the decision is already made, and a click landing afterwards would only raise an error. */
+  function resolved(event) {
+    var tile = document.getElementById('req-' + event.id);
+    if (!tile) return;
+    tile.querySelectorAll('button').forEach(function (b) { b.disabled = true; });
+    tile.classList.add('tile-done', 'tile-' + event.status);
+    var note = document.createElement('div');
+    note.className = 'tile-resolved';
+    if (event.status === 'expired') {
+      note.textContent = 'Expired before it was decided. Nothing was granted.';
+    } else {
+      note.textContent = (event.status === 'approved' ? 'Approved' : 'Denied')
+        + (event.label ? ' · ' + event.label : '')
+        + (event.via && event.via !== 'ui' ? ' · via ' + event.via : '');
+    }
+    tile.appendChild(note);
+    setTimeout(function () { drop('req-' + event.id); }, 6000);
+  }
+
+  /* A full redraw, used after a reconnect and whenever the server says we fell behind. Whatever
+     the human had open stays open: losing an expanded request mid-read would be its own bug. */
+  function resync(state) {
+    if (!state || typeof state.html !== 'string') return;
+    var open = [];
+    live.querySelectorAll('[data-request] details[open]').forEach(function (d) {
+      open.push(d.closest('[data-request]').getAttribute('data-request'));
+    });
+    live.innerHTML = state.html;
+    open.forEach(function (id) {
+      var d = live.querySelector('[data-request="' + id + '"] details');
+      if (d) d.open = true;
+    });
+    settle(state.counts);
+    clock();
+  }
+
+  function apply(event) {
+    if (event.type === 'ping' || event.type === 'hello') return settle(event.counts);
+    if (event.type === 'resync') return resync(event);
+    if (event.type === 'request.created') add('pending-list', 'req-' + event.id, event.html);
+    else if (event.type === 'request.decided') resolved(event);
+    else if (event.type === 'nudge.created') add('nudge-list', 'nudge-' + event.id, event.html);
+    else if (event.type === 'nudge.cleared') drop('nudge-' + event.id);
+    settle(event.counts);
+  }
+
+  // ---- the socket -------------------------------------------------------------------------
+  var state = document.getElementById('live-state');
+  var backoff = 1000, socket = null, retrying = false, everOpened = false;
+
+  function show(text, cls) {
+    if (!state) return;
+    state.hidden = false;
+    state.textContent = text;
+    state.className = 'live-state ' + cls;
+  }
+
+  function retry() {
+    if (retrying) return;
+    retrying = true;
+    show('reconnecting', 'off');
+    setTimeout(connect, backoff);
+    backoff = Math.min(backoff * 2, 30000);
+  }
+
+  function refresh() {
+    fetch('/ui/live', {credentials: 'same-origin'})
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(resync)
+      .catch(function () {});
+  }
+
+  function connect() {
+    retrying = false;
+    try {
+      socket = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ui/events');
+    } catch (err) {
+      return retry();  // blocked or malformed: keep trying quietly rather than going silently stale
+    }
+    socket.onopen = function () {
+      backoff = 1000;
+      show('live', 'on');
+      if (everOpened) refresh();  // catch up on anything decided while we were away
+      everOpened = true;
+    };
+    socket.onmessage = function (e) {
+      try { apply(JSON.parse(e.data)); } catch (err) { /* a message we do not understand is not fatal */ }
+    };
+    socket.onclose = retry;
+    socket.onerror = function () { try { socket.close(); } catch (err) { retry(); } };
+  }
+
+  // Phones suspend the tab rather than closing the socket; a socket that looks open after a long
+  // sleep is usually dead, so returning to the page always re-reads the truth from the server.
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState !== 'visible') return;
+    if (socket && socket.readyState === WebSocket.OPEN) refresh();
+    else retry();
+  });
+
+  connect();
+})();
+</script>
+{% endblock %}

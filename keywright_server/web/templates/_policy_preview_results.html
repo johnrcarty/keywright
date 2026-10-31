@@ -1,0 +1,13 @@
+<p>{{ preview.counts.changed }} changed · {{ preview.counts.unchanged }} unchanged · {{ preview.counts.inconclusive }} inconclusive</p>
+<p class="small mut">{{ preview.since.strftime('%Y-%m-%d %H:%M') }} to {{ preview.at.strftime('%Y-%m-%d %H:%M') }} UTC.
+{% if preview.limited %}Sample capped at the newest {{ preview.limit }} call records; older records are omitted.{% else %}{{ preview.rows|length }} call records in this window.{% endif %}
+Approval and execution records can describe the same call; these are not unique operation counts.</p>
+<p class="small">Compares each recorded call independently against current rules, active grants, resource settings and agent status. One-time grants are not spent or simulated across rows. This does not reconstruct historical policy, run tools, or check upstream availability, LLM budgets, approval cooldowns or semantic decisions. Incomplete evidence is inconclusive. No matches does not mean a rule is safe.</p>
+<table class="data-table" role="table"><thead><tr><th>Audit</th><th>Agent / tool</th><th>Current</th><th>With rule</th></tr></thead><tbody>
+{% for row in preview.rows %}<tr>
+<td data-label="Audit"><a href="/ui/audit?q=%23{{ row.id }}">#{{ row.id }}</a><div class="small mut">{{ row.ts.strftime('%m-%d %H:%M') }} UTC</div></td>
+<td data-label="Agent / tool">{{ row.agent }}<div class="small">{{ row.tool }}</div>{% if row.reason %}<div class="small mut">{{ row.reason }}</div>{% endif %}</td>
+<td data-label="Current">{{ preview.labels[row.before] }}</td>
+<td data-label="With rule">{% if row.changed %}<b>{{ preview.labels[row.after] }}</b>{% else %}{{ preview.labels[row.after] }}{% endif %}</td>
+</tr>{% endfor %}</tbody></table>
+{% if not preview.rows %}<p>No recent brokered call records for this agent scope.</p>{% endif %}

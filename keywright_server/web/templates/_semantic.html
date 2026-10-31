@@ -1,0 +1,10 @@
+{# Jev's verdict on a request: the one-line reading, then every answer so the human can see why.
+   Advisory in shadow mode; under trust an eligible verdict has already approved the request once. #}
+{% set v = req.semantic %}{% if v %}
+<div class="semantic {{ v.verdict }}"><b>{{ jev_line(v) }}</b>
+{% if v.status == 'ok' %}<ul class="small">
+<li>category <b>{{ v.summary.category }}</b> ({{ '%.2f' % v.summary.category_confidence }}) · reversibility {{ v.summary.reversibility }} ({{ '%.2f' % v.summary.reversibility_confidence }}){% if v.summary.task_fit is not none %} · reason fits {{ '%.2f' % v.summary.task_fit }}{% else %} · no reason given, truthfulness not checked{% endif %}</li>
+<li>{% for k, p in v.summary.effects.items() %}<span class="pill {{ ('high' if k not in ('modifies_state', 'persistent_change') and not (k == 'deletes_data' and v.operation == 'put') else 'medium') if p >= 0.5 else 'medium' if p > 0.15 else 'ok' }}">{{ jev_effect_words[k] }} {{ '%.2f' % p }}</span> {% endfor %}</li>
+<li class="mut">{% if v.auto.eligible %}{{ 'would auto-approve under trust' if v.mode != 'trust' else 'auto-approved' }}{% else %}not auto-approvable: {{ v.auto.blocked_by | join(', ') }}{% endif %} · {{ v.model }} · {{ v.latency_ms }} ms{% if v.usage %} · {{ v.usage.input_tokens }} tokens in{% endif %}{% if v.omitted %} · omitted: {{ v.omitted | join(', ') }}{% endif %}</li>
+</ul>{% else %}<div class="small mut">{{ v.status }}{% if v.reason %}: {{ v.reason }}{% endif %} · the decision is yours as usual</div>{% endif %}
+</div>{% endif %}

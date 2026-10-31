@@ -1,0 +1,30 @@
+{% extends "base.html" %}{% block title %}Rules{% endblock %}{% block body %}
+<h1>Standing rules</h1>
+<p class="page-intro"><a href="/ui/friction">Review approval friction and exact-operation suggestions</a>.</p>
+{% if error %}<div class="card" role="alert">{{ error }}</div>{% endif %}
+<div class="card">
+<form method="post" action="/ui/policies">
+<div class="grid">
+<div><label>Pattern</label><input type="text" name="pattern" value="{{ draft.get('pattern', '') }}" placeholder="ssh/nvr/exec/journalctl  ·  mcp/ha/tools/get_state  ·  ssh/dev-box/exec/**" required>
+<div class="help"><code>*</code> one segment, <code>**</code> everything below. A literal pattern also covers everything under it. MCP calls can be qualified by argument: <code>mcp/ha/tools/call_service/service=automation.turn_off</code>, and a value may end in <code>*</code> (<code>entity_id=light.*</code>). Keys come from the resource's argument keys.</div></div>
+<div><label>Effect</label><select name="effect"><option value="allow">allow</option><option value="deny" {{ 'selected' if draft.get('effect') == 'deny' }}>deny (always wins)</option></select></div>
+<div><label>Agent</label><select name="agent_id"><option value="">every agent</option>{% for a in agents %}<option value="{{ a.id }}" {{ 'selected' if draft.get('agent_id') == a.id }}>{{ a.name }}</option>{% endfor %}</select></div>
+<div><label>Note</label><input type="text" name="note" value="{{ draft.get('note', '') }}"></div>
+</div>
+<div class="row" style="margin-top:10px"><button class="btn" name="action" value="preview">Preview recent activity</button><button class="btn p" name="action" value="save">Add rule</button></div>
+</form></div>
+{% if preview %}
+<section class="card" aria-labelledby="preview-title">
+<h2 id="preview-title">Rule preview · not saved</h2>
+<p><b>{{ draft.effect }} <code>{{ draft.pattern }}</code></b> · {{ agent_map[draft.agent_id].name if draft.agent_id in agent_map else 'every agent' }}</p>
+{% include "_policy_preview_results.html" %}
+<p class="small">Edit the draft above and preview again, or choose <b>Add rule</b> to save. Access settings may change after this preview.</p>
+</section>
+{% endif %}
+<div class="card"><table class="data-table" role="table"><thead role="rowgroup"><tr role="row"><th scope="col" role="columnheader">Effect</th><th scope="col" role="columnheader">Pattern</th><th scope="col" role="columnheader">Agent</th><th scope="col" role="columnheader">Note</th><th scope="col" role="columnheader">Added</th><th scope="col" role="columnheader">Actions</th></tr></thead><tbody role="rowgroup">
+{% for p in rows %}<tr role="row"><td role="cell" data-label="Effect"><div class="cell-value"><span class="pill {{ p.effect }}">{{ p.effect }}</span></div></td><td role="cell" data-label="Pattern" class="wide"><div class="cell-value"><code>{{ p.pattern }}</code></div></td>
+<td role="cell" data-label="Agent" class="wide"><div class="cell-value">{{ agent_map[p.agent_id].name if p.agent_id in agent_map else '<i class="mut">all</i>'|safe }}</div></td><td role="cell" data-label="Note" class="wide small"><div class="cell-value">{{ p.note }}<div>{{ constraint_label(p.constraints) }}</div>{% if p.constraints %}<details><summary>Operation constraints</summary>{% with constraints=p.constraints %}{% include "_constraints.html" %}{% endwith %}</details>{% endif %}{% if p.request_id %}<a href="/ui/requests/{{ p.request_id }}">Original decision</a>{% endif %}</div></td>
+<td role="cell" data-label="Added" class="small mut"><div class="cell-value">{{ p.created_at.strftime('%m-%d') }} · {{ p.created_by }}</div></td>
+<td role="cell" data-label="Actions" class="wide actions"><div class="cell-value"><form method="post" action="/ui/policies/{{ p.id }}/delete" class="inline"><button class="btn sm">Delete</button></form></div></td></tr>{% endfor %}
+</tbody></table>{% if not rows %}<p class="mut">No standing rules yet. Add a rule above.</p>{% endif %}</div>
+{% endblock %}

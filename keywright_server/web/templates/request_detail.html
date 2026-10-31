@@ -1,0 +1,27 @@
+{% extends "base.html" %}{% block title %}Request {{ req.id }}{% endblock %}{% block body %}
+<h1>Request <span class="mono">{{ req.id }}</span> <span class="pill {{ req.status }}">{{ req.status }}</span></h1>
+<div class="card">
+<table class="detail-table" role="table"><tbody role="rowgroup">
+<tr role="row"><th scope="row" role="rowheader">Agent</th><td role="cell">{{ req.agent.name }}</td></tr>
+<tr role="row"><th scope="row" role="rowheader">Session</th><td role="cell" class="mono">{{ req.session_id or '— (no session id: “This session” is not available for this request)' }}</td></tr>
+<tr role="row"><th scope="row" role="rowheader">Patterns</th><td role="cell">{% include "_patterns.html" %}</td></tr>
+<tr role="row"><th scope="row" role="rowheader">Reason</th><td role="cell">{{ req.reason or '—' }}</td></tr>
+{% if hazards_of(req.detail) %}<tr role="row"><th scope="row" role="rowheader">Flags</th><td role="cell">{% include "_hazards.html" %}</td></tr>{% endif %}
+{% if req.semantic %}<tr role="row"><th scope="row" role="rowheader">Jev</th><td role="cell">{% include "_semantic.html" %}</td></tr>{% endif %}
+{% set ops = operations(req.detail) %}{% if ops %}<tr role="row"><th scope="row" role="rowheader">Operation{% if ops|length > 1 %}s ({{ ops|length }}){% endif %}</th><td role="cell">{% for pats, op in ops %}<div class="access-source">{% with constraints=op %}{% include "_constraints.html" %}{% endwith %}{% if pats %}<div class="small mut">{% for p in pats %}<code>{{ p }}</code> {% endfor %}</div>{% endif %}</div>{% endfor %}</td></tr>
+{% elif req.detail %}<tr role="row"><th scope="row" role="rowheader">Detail</th><td role="cell"><pre>{{ req.detail | redact | tojson(indent=1) }}</pre></td></tr>{% endif %}
+<tr role="row"><th scope="row" role="rowheader">Created</th><td role="cell">{{ req.created_at }}</td></tr>
+{% if req.decided_at %}<tr role="row"><th scope="row" role="rowheader">Decided</th><td role="cell">{{ req.decided_at }} · {{ decision_label(req) }} via {{ req.decided_via }}{% if req.deny_reason %} · “{{ req.deny_reason }}”{% endif %}</td></tr>{% endif %}
+{% if req.decision_options %}<tr role="row"><th scope="row" role="rowheader">Access scope</th><td role="cell">{{ 'Exact operation' if req.decision_options.extent == 'exact' else 'Listed permission patterns' }}{% if req.decision_options.ttl_s %} · {{ req.decision_options.ttl_s // 60 }} minutes{% endif %}</td></tr>{% endif %}
+</tbody></table>
+{% if req.status == 'pending' %}<div style="margin-top:12px">{% with next='/ui/requests/' ~ req.id, in_detail=True %}{% include "_decide.html" %}{% endwith %}</div>{% endif %}
+</div>
+{% if grants %}<div class="row toolbar"><form method="post" action="/ui/requests/{{ req.id }}/revoke"><input type="hidden" name="next" value="/ui/requests/{{ req.id }}"><button class="btn">Revoke this approval</button></form><span class="small mut">Other permission sources may still allow access. Running operations continue.</span></div>{% endif %}
+{% if rules %}<div class="card">This decision created {{ rules|length }} standing rules. <a href="/ui/policies">Manage those rules</a> to change permanent access.</div>{% endif %}
+{% if timeline %}<h2>Approval activity</h2><div class="card">
+{% for e in timeline %}<div class="access-target"><div><b>{{ e.tool }}</b> · {{ e.decision }} <a href="/ui/audit?q=%23{{ e.id }}">audit #{{ e.id }}</a></div><div class="small mut">{{ e.ts.strftime('%Y-%m-%d %H:%M:%S') }} UTC{% if e.duration_ms is not none %} · {{ e.duration_ms }} ms{% endif %}{% if e.exit_code is not none %} · exit {{ e.exit_code }}{% endif %}</div>
+{% if e.detail.command %}<pre>$ {{ e.detail.command }}</pre>{% elif e.detail.path %}<div><code>{{ e.detail.path }}</code></div>{% elif e.detail.tool %}<div>{{ e.detail.server }} · {{ e.detail.tool }}</div>{% endif %}</div>{% endfor %}
+</div>{% endif %}
+{% if grants %}<h2>Grants from this request</h2><div class="card"><table class="data-table" role="table"><thead role="rowgroup"><tr role="row"><th scope="col" role="columnheader">Pattern</th><th scope="col" role="columnheader">Scope</th><th scope="col" role="columnheader">Expires</th><th scope="col" role="columnheader">Uses</th><th scope="col" role="columnheader">Revoked</th></tr></thead><tbody role="rowgroup">
+{% for g in grants %}<tr role="row"><td role="cell" data-label="Pattern" class="wide"><div class="cell-value"><code>{{ g.pattern }}</code></div></td><td role="cell" data-label="Scope"><div class="cell-value">{{ g.scope }}</div></td><td role="cell" data-label="Expires"><div class="cell-value">{{ g.expires_at or '—' }}</div></td><td role="cell" data-label="Uses"><div class="cell-value">{{ g.uses_remaining if g.uses_remaining is not none else '∞' }}</div></td><td role="cell" data-label="Revoked"><div class="cell-value">{{ g.revoked_at or '' }}</div></td></tr>{% endfor %}</tbody></table></div>{% endif %}
+{% endblock %}

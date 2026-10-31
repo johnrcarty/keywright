@@ -1,0 +1,33 @@
+[project]
+name = "keywright-router"
+version = "0.0.1"
+description = "Keywright router: routes incoming mail with boolean rules, acting only through Keywright."
+requires-python = ">=3.12"
+dependencies = [
+  "keywright>=0.0.1,<0.1",
+  "httpx>=0.27",
+  "pyyaml>=6",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-asyncio>=0.23", "ruff>=0.5"]
+
+[project.urls]
+Repository = "https://github.com/johnrcarty/keywright"
+Issues = "https://github.com/johnrcarty/keywright/issues"
+
+[project.scripts]
+keywright-router = "keywright_router.__main__:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["keywright_router"]
+
+[tool.ruff]
+line-length = 110
+
+[tool.hatch.build.targets.sdist]
+include = ["/keywright_router", "/pyproject.toml", "/README.md", "/rules.example.yaml"]

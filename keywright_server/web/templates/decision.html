@@ -1,0 +1,26 @@
+{% extends "base.html" %}{% set hide_nav = True %}{% block title %}Keywright decision{% endblock %}{% block body %}
+<h1 class="brand">{{ icon('shield') }}Keywright</h1>
+{% if req %}
+<div class="card">
+{% include "_hazards.html" %}
+<div><b>{{ req.agent.name }}</b> asks for:</div>
+<div style="margin:8px 0">{% include "_patterns.html" %}</div>
+{% for pats, op in operations(req.detail) %}{% with constraints=op %}{% include "_constraints.html" %}{% endwith %}{% endfor %}
+{% if req.reason %}<div>“{{ req.reason }}”</div>{% endif %}
+<div class="small mut" style="margin-top:6px">{{ req.created_at.strftime('%Y-%m-%d %H:%M:%S') }} UTC · status <span class="pill {{ req.status }}">{{ req.status }}</span></div>
+</div>
+{% if done %}
+<div class="card"><b>Recorded:</b> {{ scope_labels[scope] }}. You can close this page.</div>
+{% elif req.status != 'pending' %}
+<div class="card">This request was already <b>{{ req.status }}</b>{% if req.decision_scope %} ({{ decision_label(req) }}){% endif %}.</div>
+{% else %}
+<form method="post" class="card">
+<div>Confirm: <b>{{ scope_labels[scope] }}</b></div>
+<p class="small">{% if hazard_blocks(hazard_level(req.detail)) %}Flagged destructive: this allows the exact operation shown once, or denies it. {% endif %}{% if binds_exactly(req.detail) %}This decision covers the exact operation{% if operations(req.detail)|length > 1 %}s{% endif %} shown, for the selected duration.{% else %}This decision covers the listed permission patterns.{% endif %} <a href="/ui/requests/{{ req.id }}">Review other scope and duration choices</a> in the admin UI.</p>
+<p class="help">{% if scope == 'session' %}Session access uses the client-supplied ID and expires within {{ session_cap_minutes }} minutes. {% endif %}Expiry and revocation prevent future calls; running operations continue.</p>
+{% if scope == 'deny' %}<label>Reason (optional, shown to the agent)</label><input type="text" name="deny_reason">{% endif %}
+<div style="margin-top:12px" class="row"><button class="btn {{ 'bad' if scope == 'deny' else 'ok' }}">{{ scope_labels[scope] }}</button></div>
+</form>
+{% endif %}
+{% endif %}
+{% endblock %}

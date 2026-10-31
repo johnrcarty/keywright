@@ -1,0 +1,25 @@
+{% from "_icons.html" import icon %}
+{% set failed = e.decision in ['deny', 'denied', 'locked', 'error', 'revoked', 'refused'] or (e.exit_code is not none and e.exit_code != 0) %}
+{% set passed = e.decision in ['allow', 'approved', 'ok'] and not failed %}
+<details class="activity-row" id="event-{{ e.id }}">
+<summary>
+<span class="activity-icon {{ 'failed' if failed else 'passed' if passed else '' }}">{{ icon('deny' if failed else 'check' if passed else 'activity') }}</span>
+<span class="activity-copy"><span class="activity-title">{{ e.patterns[0] if e.patterns else e.tool }}</span><span class="activity-subtitle">{{ e.agent_name or 'System' }} · {{ e.tool }}{% if e.patterns|length > 1 %} · +{{ e.patterns|length - 1 }} scopes{% endif %}</span>{% if e.detail.hazards %}<span class="activity-flag">{{ icon('warning') }} {{ e.detail.hazards|length }} hazard{{ '' if e.detail.hazards|length == 1 else 's' }} flagged</span>{% endif %}</span>
+<span class="activity-meta"><time datetime="{{ e.ts.isoformat() }}" title="{{ e.ts.strftime('%Y-%m-%d %H:%M:%S UTC') }}">{% set age = (now - e.ts).total_seconds() | int %}{% if age < 60 %}just now{% elif age < 3600 %}{{ age // 60 }}m ago{% elif age < 86400 %}{{ age // 3600 }}h ago{% else %}{{ e.ts.strftime('%b %d') }}{% endif %}</time><span class="pill {{ e.decision }}">{{ e.decision }}</span>{% if e.exit_code is not none and e.exit_code != 0 %}<span class="activity-flag">exit {{ e.exit_code }}</span>{% endif %}</span>
+</summary>
+<div class="activity-detail">
+<dl><div><dt>Event</dt><dd><a href="/ui/audit?q=%23{{ e.id }}">#{{ e.id }}</a></dd></div><div><dt>Time</dt><dd>{{ e.ts.strftime('%Y-%m-%d %H:%M:%S UTC') }}</dd></div><div><dt>Agent</dt><dd>{{ e.agent_name or 'System' }}</dd></div><div><dt>Tool</dt><dd>{{ e.tool }}</dd></div>{% if e.session_id %}<div><dt>Session</dt><dd class="mono">{{ e.session_id }}</dd></div>{% endif %}{% if e.exit_code is not none %}<div><dt>Result</dt><dd>exit {{ e.exit_code }}{% if e.duration_ms is not none %} · {{ e.duration_ms }} ms{% endif %}</dd></div>{% endif %}</dl>
+{% for p in e.patterns %}<div class="activity-pattern"><code>{{ p }}</code></div>{% endfor %}
+{% if e.detail.command %}<pre>$ {{ e.detail.command }}</pre>{% endif %}
+{% if e.detail.hazards %}<div class="hazard">{% for h in e.detail.hazards %}<div><span class="pill {{ h.severity }}">{{ h.severity }}</span> {{ h.reason }}</div>{% endfor %}</div>{% endif %}
+{% if e.detail.reason %}<p class="small mut">{{ e.detail.reason }}</p>{% endif %}
+{% if e.detail.error %}<p class="small activity-flag">{{ e.detail.error }}</p>{% endif %}
+{% set delivery = e.detail.get('result_delivery') %}
+{% if delivery and delivery.mode != 'off' %}
+<p class="small"><b>MCP result:</b> upstream {{ 'reported an error' if delivery.upstream_is_error else 'completed without a tool error' }} · delivery <b>{{ delivery.delivery }}</b> · inspection {{ delivery.mode }} · coverage {{ delivery.coverage }}.</p>
+{% if delivery.delivery == 'withheld' %}<p class="small activity-flag">The tool already ran. Withholding its result does not undo its effects; do not automatically retry.</p>{% endif %}
+{% if delivery.findings %}<p class="small">Findings: {{ delivery.findings | join(', ') }}. {{ delivery.matches }} credential matches. Instruction findings are advisory.</p>{% endif %}
+{% if delivery.gaps %}<p class="small">Coverage gaps: {{ delivery.gaps | join(', ') }}.</p>{% endif %}
+{% endif %}
+</div>
+</details>

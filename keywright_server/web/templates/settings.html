@@ -1,0 +1,53 @@
+{% extends "base.html" %}{% block title %}Settings{% endblock %}{% block body %}
+<h1>Settings</h1>
+<div class="card"><h2 style="margin-top:0">General</h2>
+<form method="post" action="/ui/settings/general">
+<label>Public URL (used in notification links and enrol commands)</label><input type="url" name="public_url" value="{{ general.public_url }}" placeholder="http://keywright.lan:8700">
+<label>Outbound IP of this Keywright (optional; adds <code>from=</code> to keys enrolled with the paste-able script)</label><input type="text" name="outbound_ip" value="{{ general.outbound_ip or '' }}" placeholder="10.0.0.2">
+<div style="margin-top:10px"><button class="btn p">Save</button></div></form></div>
+
+<div class="card"><h2 style="margin-top:0">Jev second opinion</h2>
+<div class="help">Jev (TypeSafe) reads each operation that is about to ask you and answers what it does and whether the agent's stated reason fits. Commands, paths, tool arguments and the reason are sent to TypeSafe; resource names are not, and values that look like credentials stop the call. Nothing is sent for operations already allowed, denied or refused.</div>
+{% if not jev_configured %}<div class="hazard medium" style="margin-top:8px"><b>No key.</b> Set <code>KW_TYPESAFE_API_KEY</code> in the broker's environment to enable this.</div>{% endif %}
+<form method="post" action="/ui/settings/semantic" style="margin-top:8px">
+<label class="inline"><input type="radio" name="mode" value="off" {{ 'checked' if jev.mode == 'off' }} {{ 'disabled' if not jev_configured }}> Off</label>
+<label class="inline"><input type="radio" name="mode" value="shadow" {{ 'checked' if jev.mode == 'shadow' }} {{ 'disabled' if not jev_configured }}> Shadow: record the verdict and show it to me; I decide everything</label>
+<label class="inline mut"><input type="radio" name="mode" value="trust" {{ 'checked' if jev.mode == 'trust' }} {{ '' if jev_trust_selectable and jev_configured else 'disabled' }}> Trust: a clean verdict on an unflagged, exactly-bound read with a reason that fits is approved once in Jev's name; everything else asks me{% if not jev_trust_selectable %} <span class="small">(disabled until shadow data earns it)</span>{% endif %}</label>
+<div class="row" style="margin-top:8px"><div><label>Timeout (seconds)</label><input type="number" name="timeout_s" min="1" max="30" step="0.5" value="{{ jev.timeout_s }}"></div>
+<div><label>Daily call cap</label><input type="number" name="daily_cap" min="0" max="100000" value="{{ jev.daily_cap }}"></div></div>
+<div class="help">Past the timeout or the cap the request goes to you without a verdict. Under trust, no verdict is never an approval.</div>
+<div style="margin-top:10px"><button class="btn p" {{ 'disabled' if not jev_configured }}>Save</button></div></form>
+{% if jev_tally.verdicts %}<div class="help" style="margin-top:10px"><b>Shadow so far:</b> {{ jev_tally.verdicts }} verdicts ({{ jev_tally.no_verdict }} without an answer), {{ jev_tally.safe }} judged safe. Would have auto-approved {{ jev_tally.would_auto }}: you approved {{ jev_tally.would_auto_approved }} and denied <b>{{ jev_tally.would_auto_denied }}</b> of those. Judged unsafe but approved by you: {{ jev_tally.unsafe_approved }}.</div>{% endif %}
+</div>
+
+<div class="card"><h2 style="margin-top:0">Notifications</h2>
+<div class="small mut">Active: <b>{{ notifier.driver_id }}</b>{% if notifier.last_error %} · <span style="color:var(--bad)">{{ notifier.last_error }}</span>{% endif %}</div>
+<form method="post" action="/ui/settings/notifications">
+<label>Driver</label>
+<select name="driver" onchange="this.form.action='/ui/settings/notifications/probe';this.form.submit()">
+{% for id, cls in drivers.items() %}<option value="{{ id }}" {{ 'selected' if id == notif.driver }}>{{ cls.label }}</option>{% endfor %}</select>
+<div class="help">{{ driver.description }}</div>
+{% for f in driver.fields %}
+<label>{{ f.label }}{% if f.required %} *{% endif %}</label>
+{% set val = notif.config.get(f.name) %}
+{% if f.type == 'multiselect' %}
+  {% set opts = f.options or (notif.choices or {}).get(f.options_from_probe) or [] %}
+  {% if not opts %}<div class="help">No options yet: fill the fields above and press <b>Probe</b>.</div>{% endif %}
+  {% for o in opts %}<div><label class="inline"><input type="checkbox" name="{{ f.name }}" value="{{ o[0] }}" {{ 'checked' if val and o[0] in val }}> {{ o[1] }} <span class="mono mut small">{{ o[0] }}</span></label></div>{% endfor %}
+{% elif f.type == 'select' %}<select name="{{ f.name }}">{% for o in f.options %}<option value="{{ o[0] }}" {{ 'selected' if val == o[0] }}>{{ o[1] }}</option>{% endfor %}</select>
+{% elif f.type == 'checkbox' %}<label class="inline"><input type="checkbox" name="{{ f.name }}" {{ 'checked' if val }}> {{ f.help }}</label>
+{% elif f.type == 'textarea' %}<textarea name="{{ f.name }}">{{ val or '' }}</textarea>
+{% else %}<input type="{{ 'password' if f.type == 'password' else ('url' if f.type == 'url' else 'text') }}" name="{{ f.name }}" value="{{ ('***' if val else '') if f.type == 'password' else (val or '') }}" {{ 'required' if f.required }}>
+{% endif %}
+{% if f.help and f.type != 'checkbox' %}<div class="help">{{ f.help }}</div>{% endif %}
+{% endfor %}
+<label>Buttons on the notification (max {{ driver.max_actions }} for {{ driver.label }}; Always is UI-only on purpose)</label>
+{% for b in ['once','session','ttl15','path15','ttl30','ttl','deny'] %}<label class="inline" style="margin-right:14px"><input type="checkbox" name="buttons" value="{{ b }}" {{ 'checked' if b in (notif.buttons or default_buttons) }}> {{ scope_labels[b] }}</label>{% endfor %}
+<div class="row" style="margin-top:12px">
+<button class="btn p">Save</button>
+<button class="btn" formaction="/ui/settings/notifications/probe">Probe</button>
+</div>
+</form>
+<form method="post" action="/ui/settings/notifications/test" style="margin-top:8px"><button class="btn sm">Send a test request</button> <span class="small mut">creates a real pending request (10 min) in the first agent's name</span></form>
+</div>
+{% endblock %}

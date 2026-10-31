@@ -1,0 +1,6 @@
+{# patterns of a request, grouped by bundle when the request used bundles: expects req #}
+{% set groups = req.detail.bundles if req.detail and req.detail.bundles else {} %}
+{% set grouped = [] %}{% for name, pats in groups.items() %}{% for p in pats %}{% set _ = grouped.append(p) %}{% endfor %}{% endfor %}
+{% for name, pats in groups.items() %}<details class="bundle"><summary><b>bundle {{ name }}</b> <span class="mut small">({{ pats | length }} patterns)</span></summary>
+<div>{% for p in pats %}<code>{{ p }}</code><br>{% endfor %}</div></details>{% endfor %}
+{% for p in req.patterns %}{% if p not in grouped %}<code>{{ p }}</code><br>{% endif %}{% endfor %}
