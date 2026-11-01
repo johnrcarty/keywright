@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "implementation_commit": "23d1fb8d5b1cad06c844ed2c4ef9c41e7b9057d5",
+  "ci_run": "https://github.com/johnrcarty/keywright/actions/runs/41281068875",
+  "ci_conclusion": "success",
+  "source_files": 528,
+  "supplemental_notices": 447,
+  "images": {
+    "amd64": {
+      "application_image": "ghcr.io/johnrcarty/keywright@sha256:017f273d548e9ef6a78d7fc3d39c42f3e8f4bab58083d8028d5e8f7d3055ee1d",
+      "source_image": "ghcr.io/johnrcarty/keywright@sha256:444583d229e356914ca4e954d802359a72090c9d71a7dc40eca3e6508656e557",
+      "source_lock_sha256": "7c53094a7eeb5c4770e7067b38904799dbb05c4cbc1807af82a954983067dba0",
+      "pip_cache_files": 0,
+      "python_distributions": 52,
+      "debian_packages": 124,
+      "source_checksums_verified_by_ci": true
+    },
+    "arm64": {
+      "application_image": "ghcr.io/johnrcarty/keywright@sha256:757129ba73b790a8853a75cfa95a29f770937bdb26949eeb4269efc474969673",
+      "source_image": "ghcr.io/johnrcarty/keywright@sha256:c83c17fb3143701d1f2138ff8cb05b19ebe49736c37f167083e800bb110ff873",
+      "source_lock_sha256": "7c53094a7eeb5c4770e7067b38904799dbb05c4cbc1807af82a954983067dba0",
+      "pip_cache_files": 0,
+      "python_distributions": 52,
+      "debian_packages": 124,
+      "source_checksums_verified_by_ci": true
+    }
+  },
+  "findings": {
+    "LIC-001": "Resolved: exact-commit upstream notice exceptions, CFFI/libffi 3.4.6 build evidence, native binary hash checks and supplemental notices shipped.",
+    "LIC-002": "Resolved for new images: source images are published before application images in the same registry package; image labels bind source digests. Tag builds prepare draft release source/notice assets.",
+    "LIC-003": "Resolved: pip caching disabled for build subprocesses; both native images report zero cache files."
+  },
+  "validation": {
+    "python_matrix": [
+      "3.12",
+      "3.13",
+      "3.14"
+    ],
+    "native_architectures": [
+      "amd64",
+      "arm64"
+    ],
+    "downloaded_source_and_notice_checksums_verified": true,
+    "local_release_material_regressions_passed": 13,
+    "workflow_lint_passed": true,
+    "draft_asset_assembly_and_checksums_verified": true,
+    "local_compose_smoke_and_volume_persistence_passed": true,
+    "github_release_creation_tested": false,
+    "github_release_creation_note": "No tag was created; the tag-only draft-release job was deliberately not invoked."
+  },
+  "policies": [
+    "SECURITY.md",
+    "SUPPORT.md",
+    "CONTRIBUTING.md"
+  ],
+  "launch_actions": [
+    "Enable and verify GitHub private vulnerability reporting after making the repository public.",
+    "Exclude historical unaudited preview image versions from public distribution, or supply equivalent materials. Retain source images referenced by distributed application images.",
+    "Perform final release review and visibility/publication checks; no public release was made by this work."
+  ]
+}

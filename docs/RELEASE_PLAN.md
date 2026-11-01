@@ -27,7 +27,8 @@ Before tagging or making the repository public:
       and source-material images published before application images. Source digests are
       recorded on the application image and verified after pulling both architectures.
       Version tags prepare draft release assets with source archives, notices and checksums.
-      See `third_party/README.md`; `RELEASE_AUDIT.json` preserves the original audit findings.
+      See `third_party/README.md` and `LICENSING_RELEASE.json` for passing native publication
+      and source-retrieval checks at `23d1fb8`. `RELEASE_AUDIT.json` preserves the original findings.
 - [x] Pass CI on Python 3.12–3.14 and test wheel/source/container installs for candidate
       `10af43c`; final release changes must retain passing checks.
 - [x] Complete core and knowledge acceptance on a clean AMD64 VM using the published bundle.

@@ -5,7 +5,7 @@ behavior and how you verified it. Discuss substantial behavior or architecture
 changes in an issue before implementation. Security reports belong in the
 [private reporting process](SECURITY.md), not a public issue or pull request.
 
-Follow the development setup in [README.md](README.md). Install the client, server
+Follow the development setup in [repository README](https://github.com/johnrcarty/keywright/blob/main/README.md). Install the client, server
 and optional router from the same checkout. Use disposable broker data, test SSH
 targets and synthetic knowledge documents. Never connect automated tests to a
 production database, service or knowledge corpus.
@@ -31,5 +31,5 @@ not require copyright assignment or a separate contributor agreement.
 
 Container dependency changes require updating the reviewed source/notice lock,
 runtime constraints and native binary hashes together. Follow
-[the release material instructions](third_party/README.md); a passing application
+[the release material instructions](https://github.com/johnrcarty/keywright/blob/main/third_party/README.md); a passing application
 test suite alone does not approve new dependency license coverage.
