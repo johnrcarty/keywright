@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "audited_at_utc": "2026-11-01T04:18:39.207768+00:00",
+  "candidate_commit": "f3e4e5f24a8c142ef6613a2adf3b5cd1db42e587",
+  "ci_run": "https://github.com/johnrcarty/keywright/actions/runs/41261138870",
+  "ci_conclusion": "success",
+  "image_manifest": "ghcr.io/johnrcarty/keywright@sha256:2a4874a8f4f2b5360cdd0d69a90cf14c1400f38b48cb36cc225ea81423e1f7d5",
+  "privacy": {
+    "status": "passed_for_recorded_candidate",
+    "reachable_commits": 6,
+    "reachable_blobs": 259,
+    "history_secret_findings": 0,
+    "private_reference_comparisons": 30,
+    "confirmed_private_identifier_findings": 0,
+    "python_archives_checked": 18,
+    "extracted_python_artifact_files": 993,
+    "python_artifact_secret_findings": 0,
+    "application_layer_secret_findings": 0,
+    "installer_checksums_verified": true,
+    "secret_scanner": "gitleaks 8.30.1",
+    "manual_review": [
+      "Reachable filenames, URLs, email addresses, IPv4 addresses and absolute paths",
+      "Potential family and household references in source and documentation",
+      "Fixture and example provenance; no operational knowledge corpus included",
+      "Image environment, build history, application paths and every layer",
+      "Git author identity retained as authorized",
+      "Both Docker build records and the complete Actions log archive for the recorded CI run"
+    ],
+    "scope_limits": [
+      "Applies to the recorded source/history and CI artifacts, not future builds.",
+      "Public author identity and synthetic private-network examples intentionally remain.",
+      "Known-identifier checks covered all image file bytes; secret-pattern scanning of images covered application files in all layers, not all upstream binaries.",
+      "Optional third-party service/model images and unpublished local router images were not audited."
+    ],
+    "ci_build_records_checked": 2,
+    "ci_log_files_checked": 18,
+    "ci_secret_scanner_candidates": 27,
+    "ci_secret_candidate_dispositions": {
+      "public_image_tag": 23,
+      "official_python_public_signing_fingerprint": 4
+    },
+    "ci_confirmed_secret_findings": 0,
+    "ci_private_identifier_findings": 0
+  },
+  "images": {
+    "amd64": {
+      "reference": "ghcr.io/johnrcarty/keywright@sha256:7a5a8a7ca00c4e0c41af37c04460e65f8e97a4b968260cb79f3843bdf29c076a",
+      "layers_scanned": 10,
+      "layer_file_entries": 14195,
+      "uncompressed_file_bytes_checked": 351386284,
+      "installed_debian_packages": 124,
+      "installed_python_distributions": 52,
+      "primary_package_notices_present": true,
+      "private_identifier_candidates": 1,
+      "candidate_disposition": "An upstream package document mentions a public package-index project; reviewed as unrelated third-party text.",
+      "pip_cache_regular_files": 36
+    },
+    "arm64": {
+      "reference": "ghcr.io/johnrcarty/keywright@sha256:7890f9ff18d0dfa7e27f1f405ff71667db7e9815b5961b616f8b16ba52b4d2d5",
+      "layers_scanned": 10,
+      "layer_file_entries": 14197,
+      "uncompressed_file_bytes_checked": 381404431,
+      "installed_debian_packages": 124,
+      "installed_python_distributions": 52,
+      "primary_package_notices_present": true,
+      "private_identifier_candidates": 1,
+      "candidate_disposition": "An upstream package document mentions a public package-index project; reviewed as unrelated third-party text.",
+      "pip_cache_regular_files": 36
+    }
+  },
+  "licensing": {
+    "status": "audit_completed_remediation_required",
+    "keywright_license": "Apache-2.0",
+    "all_18_python_archives_include_license_metadata_and_notices": true,
+    "source_archive_files_verified": 520,
+    "source_archive_bytes": 522678447,
+    "source_components": {
+      "cargo": 187,
+      "debian": 86,
+      "pypi": 50,
+      "cpython": 1,
+      "openssl": 1
+    },
+    "collected_notice_texts": 443,
+    "dependency_notes": [
+      "AsyncSSH 2.24.1: EPL-2.0 route; unmodified Python source and license retained.",
+      "Certifi 2026.10.23: MPL-2.0; Python source, certificate bundle and license retained.",
+      "Debian GPL/LGPL components require corresponding-source distribution arrangements.",
+      "Cryptography bundles OpenSSL 4.0.3; CPython uses Debian OpenSSL 3.5.7.",
+      "Uvloop source includes libuv 1.52.1; installed wheel notices only identify uvloop."
+    ],
+    "open_findings": [
+      {
+        "id": "LIC-001",
+        "priority": "release-blocker",
+        "finding": "Supplemental native-component notices and provenance are not fully covered by installed wheel license files.",
+        "action": "Review and ship the collected OpenSSL/libuv/Rust notices; resolve bundled CFFI/libffi provenance and the two source-crate notice exceptions before calling the bundle complete."
+      },
+      {
+        "id": "LIC-002",
+        "priority": "release-blocker",
+        "finding": "Required corresponding-source distribution is not integrated into release publication.",
+        "action": "Publish version-matched reviewed source and notice assets with checksums and image digests; retain them for distributed image versions. Prepared archives are not yet published or approved as complete."
+      },
+      {
+        "id": "LIC-003",
+        "priority": "packaging-follow-up",
+        "finding": "Both images contain 36 pip build-cache files, beyond the installed runtime package inventory.",
+        "action": "Disable caching in build subprocesses and rebuild, or inventory and license those additional cache contents. Verify the final image has no build cache."
+      }
+    ]
+  },
+  "prepared_asset_sha256": {
+    "third-party-notices-f3e4e5f.tar.gz": "084989d6be2b40fce83229787c743af6a3f20e574e3061393c9d64685f2b8066",
+    "third-party-sources-f3e4e5f.tar": "f65a864c9f633063284bcccb1b2922bce28382d68efdd65311915ecab5ecb072"
+  },
+  "publication": {
+    "repository_private": true,
+    "no_release_published_by_audit": true
+  }
+}

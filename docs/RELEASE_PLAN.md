@@ -17,12 +17,19 @@ Completed in the initial migration:
 
 Before tagging or making the repository public:
 
-- [ ] Review a dedicated secret scan and privacy audit of the exact candidate and artifacts.
+- [x] Audit source/history, Python artifacts, installer and both image architectures for
+      candidate `f3e4e5f`; no confirmed setup/family identifiers or first-party secrets found.
+      See `RELEASE_AUDIT.json` for exact digests, methods and scope. Repeat for a changed candidate.
 - [x] Adopt Apache-2.0 across the server, client and router; ship license and notice files
       with Python distributions, container images and installation bundles.
 - [ ] Audit third-party licenses in the exact release images, retain notices and provide
       any required corresponding-source materials for redistributed components.
-      `THIRD_PARTY_NOTICES` identifies source/notice locations and the audit boundary.
+      Audit completed for `f3e4e5f`, with remediation still required (see `RELEASE_AUDIT.json`):
+      install/review supplemental native-library notices and CFFI/libffi provenance; remove
+      pip build caches; publish version-matched corresponding-source and notice assets.
+      Prepared review materials contain 520 verified source files and 443 notice texts.
+      They are not yet a complete approved release bundle. `THIRD_PARTY_NOTICES` describes
+      the licensing boundary; the application license remains Apache-2.0.
 - [x] Pass CI on Python 3.12–3.14 and test wheel/source/container installs for candidate
       `10af43c`; final release changes must retain passing checks.
 - [x] Complete core and knowledge acceptance on a clean AMD64 VM using the published bundle.
@@ -31,7 +38,8 @@ Before tagging or making the repository public:
 - [x] Complete the knowledge release gates below, including real PostgreSQL/pgvector tests.
 - [ ] Confirm Python package-name access and trusted publishing, then add a tested PyPI workflow.
 - [ ] Approve public repository/package visibility and verify anonymous image pulls.
-- [ ] Freeze the source commit, record artifact hashes, and write release notes.
+- [ ] Freeze the source commit, record artifact hashes, and write release notes. Recheck
+      privacy and third-party licensing against any rebuilt images or changed dependencies.
 
 ## Knowledge release gates
 
