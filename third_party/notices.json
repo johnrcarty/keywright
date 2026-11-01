@@ -1,0 +1,3578 @@
+[
+  {
+    "component": "Authlib",
+    "version": "1.9.1",
+    "ecosystem": "pypi",
+    "source_path": "authlib-1.9.1/LICENSE",
+    "source_sha256": "5c7d9848f47cac340f060f76ae0bc09b59f5c8e89cc1bb032d4370a0c55b5974",
+    "text_sha256": "8e1b48518de9c6cd00cb48c7fe5b8023fd90d5552ca12ebe7362a0df30ddbe45"
+  },
+  {
+    "component": "Jinja2",
+    "version": "3.1.6",
+    "ecosystem": "pypi",
+    "source_path": "jinja2-3.1.6/LICENSE.txt",
+    "source_sha256": "0137fb05990d35f1275a587e9aee6d56da821fc83491a0fb838183be43f66d6d",
+    "text_sha256": "3b49dcee4105eb37bac10faf1be260408fe85d252b8e9df2e0979fc1e094437b"
+  },
+  {
+    "component": "Jinja2",
+    "version": "3.1.6",
+    "ecosystem": "pypi",
+    "source_path": "jinja2-3.1.6/docs/license.rst",
+    "source_sha256": "0137fb05990d35f1275a587e9aee6d56da821fc83491a0fb838183be43f66d6d",
+    "text_sha256": "1e07e9c25f2618a040560b70e63f42259eab24e558d0f3532e6163d751cb4eea"
+  },
+  {
+    "component": "MarkupSafe",
+    "version": "3.0.4",
+    "ecosystem": "pypi",
+    "source_path": "markupsafe-3.0.4/LICENSE.txt",
+    "source_sha256": "2e9ad7dd851bf45fab9f75cbff4cb493fee9979e8d8c7c9c3ee119022518edd6",
+    "text_sha256": "489a8e1108509ed98a37bb983e11e0f7e1d31f0bd8f99a79c8448e7ff37d07ea"
+  },
+  {
+    "component": "MarkupSafe",
+    "version": "3.0.4",
+    "ecosystem": "pypi",
+    "source_path": "markupsafe-3.0.4/docs/license.rst",
+    "source_sha256": "2e9ad7dd851bf45fab9f75cbff4cb493fee9979e8d8c7c9c3ee119022518edd6",
+    "text_sha256": "6fc7e80b75b5999783a328d90976a2585e0956c4a348c3c888453938ceca742d"
+  },
+  {
+    "component": "PyJWT",
+    "version": "2.15.1",
+    "ecosystem": "pypi",
+    "source_path": "pyjwt-2.15.1/LICENSE",
+    "source_sha256": "4f259e80cdfb6b3fc18a7de51fd1ef9ec79652f25019bae68975ca2468a34df8",
+    "text_sha256": "797a7a20231d4c433e9f1911db1731d06b5828b98f499819a034f7c0f56f5ce5"
+  },
+  {
+    "component": "PyYAML",
+    "version": "6.0.3",
+    "ecosystem": "pypi",
+    "source_path": "pyyaml-6.0.3/LICENSE",
+    "source_sha256": "d76623373421df22fb4cf8817020cbb7ef15c725b9d5e45f17e189bfc384190f",
+    "text_sha256": "8d3928f9dc4490fd635707cb88eb26bd764102a7282954307d3e5167a577e8a4"
+  },
+  {
+    "component": "SQLAlchemy",
+    "version": "2.0.55",
+    "ecosystem": "pypi",
+    "source_path": "sqlalchemy-2.0.55/LICENSE",
+    "source_sha256": "ae40c563bc10a8d56f1fd1f39f069aeb5eb85ca26913b2314dd8d190139258fa",
+    "text_sha256": "e862bb5b904fb5513c3e14288d7a25a12eb0ecc7847a0a965d310e9a955e7cb9"
+  },
+  {
+    "component": "SQLAlchemy",
+    "version": "2.0.55",
+    "ecosystem": "pypi",
+    "source_path": "sqlalchemy-2.0.55/doc/build/copyright.rst",
+    "source_sha256": "ae40c563bc10a8d56f1fd1f39f069aeb5eb85ca26913b2314dd8d190139258fa",
+    "text_sha256": "4a0179c4ef9fb2c7464215c8c48686fe326a3dfcf34752ab41cd91e93a7cac87"
+  },
+  {
+    "component": "SQLAlchemy",
+    "version": "2.0.55",
+    "ecosystem": "pypi",
+    "source_path": "sqlalchemy-2.0.55/doc/copyright.html",
+    "source_sha256": "ae40c563bc10a8d56f1fd1f39f069aeb5eb85ca26913b2314dd8d190139258fa",
+    "text_sha256": "c59aef3e6869cb1d4e8641d3d57a399507fc8a7104bdde77fe99db3e716067a6"
+  },
+  {
+    "component": "aiosqlite",
+    "version": "0.22.1",
+    "ecosystem": "pypi",
+    "source_path": "aiosqlite-0.22.1/LICENSE",
+    "source_sha256": "043e0bd78d32888c0a9ca90fc788b38796843360c855a7262a532813133a0650",
+    "text_sha256": "ab0c171dc3ef8bf325a84bb77d855421f2611335ddf6e08816b2922c4edc0f76"
+  },
+  {
+    "component": "annotated-doc",
+    "version": "0.0.5",
+    "ecosystem": "pypi",
+    "source_path": "annotated_doc-0.0.5/LICENSE",
+    "source_sha256": "c7e58ce09192557605d8bbd92836d7e1d520ac9580096042c0bfd197efacf1bb",
+    "text_sha256": "fff170779a6acbf65abdb405c087f1cee1786691e4a96a4034517e4a504a0cdf"
+  },
+  {
+    "component": "annotated-types",
+    "version": "0.8.0",
+    "ecosystem": "pypi",
+    "source_path": "annotated_types-0.8.0/LICENSE",
+    "source_sha256": "13b2beaad985e05e2d6407ee4c4f35590b11f8d693a258a561055cac8f64cab7",
+    "text_sha256": "fe1049884b1a0d9342901e88e07f32925d24b3121d9972b6a6805fb9824b095d"
+  },
+  {
+    "component": "anyio",
+    "version": "4.15.1",
+    "ecosystem": "pypi",
+    "source_path": "anyio-4.15.1/LICENSE",
+    "source_sha256": "9f28306018cbd6d329e64a36d58256edff76dd996fe423bc957326e578b82a94",
+    "text_sha256": "5361ac9dc58f2ef5fd2e9b09c68297c17f04950909bbc8023bdb82eacf22c2b0"
+  },
+  {
+    "component": "asyncpg",
+    "version": "0.32.0",
+    "ecosystem": "pypi",
+    "source_path": "asyncpg-0.32.0/LICENSE",
+    "source_sha256": "45e64e56714d888330b884aad1dfb363d0bf43fb343e3d1a8968525f3bade478",
+    "text_sha256": "d9222d73fdac50992174076efa04f44f6fbcd9d56155a7c7092e98757042a6f6"
+  },
+  {
+    "component": "asyncssh",
+    "version": "2.24.1",
+    "ecosystem": "pypi",
+    "source_path": "asyncssh-2.24.1/COPYRIGHT",
+    "source_sha256": "efcd36e9b35f79873535b06444a7c9b0a3c61d97081b208c7fdd3fd8a40f1eca",
+    "text_sha256": "68c286b0cf4507bec8922103efe861adb0bd3218003b1ec1b25e2e64bdd76bd3"
+  },
+  {
+    "component": "asyncssh",
+    "version": "2.24.1",
+    "ecosystem": "pypi",
+    "source_path": "asyncssh-2.24.1/LICENSE",
+    "source_sha256": "efcd36e9b35f79873535b06444a7c9b0a3c61d97081b208c7fdd3fd8a40f1eca",
+    "text_sha256": "8c349f80764d0648e645f41ef23772a70c995a0924b5235f735f4a3d09df127c"
+  },
+  {
+    "component": "attrs",
+    "version": "26.1.0",
+    "ecosystem": "pypi",
+    "source_path": "attrs-26.1.0/docs/license.md",
+    "source_sha256": "d03ceb89cb322a8fd706d4fb91940737b6642aa36998fe130a9bc96c985eff32",
+    "text_sha256": "b26415d5042a70fcc29edc17112f68311aa09935290a208218d4930d9b571a7a"
+  },
+  {
+    "component": "attrs",
+    "version": "26.1.0",
+    "ecosystem": "pypi",
+    "source_path": "attrs-26.1.0/LICENSE",
+    "source_sha256": "d03ceb89cb322a8fd706d4fb91940737b6642aa36998fe130a9bc96c985eff32",
+    "text_sha256": "882115c95dfc2af1eeb6714f8ec6d5cbcabf667caff8729f42420da63f714e9f"
+  },
+  {
+    "component": "certifi",
+    "version": "2026.10.23",
+    "ecosystem": "pypi",
+    "source_path": "certifi-2026.10.23/LICENSE",
+    "source_sha256": "a9895e6e2758b371e0545e321a3a8fd1fcfd9829ada8824a936dfb16aaaf36cd",
+    "text_sha256": "e93716da6b9c0d5a4a1df60fe695b370f0695603d21f6f83f053e42cfc10caf7"
+  },
+  {
+    "component": "cffi",
+    "version": "2.1.1",
+    "ecosystem": "pypi",
+    "source_path": "cffi-2.1.1/LICENSE",
+    "source_sha256": "dd31f52ea1086513bb9df30f8fcee9b8918323ae067a3d5b78bc826a000712be",
+    "text_sha256": "5ba24ddc57067f9249add644c3afc41a5d6dc37e23433ef759d95df370b0af63"
+  },
+  {
+    "component": "click",
+    "version": "8.5.0",
+    "ecosystem": "pypi",
+    "source_path": "click-8.5.0/LICENSE.txt",
+    "source_sha256": "ba0d2089de75ea0310e2dde03160e6ca10009947fb95a182f9b54021bb272e34",
+    "text_sha256": "9a8ad106a394e853bfe21f42f4e72d592819a22805d991b5f3275029292b658d"
+  },
+  {
+    "component": "click",
+    "version": "8.5.0",
+    "ecosystem": "pypi",
+    "source_path": "click-8.5.0/docs/license.md",
+    "source_sha256": "ba0d2089de75ea0310e2dde03160e6ca10009947fb95a182f9b54021bb272e34",
+    "text_sha256": "b4aa3a8b0dfd4c8cea97ea65b3f19ef54bd280665533478f35c0a5d205a7d341"
+  },
+  {
+    "component": "cryptography",
+    "version": "50.0.2",
+    "ecosystem": "pypi",
+    "source_path": "cryptography-50.0.2/LICENSE",
+    "source_sha256": "7b46165bb56eb4704e2eaaf86f3c940d19154535d9b0ca7d6d590b04060e00d5",
+    "text_sha256": "3e0c7c091a948b82533ba98fd7cbb40432d6f1a9acbf85f5922d2f99a93ae6bb"
+  },
+  {
+    "component": "cryptography",
+    "version": "50.0.2",
+    "ecosystem": "pypi",
+    "source_path": "cryptography-50.0.2/LICENSE.APACHE",
+    "source_sha256": "7b46165bb56eb4704e2eaaf86f3c940d19154535d9b0ca7d6d590b04060e00d5",
+    "text_sha256": "aac73b3148f6d1d7111dbca32099f68d26c644c6813ae1e4f05f6579aa2663fe"
+  },
+  {
+    "component": "cryptography",
+    "version": "50.0.2",
+    "ecosystem": "pypi",
+    "source_path": "cryptography-50.0.2/LICENSE.BSD",
+    "source_sha256": "7b46165bb56eb4704e2eaaf86f3c940d19154535d9b0ca7d6d590b04060e00d5",
+    "text_sha256": "602c4c7482de6479dd2e9793cda275e5e63d773dacd1eca689232ab7008fb4fb"
+  },
+  {
+    "component": "fastapi",
+    "version": "0.162.0",
+    "ecosystem": "pypi",
+    "source_path": "fastapi-0.162.0/LICENSE",
+    "source_sha256": "6a22c1e2e6e32e0633ee7e170f00009a29b8228b16feb219ee42f32fd8d88a8f",
+    "text_sha256": "4ec89ffc81485b97fec584b2d4a961032eeffe834453894fd9c1274906cc744e"
+  },
+  {
+    "component": "greenlet",
+    "version": "3.5.6",
+    "ecosystem": "pypi",
+    "source_path": "greenlet-3.5.6/LICENSE",
+    "source_sha256": "8e67c43bdfc88d5fee6db0d3e40175b362fc95fb85f0412d233b9b203c53a575",
+    "text_sha256": "769831d6e5dfaf2c20802faccff1fafb4c2025dd8f6253dfa47fcad59d4d0979"
+  },
+  {
+    "component": "greenlet",
+    "version": "3.5.6",
+    "ecosystem": "pypi",
+    "source_path": "greenlet-3.5.6/LICENSE.PSF",
+    "source_sha256": "8e67c43bdfc88d5fee6db0d3e40175b362fc95fb85f0412d233b9b203c53a575",
+    "text_sha256": "e5ff3c23c110e494cd7d736c10fd96d462457bafeca310840db6527298c7d46b"
+  },
+  {
+    "component": "h11",
+    "version": "0.16.0",
+    "ecosystem": "pypi",
+    "source_path": "h11-0.16.0/LICENSE.txt",
+    "source_sha256": "4e35b956cf45792e4caa5885e69fba00bdbc6ffafbfa020300e549b208ee5ff1",
+    "text_sha256": "37db5bb85926db28a427a25867f10b1232003aea1be69ccb851138adb8e6f361"
+  },
+  {
+    "component": "httpcore",
+    "version": "1.0.9",
+    "ecosystem": "pypi",
+    "source_path": "httpcore-1.0.9/LICENSE.md",
+    "source_sha256": "6e34463af53fd2ab5d807f399a9b45ea31c3dfa2276f15a2c3f00afff6e176e8",
+    "text_sha256": "fdcb59154c74cbaba16a11242f7740bea9f23d6feb5547917d8c5f94a80392a5"
+  },
+  {
+    "component": "httpcore2",
+    "version": "2.16.0",
+    "ecosystem": "pypi",
+    "source_path": "httpcore2-2.16.0/LICENSE.md",
+    "source_sha256": "c72cd0413563b17e1cd8354677dff887466f8ec2551679759e93126534428643",
+    "text_sha256": "c4df125c807b0613501e943a5c92496dd11d2c16604ce396097a8dde396304d9"
+  },
+  {
+    "component": "httptools",
+    "version": "0.9.0",
+    "ecosystem": "pypi",
+    "source_path": "httptools-0.9.0/LICENSE",
+    "source_sha256": "d484ebb7e3a3f3597b0f645fbd1b85633674ca808c1f5ba11c2caf7c66f5c8b6",
+    "text_sha256": "f4573e7cb7676745fb5b8d36fa548aa93e391cfb6872ddacd65130c45ea6a92d"
+  },
+  {
+    "component": "httptools",
+    "version": "0.9.0",
+    "ecosystem": "pypi",
+    "source_path": "httptools-0.9.0/vendor/http-parser/LICENSE-MIT",
+    "source_sha256": "d484ebb7e3a3f3597b0f645fbd1b85633674ca808c1f5ba11c2caf7c66f5c8b6",
+    "text_sha256": "79e6ba8b687cb54786207342b9b6fcee0ac10218453ed9009b84d949b2233cc0"
+  },
+  {
+    "component": "httptools",
+    "version": "0.9.0",
+    "ecosystem": "pypi",
+    "source_path": "httptools-0.9.0/vendor/llhttp/LICENSE",
+    "source_sha256": "d484ebb7e3a3f3597b0f645fbd1b85633674ca808c1f5ba11c2caf7c66f5c8b6",
+    "text_sha256": "628168d68bb5a8a17e0bbefb3bd74e326e1edc20583d76f52f457c82c921867d"
+  },
+  {
+    "component": "httptools",
+    "version": "0.9.0",
+    "ecosystem": "pypi",
+    "source_path": "httptools-0.9.0/vendor/llhttp/LICENSE-MIT",
+    "source_sha256": "d484ebb7e3a3f3597b0f645fbd1b85633674ca808c1f5ba11c2caf7c66f5c8b6",
+    "text_sha256": "ebca854e0134cd256d673627c20499f42577eb74bacf08b9f25b626a73c91277"
+  },
+  {
+    "component": "httpx",
+    "version": "0.28.1",
+    "ecosystem": "pypi",
+    "source_path": "httpx-0.28.1/LICENSE.md",
+    "source_sha256": "75e98c5f16b0f35b567856f597f06ff2270a374470a5c2392242528e3e3e42fc",
+    "text_sha256": "4ec59d544f12b5f539a3a716fd321ac58ccd8030b465221f2c880200cdf28d8d"
+  },
+  {
+    "component": "httpx2",
+    "version": "2.16.0",
+    "ecosystem": "pypi",
+    "source_path": "httpx2-2.16.0/LICENSE.md",
+    "source_sha256": "0d54c98128e8f2ff7fbbde0fca8c359e5f032edeaaaac443cdb7f31f685bcd7f",
+    "text_sha256": "7e7d6dbaf7fe160d39fd6e84fd02c33cab96bcbea34d36998d545bceb4a19c30"
+  },
+  {
+    "component": "idna",
+    "version": "3.20",
+    "ecosystem": "pypi",
+    "source_path": "idna-3.20/LICENSE.md",
+    "source_sha256": "a7db850025b95ded1eae8a46181a1a6c56c92c96f0e2b005d9ff8dc0210cab44",
+    "text_sha256": "1a9a4f0e3d479a27240ddd59a9137a66ab4a0f9dfdc8ca6188cc0bfd85187f04"
+  },
+  {
+    "component": "itsdangerous",
+    "version": "2.2.0",
+    "ecosystem": "pypi",
+    "source_path": "itsdangerous-2.2.0/LICENSE.txt",
+    "source_sha256": "e0050c0b7da1eea53ffaf149c0cfbb5c6e2e2b69c4bef22c81fa6eb73e5f6173",
+    "text_sha256": "63af09891b6be8ad1a4252ed43af0f4efba7fc948e228367bed7f3c5ae0b09d7"
+  },
+  {
+    "component": "itsdangerous",
+    "version": "2.2.0",
+    "ecosystem": "pypi",
+    "source_path": "itsdangerous-2.2.0/docs/license.rst",
+    "source_sha256": "e0050c0b7da1eea53ffaf149c0cfbb5c6e2e2b69c4bef22c81fa6eb73e5f6173",
+    "text_sha256": "1e07e9c25f2618a040560b70e63f42259eab24e558d0f3532e6163d751cb4eea"
+  },
+  {
+    "component": "joserfc",
+    "version": "1.7.7",
+    "ecosystem": "pypi",
+    "source_path": "joserfc-1.7.7/LICENSE",
+    "source_sha256": "471d0fd12a5a0d1c0942de280f39efe6f597878315033270b504d4d006d25510",
+    "text_sha256": "19ee1fafcc9ec4217fc32b8a651d820538c789cf4041cb4e46b4b176a5f2a9c8"
+  },
+  {
+    "component": "jsonschema",
+    "version": "4.26.0",
+    "ecosystem": "pypi",
+    "source_path": "jsonschema-4.26.0/json/LICENSE",
+    "source_sha256": "0c26707e2efad8aa1bfc5b7ce170f3fccc2e4918ff85989ba9ffa9facb2be326",
+    "text_sha256": "837402bd25fad9b704265801ca3f92566a98157c1f9a7acd6f446299ba1c305a"
+  },
+  {
+    "component": "jsonschema",
+    "version": "4.26.0",
+    "ecosystem": "pypi",
+    "source_path": "jsonschema-4.26.0/COPYING",
+    "source_sha256": "0c26707e2efad8aa1bfc5b7ce170f3fccc2e4918ff85989ba9ffa9facb2be326",
+    "text_sha256": "4f92a015a13c4d1a040bef018aa13430b4f1bc73b41b16bb846c346766de7439"
+  },
+  {
+    "component": "jsonschema-specifications",
+    "version": "2025.9.1",
+    "ecosystem": "pypi",
+    "source_path": "jsonschema_specifications-2025.9.1/COPYING",
+    "source_sha256": "b540987f239e745613c7a9176f3edb72b832a4ac465cf02712288397832b5e8d",
+    "text_sha256": "42dcd63495f87b4eb7c7757afa379bb55a53f94afd7a5f657d9adf57236e515c"
+  },
+  {
+    "component": "mcp",
+    "version": "2.3.0",
+    "ecosystem": "pypi",
+    "source_path": "mcp-2.3.0/LICENSE",
+    "source_sha256": "8b147a50441cf059dc88c684e0aeed3687f0aa0f39c6cde7b90330effd2b34d8",
+    "text_sha256": "5e13dbbc1d120fc2a03cecde7c91424ae2d7de11b63d58ded2f4431e261ee50d"
+  },
+  {
+    "component": "mcp-types",
+    "version": "2.3.0",
+    "ecosystem": "pypi",
+    "source_path": "mcp_types-2.3.0/LICENSE",
+    "source_sha256": "d1e46549edb35ee19a94940fcee6d1addd7e589ab7ea92dda83f5d84781fc362",
+    "text_sha256": "5e13dbbc1d120fc2a03cecde7c91424ae2d7de11b63d58ded2f4431e261ee50d"
+  },
+  {
+    "component": "opentelemetry-api",
+    "version": "1.45.2",
+    "ecosystem": "pypi",
+    "source_path": "opentelemetry_api-1.45.2/LICENSE",
+    "source_sha256": "d7b0008e21e5fd61cbe7a7f34ca3b6905a78ab677d9bc395e299359c75cda6b4",
+    "text_sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+  },
+  {
+    "component": "pip",
+    "version": "26.2.2",
+    "ecosystem": "pypi",
+    "source_path": "pip-26.2.2/LICENSE.txt",
+    "source_sha256": "3a8e5c800492787f33a4114ef54444546c340df428974ebba17e0fd47e11af2f",
+    "text_sha256": "634300a669d49aeae65b12c6c48c924c51a4cdf3d1ff086dc3456dc8bcaa2104"
+  },
+  {
+    "component": "pip",
+    "version": "26.2.2",
+    "ecosystem": "pypi",
+    "source_path": "pip-26.2.2/docs/html/copyright.rst",
+    "source_sha256": "3a8e5c800492787f33a4114ef54444546c340df428974ebba17e0fd47e11af2f",
+    "text_sha256": "4b6d610ad841d556e2ddf6636d8e2d5bf307e7e83450b12010ee075e2032c939"
+  },
+  {
+    "component": "pip",
+    "version": "26.2.2",
+    "ecosystem": "pypi",
+    "source_path": "pip-26.2.2/src/pip/_vendor/cachecontrol/LICENSE.txt",
+    "source_sha256": "3a8e5c800492787f33a4114ef54444546c340df428974ebba17e0fd47e11af2f",
+    "text_sha256": "86eeee87be2a43f3ff1f56496f451f69243926f025fedbb033666c304c4c161b"
+  },
+  {
+    "component": "pip",
+    "version": "26.2.2",
+    "ecosystem": "pypi",
+    "source_path": "pip-26.2.2/src/pip/_vendor/certifi/LICENSE",
+    "source_sha256": "3a8e5c800492787f33a4114ef54444546c340df428974ebba17e0fd47e11af2f",
+    "text_sha256": "e93716da6b9c0d5a4a1df60fe695b370f0695603d21f6f83f053e42cfc10caf7"
+  },
+  {
+    "component": "pip",
+    "version": "26.2.2",
+    "ecosystem": "pypi",
+    "source_path": "pip-26.2.2/src/pip/_vendor/distlib/LICENSE.txt",
+    "source_sha256": "3a8e5c800492787f33a4114ef54444546c340df428974ebba17e0fd47e11af2f",
+    "text_sha256": "808e10c8a6ab8deb149ff9b3fb19f447a808094606d712a9ca57fead3552599d"
+  },
+  {
+    "component": "pip",
+    "version": "26.2.2",
+    "ecosystem": "pypi",
+    "source_path": "pip-26.2.2/src/pip/_vendor/distro/LICENSE",
+    "source_sha256": "3a8e5c800492787f33a4114ef54444546c340df428974ebba17e0fd47e11af2f",
+    "text_sha256": "cb5e8e7e5f4a3988e1063c142c60dc2df75605f4c46515e776e3aca6df976e14"
+  },
+  {
+    "component": "pip",
+    "version": "26.2.2",
+    "ecosystem": "pypi",
+    "source_path": "pip-26.2.2/src/pip/_vendor/idna/LICENSE.md",
+    "source_sha256": "3a8e5c800492787f33a4114ef54444546c340df428974ebba17e0fd47e11af2f",
+    "text_sha256": "1a9a4f0e3d479a27240ddd59a9137a66ab4a0f9dfdc8ca6188cc0bfd85187f04"
+  },
+  {
+    "component": "pip",
+    "version": "26.2.2",
+    "ecosystem": "pypi",
+    "source_path": "pip-26.2.2/src/pip/_vendor/msgpack/COPYING",
+    "source_sha256": "3a8e5c800492787f33a4114ef54444546c340df428974ebba17e0fd47e11af2f",
+    "text_sha256": "492dedba85da5872f78e6091bcd1fea474d660d35acb4dee964b8aab3f007427"
+  },
+  {
+    "component": "pip",
+    "version": "26.2.2",
+    "ecosystem": "pypi",
+    "source_path": "pip-26.2.2/src/pip/_vendor/packaging/LICENSE",
+    "source_sha256": "3a8e5c800492787f33a4114ef54444546c340df428974ebba17e0fd47e11af2f",
+    "text_sha256": "cad1ef5bd340d73e074ba614d26f7deaca5c7940c3d8c34852e65c4909686c48"
+  },
+  {
+    "component": "pip",
+    "version": "26.2.2",
+    "ecosystem": "pypi",
+    "source_path": "pip-26.2.2/src/pip/_vendor/packaging/LICENSE.APACHE",
+    "source_sha256": "3a8e5c800492787f33a4114ef54444546c340df428974ebba17e0fd47e11af2f",
+    "text_sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+  },
+  {
+    "component": "pip",
+    "version": "26.2.2",
+    "ecosystem": "pypi",
+    "source_path": "pip-26.2.2/src/pip/_vendor/packaging/LICENSE.BSD",
+    "source_sha256": "3a8e5c800492787f33a4114ef54444546c340df428974ebba17e0fd47e11af2f",
+    "text_sha256": "b70e7e9b742f1cc6f948b34c16aa39ffece94196364bc88ff0d2180f0028fac5"
+  },
+  {
+    "component": "pip",
+    "version": "26.2.2",
+    "ecosystem": "pypi",
+    "source_path": "pip-26.2.2/src/pip/_vendor/pkg_resources/LICENSE",
+    "source_sha256": "3a8e5c800492787f33a4114ef54444546c340df428974ebba17e0fd47e11af2f",
+    "text_sha256": "86da0f01aeae46348a3c3d465195dc1ceccde79f79e87769a64b8da04b2a4741"
+  },
+  {
+    "component": "pip",
+    "version": "26.2.2",
+    "ecosystem": "pypi",
+    "source_path": "pip-26.2.2/src/pip/_vendor/platformdirs/LICENSE",
+    "source_sha256": "3a8e5c800492787f33a4114ef54444546c340df428974ebba17e0fd47e11af2f",
+    "text_sha256": "29e0fd62e929850e86eb28c3fdccf0cefdf4fa94879011cffb3d0d4bed6d4db6"
+  },
+  {
+    "component": "pip",
+    "version": "26.2.2",
+    "ecosystem": "pypi",
+    "source_path": "pip-26.2.2/src/pip/_vendor/pygments/LICENSE",
+    "source_sha256": "3a8e5c800492787f33a4114ef54444546c340df428974ebba17e0fd47e11af2f",
+    "text_sha256": "a9d66f1d526df02e29dce73436d34e56e8632f46c275bbdffc70569e882f9f17"
+  },
+  {
+    "component": "pip",
+    "version": "26.2.2",
+    "ecosystem": "pypi",
+    "source_path": "pip-26.2.2/src/pip/_vendor/pyproject_hooks/LICENSE",
+    "source_sha256": "3a8e5c800492787f33a4114ef54444546c340df428974ebba17e0fd47e11af2f",
+    "text_sha256": "1b22b049b5267d6dfc23a67bf4a84d8ec04b9fdfb1a51d360e42b4342c8b4154"
+  },
+  {
+    "component": "pip",
+    "version": "26.2.2",
+    "ecosystem": "pypi",
+    "source_path": "pip-26.2.2/src/pip/_vendor/requests/LICENSE",
+    "source_sha256": "3a8e5c800492787f33a4114ef54444546c340df428974ebba17e0fd47e11af2f",
+    "text_sha256": "09e8a9bcec8067104652c168685ab0931e7868f9c8284b66f5ae6edae5f1130b"
+  },
+  {
+    "component": "pip",
+    "version": "26.2.2",
+    "ecosystem": "pypi",
+    "source_path": "pip-26.2.2/src/pip/_vendor/resolvelib/LICENSE",
+    "source_sha256": "3a8e5c800492787f33a4114ef54444546c340df428974ebba17e0fd47e11af2f",
+    "text_sha256": "f388fd38cad13112c1dc0f669bbe80e7f84541edbafb72f3030d2ca7642c3c9d"
+  },
+  {
+    "component": "pip",
+    "version": "26.2.2",
+    "ecosystem": "pypi",
+    "source_path": "pip-26.2.2/src/pip/_vendor/rich/LICENSE",
+    "source_sha256": "3a8e5c800492787f33a4114ef54444546c340df428974ebba17e0fd47e11af2f",
+    "text_sha256": "deed7c17a4318158190a3ea239cc879a5a50271cebb98ae7025f48fbe58dca15"
+  },
+  {
+    "component": "pip",
+    "version": "26.2.2",
+    "ecosystem": "pypi",
+    "source_path": "pip-26.2.2/src/pip/_vendor/tomli/LICENSE",
+    "source_sha256": "3a8e5c800492787f33a4114ef54444546c340df428974ebba17e0fd47e11af2f",
+    "text_sha256": "b80816b0d530b8accb4c2211783790984a6e3b61922c2b5ee92f3372ab2742fe"
+  },
+  {
+    "component": "pip",
+    "version": "26.2.2",
+    "ecosystem": "pypi",
+    "source_path": "pip-26.2.2/src/pip/_vendor/tomli_w/LICENSE",
+    "source_sha256": "3a8e5c800492787f33a4114ef54444546c340df428974ebba17e0fd47e11af2f",
+    "text_sha256": "b80816b0d530b8accb4c2211783790984a6e3b61922c2b5ee92f3372ab2742fe"
+  },
+  {
+    "component": "pip",
+    "version": "26.2.2",
+    "ecosystem": "pypi",
+    "source_path": "pip-26.2.2/src/pip/_vendor/truststore/LICENSE",
+    "source_sha256": "3a8e5c800492787f33a4114ef54444546c340df428974ebba17e0fd47e11af2f",
+    "text_sha256": "33be7b7e8fa4fd19b1760e1a8ed8a668bdab852c91b692dd41424bcb725a9fca"
+  },
+  {
+    "component": "pip",
+    "version": "26.2.2",
+    "ecosystem": "pypi",
+    "source_path": "pip-26.2.2/src/pip/_vendor/urllib3/LICENSE.txt",
+    "source_sha256": "3a8e5c800492787f33a4114ef54444546c340df428974ebba17e0fd47e11af2f",
+    "text_sha256": "130e3a64d5fdd5d096a752694634a7d9df284469de86e5732100268041e3d686"
+  },
+  {
+    "component": "pycparser",
+    "version": "3.12",
+    "ecosystem": "pypi",
+    "source_path": "pycparser-3.12/LICENSE",
+    "source_sha256": "f03387877eab82ce01bbdfd0ba7252ee55a90b1c708d5129e2ce915475cf1db6",
+    "text_sha256": "0a9e78156ae8b96caf1b4f11ac2df424b83de29736f9e757630548a6272fdf90"
+  },
+  {
+    "component": "pydantic",
+    "version": "2.14.2",
+    "ecosystem": "pypi",
+    "source_path": "pydantic-2.14.2/LICENSE",
+    "source_sha256": "fb7b2db6cefe8414dd612edeede49c4c433acb0432b0f92b95024e45f66c505d",
+    "text_sha256": "a9e186f3ca16b5eef84318e7a701721351a00cb7b8ae3a4394b67b49e3529ef3"
+  },
+  {
+    "component": "pydantic_core",
+    "version": "2.50.2",
+    "ecosystem": "pypi",
+    "source_path": "pydantic_core-2.50.2/LICENSE",
+    "source_sha256": "1b0e8dc3932cf4e9ed5727570325cacc716b9409ffc794a221c0ccc72e8eb775",
+    "text_sha256": "2afdd30d54b4d62b6f488a6bcc1546e84ec5061f13f4209c03d012348783795a"
+  },
+  {
+    "component": "python-dotenv",
+    "version": "1.2.4",
+    "ecosystem": "pypi",
+    "source_path": "python_dotenv-1.2.4/LICENSE",
+    "source_sha256": "f0d53e69935a851c0dcc78f3ab7aaccd8cabef0b92382b576b824212902873c0",
+    "text_sha256": "80619b7049f08c81683ad0e01f08f257a840652dd71ee83146d36658c7d2c2b9"
+  },
+  {
+    "component": "python-dotenv",
+    "version": "1.2.4",
+    "ecosystem": "pypi",
+    "source_path": "python_dotenv-1.2.4/docs/license.md",
+    "source_sha256": "f0d53e69935a851c0dcc78f3ab7aaccd8cabef0b92382b576b824212902873c0",
+    "text_sha256": "80619b7049f08c81683ad0e01f08f257a840652dd71ee83146d36658c7d2c2b9"
+  },
+  {
+    "component": "python-multipart",
+    "version": "0.0.33",
+    "ecosystem": "pypi",
+    "source_path": "python_multipart-0.0.33/LICENSE.txt",
+    "source_sha256": "b8112424a6abd162ec08d390565dd113ad699f2fe6fef3c987b8bbcbfe9e390d",
+    "text_sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "component": "referencing",
+    "version": "0.37.0",
+    "ecosystem": "pypi",
+    "source_path": "referencing-0.37.0/suite/LICENSE",
+    "source_sha256": "44aefc3142c5b842538163acb373e24cce6632bd54bdb01b21ad5863489f50d8",
+    "text_sha256": "42dcd63495f87b4eb7c7757afa379bb55a53f94afd7a5f657d9adf57236e515c"
+  },
+  {
+    "component": "referencing",
+    "version": "0.37.0",
+    "ecosystem": "pypi",
+    "source_path": "referencing-0.37.0/COPYING",
+    "source_sha256": "44aefc3142c5b842538163acb373e24cce6632bd54bdb01b21ad5863489f50d8",
+    "text_sha256": "42dcd63495f87b4eb7c7757afa379bb55a53f94afd7a5f657d9adf57236e515c"
+  },
+  {
+    "component": "rpds-py",
+    "version": "2026.9.1",
+    "ecosystem": "pypi",
+    "source_path": "rpds_py-2026.9.1/LICENSE",
+    "source_sha256": "4793ef7f78268b124b73fa933440f01d258bbae01de9fa53e9080c9ab0425a12",
+    "text_sha256": "314e4e91be3baa93c0fb4bccc9e4e97cd643eb839b065af921782c2175fe9909"
+  },
+  {
+    "component": "sse-starlette",
+    "version": "3.6.0",
+    "ecosystem": "pypi",
+    "source_path": "sse_starlette-3.6.0/LICENSE",
+    "source_sha256": "623151d6c20dc0eebf1b3379c27faae91fff883bac7ab6665f16f46440a88b3a",
+    "text_sha256": "80af6bfccbebd2c14d4aab96695cab9950e177190cc80f5ef819e99996883e8e"
+  },
+  {
+    "component": "starlette",
+    "version": "1.10.0",
+    "ecosystem": "pypi",
+    "source_path": "starlette-1.10.0/LICENSE.md",
+    "source_sha256": "b8399098d4c1e3522734f7235dc79b1fc967f96cf139c81e0fa30479e0685f9b",
+    "text_sha256": "dcb95677a02240243187e964f941847d19b17821cf99e5afae684fab328c19bf"
+  },
+  {
+    "component": "truststore",
+    "version": "0.10.5",
+    "ecosystem": "pypi",
+    "source_path": "truststore-0.10.5/LICENSE",
+    "source_sha256": "30d36967ccaded5cbb38d602c433f53600036c79d502f4533a49b60a03bbefcd",
+    "text_sha256": "33be7b7e8fa4fd19b1760e1a8ed8a668bdab852c91b692dd41424bcb725a9fca"
+  },
+  {
+    "component": "typing-inspection",
+    "version": "0.4.4",
+    "ecosystem": "pypi",
+    "source_path": "typing_inspection-0.4.4/LICENSE",
+    "source_sha256": "547274fa6b0a561ccf549cc9524b999a578e737d015d8709d021f9d0d13bea47",
+    "text_sha256": "804b59b25f2c31bd278f9202a19ae49a3945aa2664387e2d0a128c7cacc61ec3"
+  },
+  {
+    "component": "typing_extensions",
+    "version": "4.16.0",
+    "ecosystem": "pypi",
+    "source_path": "typing_extensions-4.16.0/LICENSE",
+    "source_sha256": "dc983d19a509c94dba722ee6abd33940f7c05a89e243c47e907eb4db6f1a43e5",
+    "text_sha256": "3b2f81fe21d181c499c59a256c8e1968455d6689d269aa85373bfb6af41da3bf"
+  },
+  {
+    "component": "uvicorn",
+    "version": "0.54.0",
+    "ecosystem": "pypi",
+    "source_path": "uvicorn-0.54.0/LICENSE.md",
+    "source_sha256": "a2e33cbfaa0306f8e6b0c13e0cb89d7d7a2da3e62b90c66e18c33d9807b28620",
+    "text_sha256": "efe1acf3e62fb99c288b0ec73e5a773b7268ef4320fe757ea994214e4b63c371"
+  },
+  {
+    "component": "uvloop",
+    "version": "0.23.0",
+    "ecosystem": "pypi",
+    "source_path": "uvloop-0.23.0/LICENSE-APACHE",
+    "source_sha256": "28d160f51ab4da3b187063652e643dea6831072add4adc1e6d62afbe73b6be27",
+    "text_sha256": "377025287798f9dcd819e1f826fa5fc5e2f382528691ab0528c5cf8c8c282c27"
+  },
+  {
+    "component": "uvloop",
+    "version": "0.23.0",
+    "ecosystem": "pypi",
+    "source_path": "uvloop-0.23.0/LICENSE-MIT",
+    "source_sha256": "28d160f51ab4da3b187063652e643dea6831072add4adc1e6d62afbe73b6be27",
+    "text_sha256": "6dd4c399f26de043d77a2ad7e31db4cb5bf08ea8368b0a42d6e158635cc8ab62"
+  },
+  {
+    "component": "uvloop",
+    "version": "0.23.0",
+    "ecosystem": "pypi",
+    "source_path": "uvloop-0.23.0/vendor/libuv/LICENSE",
+    "source_sha256": "28d160f51ab4da3b187063652e643dea6831072add4adc1e6d62afbe73b6be27",
+    "text_sha256": "16de0c32b265cb7d46a6d3bd614f259dd4d693a5e26b3407b04aae8d73041f0c"
+  },
+  {
+    "component": "uvloop",
+    "version": "0.23.0",
+    "ecosystem": "pypi",
+    "source_path": "uvloop-0.23.0/vendor/libuv/LICENSE-docs",
+    "source_sha256": "28d160f51ab4da3b187063652e643dea6831072add4adc1e6d62afbe73b6be27",
+    "text_sha256": "cce5d01fa4a83b794271bd2c28cffdf99afd43c803e6ddefddae39b591ea7448"
+  },
+  {
+    "component": "uvloop",
+    "version": "0.23.0",
+    "ecosystem": "pypi",
+    "source_path": "uvloop-0.23.0/vendor/libuv/LICENSE-extra",
+    "source_sha256": "28d160f51ab4da3b187063652e643dea6831072add4adc1e6d62afbe73b6be27",
+    "text_sha256": "262c44bd2cdba037e6d2a82fba15f5800d292bc993a6f5d6b6ea487744d02836"
+  },
+  {
+    "component": "watchfiles",
+    "version": "1.3.0",
+    "ecosystem": "pypi",
+    "source_path": "watchfiles-1.3.0/LICENSE",
+    "source_sha256": "99aee4a07847c06820765fd7b1b49ceac4f3f711ccb7d104655a33231de1c207",
+    "text_sha256": "4fd78355b67ce2677ede9fb6f63a250f377bb7e22088136a5f4699adb4bc069f"
+  },
+  {
+    "component": "websockets",
+    "version": "17.4",
+    "ecosystem": "pypi",
+    "source_path": "websockets-17.4/LICENSE",
+    "source_sha256": "09d3939b70df0c8ad2da145ebd50978bccaee1d565e838b0e7921a34d38571eb",
+    "text_sha256": "3d6a0c050d8bec52fabad502e45fb25bd02bcadbd70dea34d447b6a0ff4e6da8"
+  },
+  {
+    "component": "Python",
+    "version": "3.13.18",
+    "ecosystem": "cpython",
+    "source_path": "Python-3.13.18/Doc/copyright.rst",
+    "source_sha256": "abb0102e6d4ae027509bcb82327d9dd85515b44a3ba8ad538cfc5e9847029f68",
+    "text_sha256": "2f455e3bd119869bf01369ab852d87d11c9e67e5351a7ebc64ab2c0af344aff6"
+  },
+  {
+    "component": "Python",
+    "version": "3.13.18",
+    "ecosystem": "cpython",
+    "source_path": "Python-3.13.18/Doc/license.rst",
+    "source_sha256": "abb0102e6d4ae027509bcb82327d9dd85515b44a3ba8ad538cfc5e9847029f68",
+    "text_sha256": "952ac05720d7f1dcb63589b35eb0931b1442eb250230a4ad31198eddf0ad6abc"
+  },
+  {
+    "component": "Python",
+    "version": "3.13.18",
+    "ecosystem": "cpython",
+    "source_path": "Python-3.13.18/LICENSE",
+    "source_sha256": "abb0102e6d4ae027509bcb82327d9dd85515b44a3ba8ad538cfc5e9847029f68",
+    "text_sha256": "78b12c3a81360b357002334f0e70ea0e92eebf7a9b358805c03c48484945f3bb"
+  },
+  {
+    "component": "Python",
+    "version": "3.13.18",
+    "ecosystem": "cpython",
+    "source_path": "Python-3.13.18/Mac/BuildScript/resources/License.rtf",
+    "source_sha256": "abb0102e6d4ae027509bcb82327d9dd85515b44a3ba8ad538cfc5e9847029f68",
+    "text_sha256": "ab6df6040a4e24babad38f98454eb3263722fa6a1c441bfaa271798efbe55f27"
+  },
+  {
+    "component": "Python",
+    "version": "3.13.18",
+    "ecosystem": "cpython",
+    "source_path": "Python-3.13.18/Modules/expat/COPYING",
+    "source_sha256": "abb0102e6d4ae027509bcb82327d9dd85515b44a3ba8ad538cfc5e9847029f68",
+    "text_sha256": "31b15de82aa19a845156169a17a5488bf597e561b2c318d159ed583139b25e87"
+  },
+  {
+    "component": "Python",
+    "version": "3.13.18",
+    "ecosystem": "cpython",
+    "source_path": "Python-3.13.18/Tools/msi/bundle/bootstrap/LICENSE.txt",
+    "source_sha256": "abb0102e6d4ae027509bcb82327d9dd85515b44a3ba8ad538cfc5e9847029f68",
+    "text_sha256": "cb95daf98edda8e08a242e1060691b6941f0911692bf468a3f9c5e4b58c09b8f"
+  },
+  {
+    "component": "bitflags",
+    "version": "1.3.2",
+    "ecosystem": "cargo",
+    "source_path": "bitflags-1.3.2/LICENSE-APACHE",
+    "source_sha256": "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "bitflags",
+    "version": "1.3.2",
+    "ecosystem": "cargo",
+    "source_path": "bitflags-1.3.2/LICENSE-MIT",
+    "source_sha256": "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a",
+    "text_sha256": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+  },
+  {
+    "component": "bitflags",
+    "version": "2.7.0",
+    "ecosystem": "cargo",
+    "source_path": "bitflags-2.7.0/LICENSE-APACHE",
+    "source_sha256": "1be3f42a67d6d345ecd59f675f3f012d6974981560836e938c22b424b85ce1be",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "bitflags",
+    "version": "2.7.0",
+    "ecosystem": "cargo",
+    "source_path": "bitflags-2.7.0/LICENSE-MIT",
+    "source_sha256": "1be3f42a67d6d345ecd59f675f3f012d6974981560836e938c22b424b85ce1be",
+    "text_sha256": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+  },
+  {
+    "component": "cfg-if",
+    "version": "1.0.0",
+    "ecosystem": "cargo",
+    "source_path": "cfg-if-1.0.0/LICENSE-APACHE",
+    "source_sha256": "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "cfg-if",
+    "version": "1.0.0",
+    "ecosystem": "cargo",
+    "source_path": "cfg-if-1.0.0/LICENSE-MIT",
+    "source_sha256": "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd",
+    "text_sha256": "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397"
+  },
+  {
+    "component": "crossbeam-channel",
+    "version": "0.5.15",
+    "ecosystem": "cargo",
+    "source_path": "crossbeam-channel-0.5.15/LICENSE-APACHE",
+    "source_sha256": "82b8f8f868b36967f9606790d1903570de9ceaf870a7bf9fbbd3016d636a2cb2",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "crossbeam-channel",
+    "version": "0.5.15",
+    "ecosystem": "cargo",
+    "source_path": "crossbeam-channel-0.5.15/LICENSE-MIT",
+    "source_sha256": "82b8f8f868b36967f9606790d1903570de9ceaf870a7bf9fbbd3016d636a2cb2",
+    "text_sha256": "5734ed989dfca1f625b40281ee9f4530f91b2411ec01cb748223e7eb87e201ab"
+  },
+  {
+    "component": "crossbeam-channel",
+    "version": "0.5.15",
+    "ecosystem": "cargo",
+    "source_path": "crossbeam-channel-0.5.15/LICENSE-THIRD-PARTY",
+    "source_sha256": "82b8f8f868b36967f9606790d1903570de9ceaf870a7bf9fbbd3016d636a2cb2",
+    "text_sha256": "b16db96b93b1d7cf7bea533f572091ec6bca3234fbe0a83038be772ff391a44c"
+  },
+  {
+    "component": "crossbeam-utils",
+    "version": "0.8.19",
+    "ecosystem": "cargo",
+    "source_path": "crossbeam-utils-0.8.19/LICENSE-APACHE",
+    "source_sha256": "248e3bacc7dc6baa3b21e405ee045c3047101a49145e7e9eca583ab4c2ca5345",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "crossbeam-utils",
+    "version": "0.8.19",
+    "ecosystem": "cargo",
+    "source_path": "crossbeam-utils-0.8.19/LICENSE-MIT",
+    "source_sha256": "248e3bacc7dc6baa3b21e405ee045c3047101a49145e7e9eca583ab4c2ca5345",
+    "text_sha256": "5734ed989dfca1f625b40281ee9f4530f91b2411ec01cb748223e7eb87e201ab"
+  },
+  {
+    "component": "filetime",
+    "version": "0.2.24",
+    "ecosystem": "cargo",
+    "source_path": "filetime-0.2.24/LICENSE-APACHE",
+    "source_sha256": "bf401df4a4e3872c4fe8151134cf483738e74b67fc934d6532c882b3d24a4550",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "filetime",
+    "version": "0.2.24",
+    "ecosystem": "cargo",
+    "source_path": "filetime-0.2.24/LICENSE-MIT",
+    "source_sha256": "bf401df4a4e3872c4fe8151134cf483738e74b67fc934d6532c882b3d24a4550",
+    "text_sha256": "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397"
+  },
+  {
+    "component": "fsevent-sys",
+    "version": "4.1.0",
+    "ecosystem": "cargo",
+    "source_path": "fsevent-sys-4.1.0/LICENSE",
+    "source_sha256": "76ee7a02da4d231650c7cea31349b889be2f45ddb3ef3032d2ec8185f6313fd2",
+    "text_sha256": "c4d64f0ce17c85d4a14e22d224fbbd76dbb1e03eb38f0d3c209fb38bdc8dc646"
+  },
+  {
+    "component": "heck",
+    "version": "0.5.0",
+    "ecosystem": "cargo",
+    "source_path": "heck-0.5.0/LICENSE-APACHE",
+    "source_sha256": "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "heck",
+    "version": "0.5.0",
+    "ecosystem": "cargo",
+    "source_path": "heck-0.5.0/LICENSE-MIT",
+    "source_sha256": "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea",
+    "text_sha256": "7b63ecd5f1902af1b63729947373683c32745c16a10e8e6292e2e2dcd7e90ae0"
+  },
+  {
+    "component": "inotify",
+    "version": "0.11.0",
+    "ecosystem": "cargo",
+    "source_path": "inotify-0.11.0/LICENSE",
+    "source_sha256": "f37dccff2791ab604f9babef0ba14fbe0be30bd368dc541e2b08d07c8aa908f3",
+    "text_sha256": "7f78b31de4e7a3e2ac8de40e2b409eda313f03637aa62b8416fbde9bdc5ce4c9"
+  },
+  {
+    "component": "inotify-sys",
+    "version": "0.1.5",
+    "ecosystem": "cargo",
+    "source_path": "inotify-sys-0.1.5/LICENSE",
+    "source_sha256": "e05c02b5e89bff3b946cedeca278abc628fe811e604f027c45a8aa3cf793d0eb",
+    "text_sha256": "f68878c9ca61b25d4b2c470de571cb85ce97804a62bb153607f7e0e0d2684c8a"
+  },
+  {
+    "component": "kqueue",
+    "version": "1.0.8",
+    "ecosystem": "cargo",
+    "source_path": "kqueue-1.0.8/LICENSE",
+    "source_sha256": "7447f1ca1b7b563588a205fe93dea8df60fd981423a768bc1c0ded35ed147d0c",
+    "text_sha256": "9dc7535841863372cb757676c5acd69c010572a85df23d3467d6bb3cc2829e84"
+  },
+  {
+    "component": "kqueue-sys",
+    "version": "1.0.4",
+    "ecosystem": "cargo",
+    "source_path": "kqueue-sys-1.0.4/LICENSE",
+    "source_sha256": "ed9625ffda8729b85e45cf04090035ac368927b8cebc34898e7c120f52e4838b",
+    "text_sha256": "9dc7535841863372cb757676c5acd69c010572a85df23d3467d6bb3cc2829e84"
+  },
+  {
+    "component": "libc",
+    "version": "0.2.169",
+    "ecosystem": "cargo",
+    "source_path": "libc-0.2.169/LICENSE-APACHE",
+    "source_sha256": "b5aba8db14291edd000dfcc4d620c7ebfb122c613afb886ca8803fa4e128a20a",
+    "text_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+  },
+  {
+    "component": "libc",
+    "version": "0.2.169",
+    "ecosystem": "cargo",
+    "source_path": "libc-0.2.169/LICENSE-MIT",
+    "source_sha256": "b5aba8db14291edd000dfcc4d620c7ebfb122c613afb886ca8803fa4e128a20a",
+    "text_sha256": "a8d47ff51ca256f56a8932dba07660672dbfe3004257ca8de708aac1415937a1"
+  },
+  {
+    "component": "libredox",
+    "version": "0.1.3",
+    "ecosystem": "cargo",
+    "source_path": "libredox-0.1.3/LICENSE",
+    "source_sha256": "c0ff37bd590ca25063e35af745c343cb7a0271906fb7b37e4813e8f79f00268d",
+    "text_sha256": "8d073a6a80d1ef2d2fc2bc6c809aa221161bf1906c76d4aeef55fd2b999d9413"
+  },
+  {
+    "component": "log",
+    "version": "0.4.22",
+    "ecosystem": "cargo",
+    "source_path": "log-0.4.22/LICENSE-APACHE",
+    "source_sha256": "a7a70ba024b9dc04c27ea2f0c0548feb474ec5c54bba33a7f72f873a39d07b24",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "log",
+    "version": "0.4.22",
+    "ecosystem": "cargo",
+    "source_path": "log-0.4.22/LICENSE-MIT",
+    "source_sha256": "a7a70ba024b9dc04c27ea2f0c0548feb474ec5c54bba33a7f72f873a39d07b24",
+    "text_sha256": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+  },
+  {
+    "component": "mio",
+    "version": "1.0.3",
+    "ecosystem": "cargo",
+    "source_path": "mio-1.0.3/LICENSE",
+    "source_sha256": "2886843bf800fba2e3377cff24abf6379b4c4d5c6681eaf9ea5b0d15090450bd",
+    "text_sha256": "07919255c7e04793d8ea760d6c2ce32d19f9ff02bdbdde3ce90b1e1880929a9b"
+  },
+  {
+    "component": "notify",
+    "version": "8.0.0",
+    "ecosystem": "cargo",
+    "source_path": "notify-8.0.0/LICENSE-CC0",
+    "source_sha256": "2fee8403b3d66ac7b26aee6e40a897d85dc5ce26f44da36b8b73e987cc52e943",
+    "text_sha256": "e0456cbab4f7b5e7203e678faff37eadbdfef02e822db3b7a52a1dd9d3dc514a"
+  },
+  {
+    "component": "notify-types",
+    "version": "2.0.0",
+    "ecosystem": "cargo",
+    "source_path": "notify-types-2.0.0/LICENSE-APACHE",
+    "source_sha256": "5e0826a989adedc2a244799e823aece04662b66609d96af8dff7ac6df9a8925d",
+    "text_sha256": "b5b413d7421d728c14f33d78198d6e255a0018beef717d78c4c3f6188be3dfb4"
+  },
+  {
+    "component": "notify-types",
+    "version": "2.0.0",
+    "ecosystem": "cargo",
+    "source_path": "notify-types-2.0.0/LICENSE-MIT",
+    "source_sha256": "5e0826a989adedc2a244799e823aece04662b66609d96af8dff7ac6df9a8925d",
+    "text_sha256": "b63e167d61ced1d872a588c5ac764b0dda477d62209dc4f6b6bfea5517d0a24c"
+  },
+  {
+    "component": "once_cell",
+    "version": "1.21.3",
+    "ecosystem": "cargo",
+    "source_path": "once_cell-1.21.3/LICENSE-APACHE",
+    "source_sha256": "42f5e15c9953c5e4ccceeb2e7382a716482c34515315f7b03532b8b4e8393d2d",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "once_cell",
+    "version": "1.21.3",
+    "ecosystem": "cargo",
+    "source_path": "once_cell-1.21.3/LICENSE-MIT",
+    "source_sha256": "42f5e15c9953c5e4ccceeb2e7382a716482c34515315f7b03532b8b4e8393d2d",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "portable-atomic",
+    "version": "1.6.0",
+    "ecosystem": "cargo",
+    "source_path": "portable-atomic-1.6.0/LICENSE-APACHE",
+    "source_sha256": "7170ef9988bc169ba16dd36a7fa041e5c4cbeb6a35b76d4c03daded371eae7c0",
+    "text_sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+  },
+  {
+    "component": "portable-atomic",
+    "version": "1.6.0",
+    "ecosystem": "cargo",
+    "source_path": "portable-atomic-1.6.0/LICENSE-MIT",
+    "source_sha256": "7170ef9988bc169ba16dd36a7fa041e5c4cbeb6a35b76d4c03daded371eae7c0",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "proc-macro2",
+    "version": "1.0.81",
+    "ecosystem": "cargo",
+    "source_path": "proc-macro2-1.0.81/LICENSE-APACHE",
+    "source_sha256": "3d1597b0c024618f09a9c3b8655b7e430397a36d23fdafec26d6965e9eec3eba",
+    "text_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+  },
+  {
+    "component": "proc-macro2",
+    "version": "1.0.81",
+    "ecosystem": "cargo",
+    "source_path": "proc-macro2-1.0.81/LICENSE-MIT",
+    "source_sha256": "3d1597b0c024618f09a9c3b8655b7e430397a36d23fdafec26d6965e9eec3eba",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "pyo3",
+    "version": "0.29.0",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-0.29.0/LICENSE-APACHE",
+    "source_sha256": "cd274650b21d4bfc26a0a47587962c1edb425f69287324355cd040c3ea66071c",
+    "text_sha256": "32c76dbe0e73d79100d5ece77c158399f2e2541bc5c78548a4ba45c1cb53c5c9"
+  },
+  {
+    "component": "pyo3",
+    "version": "0.29.0",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-0.29.0/LICENSE-MIT",
+    "source_sha256": "cd274650b21d4bfc26a0a47587962c1edb425f69287324355cd040c3ea66071c",
+    "text_sha256": "afcbe3b2e6b37172b5a9ca869ee4c0b8cdc09316e5d4384864154482c33e5af6"
+  },
+  {
+    "component": "pyo3",
+    "version": "0.29.0",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-0.29.0/pyo3-runtime/LICENSE-APACHE",
+    "source_sha256": "cd274650b21d4bfc26a0a47587962c1edb425f69287324355cd040c3ea66071c",
+    "text_sha256": "32c76dbe0e73d79100d5ece77c158399f2e2541bc5c78548a4ba45c1cb53c5c9"
+  },
+  {
+    "component": "pyo3",
+    "version": "0.29.0",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-0.29.0/pyo3-runtime/LICENSE-MIT",
+    "source_sha256": "cd274650b21d4bfc26a0a47587962c1edb425f69287324355cd040c3ea66071c",
+    "text_sha256": "afcbe3b2e6b37172b5a9ca869ee4c0b8cdc09316e5d4384864154482c33e5af6"
+  },
+  {
+    "component": "pyo3-build-config",
+    "version": "0.29.0",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-build-config-0.29.0/LICENSE-APACHE",
+    "source_sha256": "c5e2a7d2f0d013342f295c048ad19237add5154a55b1c5a254c0ec93d4109078",
+    "text_sha256": "32c76dbe0e73d79100d5ece77c158399f2e2541bc5c78548a4ba45c1cb53c5c9"
+  },
+  {
+    "component": "pyo3-build-config",
+    "version": "0.29.0",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-build-config-0.29.0/LICENSE-MIT",
+    "source_sha256": "c5e2a7d2f0d013342f295c048ad19237add5154a55b1c5a254c0ec93d4109078",
+    "text_sha256": "afcbe3b2e6b37172b5a9ca869ee4c0b8cdc09316e5d4384864154482c33e5af6"
+  },
+  {
+    "component": "pyo3-ffi",
+    "version": "0.29.0",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-ffi-0.29.0/LICENSE-APACHE",
+    "source_sha256": "ca85c467da1bbc8d866eea5deff9cf29ea5f7785054a17da36e65bda9c05845b",
+    "text_sha256": "32c76dbe0e73d79100d5ece77c158399f2e2541bc5c78548a4ba45c1cb53c5c9"
+  },
+  {
+    "component": "pyo3-ffi",
+    "version": "0.29.0",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-ffi-0.29.0/LICENSE-MIT",
+    "source_sha256": "ca85c467da1bbc8d866eea5deff9cf29ea5f7785054a17da36e65bda9c05845b",
+    "text_sha256": "afcbe3b2e6b37172b5a9ca869ee4c0b8cdc09316e5d4384864154482c33e5af6"
+  },
+  {
+    "component": "pyo3-macros",
+    "version": "0.29.0",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-macros-0.29.0/LICENSE-APACHE",
+    "source_sha256": "9ac53762fd065daa3194dd09337a38bd793a188100fd1a9304c4ab312d901771",
+    "text_sha256": "32c76dbe0e73d79100d5ece77c158399f2e2541bc5c78548a4ba45c1cb53c5c9"
+  },
+  {
+    "component": "pyo3-macros",
+    "version": "0.29.0",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-macros-0.29.0/LICENSE-MIT",
+    "source_sha256": "9ac53762fd065daa3194dd09337a38bd793a188100fd1a9304c4ab312d901771",
+    "text_sha256": "afcbe3b2e6b37172b5a9ca869ee4c0b8cdc09316e5d4384864154482c33e5af6"
+  },
+  {
+    "component": "pyo3-macros-backend",
+    "version": "0.29.0",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-macros-backend-0.29.0/LICENSE-APACHE",
+    "source_sha256": "4ca3a1557399783172dc5bf39cfca835157732532cba56b71d2292161e53b362",
+    "text_sha256": "32c76dbe0e73d79100d5ece77c158399f2e2541bc5c78548a4ba45c1cb53c5c9"
+  },
+  {
+    "component": "pyo3-macros-backend",
+    "version": "0.29.0",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-macros-backend-0.29.0/LICENSE-MIT",
+    "source_sha256": "4ca3a1557399783172dc5bf39cfca835157732532cba56b71d2292161e53b362",
+    "text_sha256": "afcbe3b2e6b37172b5a9ca869ee4c0b8cdc09316e5d4384864154482c33e5af6"
+  },
+  {
+    "component": "quote",
+    "version": "1.0.45",
+    "ecosystem": "cargo",
+    "source_path": "quote-1.0.45/LICENSE-APACHE",
+    "source_sha256": "41f2619966050689382d2b44f664f4bc593e129785a36d6ee376ddf37259b924",
+    "text_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+  },
+  {
+    "component": "quote",
+    "version": "1.0.45",
+    "ecosystem": "cargo",
+    "source_path": "quote-1.0.45/LICENSE-MIT",
+    "source_sha256": "41f2619966050689382d2b44f664f4bc593e129785a36d6ee376ddf37259b924",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "redox_syscall",
+    "version": "0.5.3",
+    "ecosystem": "cargo",
+    "source_path": "redox_syscall-0.5.3/LICENSE",
+    "source_sha256": "2a908a6e00f1fdd0dfd9c0eb08ce85126f6d8bbda50017e74bc4a4b7d4a926a4",
+    "text_sha256": "efcfee7981ff72431fffb06925cad00a23dce079ed4354f61030ad5abdb78829"
+  },
+  {
+    "component": "same-file",
+    "version": "1.0.6",
+    "ecosystem": "cargo",
+    "source_path": "same-file-1.0.6/COPYING",
+    "source_sha256": "93fc1dc3aaa9bfed95e02e6eadabb4baf7e3078b0bd1b4d7b6b0b68378900502",
+    "text_sha256": "01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f"
+  },
+  {
+    "component": "same-file",
+    "version": "1.0.6",
+    "ecosystem": "cargo",
+    "source_path": "same-file-1.0.6/LICENSE-MIT",
+    "source_sha256": "93fc1dc3aaa9bfed95e02e6eadabb4baf7e3078b0bd1b4d7b6b0b68378900502",
+    "text_sha256": "cb3c929a05e6cbc9de9ab06a4c57eeb60ca8c724bef6c138c87d3a577e27aa14"
+  },
+  {
+    "component": "syn",
+    "version": "2.0.60",
+    "ecosystem": "cargo",
+    "source_path": "syn-2.0.60/LICENSE-APACHE",
+    "source_sha256": "909518bc7b1c9b779f1bbf07f2929d35af9f0f37e47c6e9ef7f9dddc1e1821f3",
+    "text_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+  },
+  {
+    "component": "syn",
+    "version": "2.0.60",
+    "ecosystem": "cargo",
+    "source_path": "syn-2.0.60/LICENSE-MIT",
+    "source_sha256": "909518bc7b1c9b779f1bbf07f2929d35af9f0f37e47c6e9ef7f9dddc1e1821f3",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "target-lexicon",
+    "version": "0.13.5",
+    "ecosystem": "cargo",
+    "source_path": "target-lexicon-0.13.5/LICENSE",
+    "source_sha256": "adb6935a6f5c20170eeceb1a3835a49e12e19d792f6dd344ccc76a985ca5a6ca",
+    "text_sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5"
+  },
+  {
+    "component": "unicode-ident",
+    "version": "1.0.12",
+    "ecosystem": "cargo",
+    "source_path": "unicode-ident-1.0.12/LICENSE-APACHE",
+    "source_sha256": "3354b9ac3fae1ff6755cb6db53683adb661634f67557942dea4facebec0fee4b",
+    "text_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+  },
+  {
+    "component": "unicode-ident",
+    "version": "1.0.12",
+    "ecosystem": "cargo",
+    "source_path": "unicode-ident-1.0.12/LICENSE-MIT",
+    "source_sha256": "3354b9ac3fae1ff6755cb6db53683adb661634f67557942dea4facebec0fee4b",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "unicode-ident",
+    "version": "1.0.12",
+    "ecosystem": "cargo",
+    "source_path": "unicode-ident-1.0.12/LICENSE-UNICODE",
+    "source_sha256": "3354b9ac3fae1ff6755cb6db53683adb661634f67557942dea4facebec0fee4b",
+    "text_sha256": "68f5b9f5ea36881a0942ba02f558e9e1faf76cc09cb165ad801744c61b738844"
+  },
+  {
+    "component": "walkdir",
+    "version": "2.5.0",
+    "ecosystem": "cargo",
+    "source_path": "walkdir-2.5.0/COPYING",
+    "source_sha256": "29790946404f91d9c5d06f9874efddea1dc06c5efe94541a7d6863108e3a5e4b",
+    "text_sha256": "01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f"
+  },
+  {
+    "component": "walkdir",
+    "version": "2.5.0",
+    "ecosystem": "cargo",
+    "source_path": "walkdir-2.5.0/LICENSE-MIT",
+    "source_sha256": "29790946404f91d9c5d06f9874efddea1dc06c5efe94541a7d6863108e3a5e4b",
+    "text_sha256": "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f"
+  },
+  {
+    "component": "wasi",
+    "version": "0.11.0+wasi-snapshot-preview1",
+    "ecosystem": "cargo",
+    "source_path": "wasi-0.11.0+wasi-snapshot-preview1/LICENSE-APACHE",
+    "source_sha256": "9c8d87e72b64a3b4db28d11ce29237c246188f4f51057d65a7eab63b7987e423",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "wasi",
+    "version": "0.11.0+wasi-snapshot-preview1",
+    "ecosystem": "cargo",
+    "source_path": "wasi-0.11.0+wasi-snapshot-preview1/LICENSE-Apache-2.0_WITH_LLVM-exception",
+    "source_sha256": "9c8d87e72b64a3b4db28d11ce29237c246188f4f51057d65a7eab63b7987e423",
+    "text_sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5"
+  },
+  {
+    "component": "wasi",
+    "version": "0.11.0+wasi-snapshot-preview1",
+    "ecosystem": "cargo",
+    "source_path": "wasi-0.11.0+wasi-snapshot-preview1/LICENSE-MIT",
+    "source_sha256": "9c8d87e72b64a3b4db28d11ce29237c246188f4f51057d65a7eab63b7987e423",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "winapi-util",
+    "version": "0.1.9",
+    "ecosystem": "cargo",
+    "source_path": "winapi-util-0.1.9/COPYING",
+    "source_sha256": "cf221c93e13a30d793f7645a0e7762c55d169dbb0a49671918a2319d289b10bb",
+    "text_sha256": "01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f"
+  },
+  {
+    "component": "winapi-util",
+    "version": "0.1.9",
+    "ecosystem": "cargo",
+    "source_path": "winapi-util-0.1.9/LICENSE-MIT",
+    "source_sha256": "cf221c93e13a30d793f7645a0e7762c55d169dbb0a49671918a2319d289b10bb",
+    "text_sha256": "cb3c929a05e6cbc9de9ab06a4c57eeb60ca8c724bef6c138c87d3a577e27aa14"
+  },
+  {
+    "component": "windows-sys",
+    "version": "0.52.0",
+    "ecosystem": "cargo",
+    "source_path": "windows-sys-0.52.0/license-apache-2.0",
+    "source_sha256": "282be5f36a8ce781fad8c8ae18fa3f9beff57ec1b52cb3de0789201425d9a33d",
+    "text_sha256": "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b"
+  },
+  {
+    "component": "windows-sys",
+    "version": "0.52.0",
+    "ecosystem": "cargo",
+    "source_path": "windows-sys-0.52.0/license-mit",
+    "source_sha256": "282be5f36a8ce781fad8c8ae18fa3f9beff57ec1b52cb3de0789201425d9a33d",
+    "text_sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+  },
+  {
+    "component": "windows-sys",
+    "version": "0.59.0",
+    "ecosystem": "cargo",
+    "source_path": "windows-sys-0.59.0/license-apache-2.0",
+    "source_sha256": "1e38bc4d79ed67fd075bcc251a1c39b32a1776bbe92e5bef1f0bf1f8c531853b",
+    "text_sha256": "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b"
+  },
+  {
+    "component": "windows-sys",
+    "version": "0.59.0",
+    "ecosystem": "cargo",
+    "source_path": "windows-sys-0.59.0/license-mit",
+    "source_sha256": "1e38bc4d79ed67fd075bcc251a1c39b32a1776bbe92e5bef1f0bf1f8c531853b",
+    "text_sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+  },
+  {
+    "component": "windows-targets",
+    "version": "0.52.6",
+    "ecosystem": "cargo",
+    "source_path": "windows-targets-0.52.6/license-apache-2.0",
+    "source_sha256": "9b724f72796e036ab90c1021d4780d4d3d648aca59e491e6b98e725b84e99973",
+    "text_sha256": "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b"
+  },
+  {
+    "component": "windows-targets",
+    "version": "0.52.6",
+    "ecosystem": "cargo",
+    "source_path": "windows-targets-0.52.6/license-mit",
+    "source_sha256": "9b724f72796e036ab90c1021d4780d4d3d648aca59e491e6b98e725b84e99973",
+    "text_sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+  },
+  {
+    "component": "windows_aarch64_gnullvm",
+    "version": "0.52.6",
+    "ecosystem": "cargo",
+    "source_path": "windows_aarch64_gnullvm-0.52.6/license-apache-2.0",
+    "source_sha256": "32a4622180e7a0ec044bb555404c800bc9fd9ec262ec147edd5989ccd0c02cd3",
+    "text_sha256": "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b"
+  },
+  {
+    "component": "windows_aarch64_gnullvm",
+    "version": "0.52.6",
+    "ecosystem": "cargo",
+    "source_path": "windows_aarch64_gnullvm-0.52.6/license-mit",
+    "source_sha256": "32a4622180e7a0ec044bb555404c800bc9fd9ec262ec147edd5989ccd0c02cd3",
+    "text_sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+  },
+  {
+    "component": "windows_aarch64_msvc",
+    "version": "0.52.6",
+    "ecosystem": "cargo",
+    "source_path": "windows_aarch64_msvc-0.52.6/license-apache-2.0",
+    "source_sha256": "09ec2a7bb152e2252b53fa7803150007879548bc709c039df7627cabbd05d469",
+    "text_sha256": "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b"
+  },
+  {
+    "component": "windows_aarch64_msvc",
+    "version": "0.52.6",
+    "ecosystem": "cargo",
+    "source_path": "windows_aarch64_msvc-0.52.6/license-mit",
+    "source_sha256": "09ec2a7bb152e2252b53fa7803150007879548bc709c039df7627cabbd05d469",
+    "text_sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+  },
+  {
+    "component": "windows_i686_gnu",
+    "version": "0.52.6",
+    "ecosystem": "cargo",
+    "source_path": "windows_i686_gnu-0.52.6/license-apache-2.0",
+    "source_sha256": "8e9b5ad5ab802e97eb8e295ac6720e509ee4c243f69d781394014ebfe8bbfa0b",
+    "text_sha256": "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b"
+  },
+  {
+    "component": "windows_i686_gnu",
+    "version": "0.52.6",
+    "ecosystem": "cargo",
+    "source_path": "windows_i686_gnu-0.52.6/license-mit",
+    "source_sha256": "8e9b5ad5ab802e97eb8e295ac6720e509ee4c243f69d781394014ebfe8bbfa0b",
+    "text_sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+  },
+  {
+    "component": "windows_i686_gnullvm",
+    "version": "0.52.6",
+    "ecosystem": "cargo",
+    "source_path": "windows_i686_gnullvm-0.52.6/license-apache-2.0",
+    "source_sha256": "0eee52d38c090b3caa76c563b86c3a4bd71ef1a819287c19d586d7334ae8ed66",
+    "text_sha256": "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b"
+  },
+  {
+    "component": "windows_i686_gnullvm",
+    "version": "0.52.6",
+    "ecosystem": "cargo",
+    "source_path": "windows_i686_gnullvm-0.52.6/license-mit",
+    "source_sha256": "0eee52d38c090b3caa76c563b86c3a4bd71ef1a819287c19d586d7334ae8ed66",
+    "text_sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+  },
+  {
+    "component": "windows_i686_msvc",
+    "version": "0.52.6",
+    "ecosystem": "cargo",
+    "source_path": "windows_i686_msvc-0.52.6/license-apache-2.0",
+    "source_sha256": "240948bc05c5e7c6dabba28bf89d89ffce3e303022809e73deaefe4f6ec56c66",
+    "text_sha256": "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b"
+  },
+  {
+    "component": "windows_i686_msvc",
+    "version": "0.52.6",
+    "ecosystem": "cargo",
+    "source_path": "windows_i686_msvc-0.52.6/license-mit",
+    "source_sha256": "240948bc05c5e7c6dabba28bf89d89ffce3e303022809e73deaefe4f6ec56c66",
+    "text_sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+  },
+  {
+    "component": "windows_x86_64_gnu",
+    "version": "0.52.6",
+    "ecosystem": "cargo",
+    "source_path": "windows_x86_64_gnu-0.52.6/license-apache-2.0",
+    "source_sha256": "147a5c80aabfbf0c7d901cb5895d1de30ef2907eb21fbbab29ca94c5b08b1a78",
+    "text_sha256": "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b"
+  },
+  {
+    "component": "windows_x86_64_gnu",
+    "version": "0.52.6",
+    "ecosystem": "cargo",
+    "source_path": "windows_x86_64_gnu-0.52.6/license-mit",
+    "source_sha256": "147a5c80aabfbf0c7d901cb5895d1de30ef2907eb21fbbab29ca94c5b08b1a78",
+    "text_sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+  },
+  {
+    "component": "windows_x86_64_gnullvm",
+    "version": "0.52.6",
+    "ecosystem": "cargo",
+    "source_path": "windows_x86_64_gnullvm-0.52.6/license-apache-2.0",
+    "source_sha256": "24d5b23dc417412679681396f2b49f3de8c1473deb516bd34410872eff51ed0d",
+    "text_sha256": "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b"
+  },
+  {
+    "component": "windows_x86_64_gnullvm",
+    "version": "0.52.6",
+    "ecosystem": "cargo",
+    "source_path": "windows_x86_64_gnullvm-0.52.6/license-mit",
+    "source_sha256": "24d5b23dc417412679681396f2b49f3de8c1473deb516bd34410872eff51ed0d",
+    "text_sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+  },
+  {
+    "component": "windows_x86_64_msvc",
+    "version": "0.52.6",
+    "ecosystem": "cargo",
+    "source_path": "windows_x86_64_msvc-0.52.6/license-apache-2.0",
+    "source_sha256": "589f6da84c646204747d1270a2a5661ea66ed1cced2631d546fdfb155959f9ec",
+    "text_sha256": "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b"
+  },
+  {
+    "component": "windows_x86_64_msvc",
+    "version": "0.52.6",
+    "ecosystem": "cargo",
+    "source_path": "windows_x86_64_msvc-0.52.6/license-mit",
+    "source_sha256": "589f6da84c646204747d1270a2a5661ea66ed1cced2631d546fdfb155959f9ec",
+    "text_sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+  },
+  {
+    "component": "archery",
+    "version": "1.2.3",
+    "ecosystem": "cargo",
+    "source_path": "archery-1.2.3/LICENSE.md",
+    "source_sha256": "33ca55ee147b1926dbea904f50fe4902494e97bc742205abbbf10c709e43815f",
+    "text_sha256": "e326b5fef9084c437878cc2184ba6dfa15503f46e5359dd67246f51761ea709f"
+  },
+  {
+    "component": "libc",
+    "version": "0.2.177",
+    "ecosystem": "cargo",
+    "source_path": "libc-0.2.177/LICENSE-APACHE",
+    "source_sha256": "2874a2af47a2325c2001a6e6fad9b16a53b802102b528163885171cf92b15976",
+    "text_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+  },
+  {
+    "component": "libc",
+    "version": "0.2.177",
+    "ecosystem": "cargo",
+    "source_path": "libc-0.2.177/LICENSE-MIT",
+    "source_sha256": "2874a2af47a2325c2001a6e6fad9b16a53b802102b528163885171cf92b15976",
+    "text_sha256": "a8d47ff51ca256f56a8932dba07660672dbfe3004257ca8de708aac1415937a1"
+  },
+  {
+    "component": "portable-atomic",
+    "version": "1.11.1",
+    "ecosystem": "cargo",
+    "source_path": "portable-atomic-1.11.1/LICENSE-APACHE",
+    "source_sha256": "f84267b20a16ea918e43c6a88433c2d54fa145c92a811b5b047ccbe153674483",
+    "text_sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+  },
+  {
+    "component": "portable-atomic",
+    "version": "1.11.1",
+    "ecosystem": "cargo",
+    "source_path": "portable-atomic-1.11.1/LICENSE-MIT",
+    "source_sha256": "f84267b20a16ea918e43c6a88433c2d54fa145c92a811b5b047ccbe153674483",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "proc-macro2",
+    "version": "1.0.103",
+    "ecosystem": "cargo",
+    "source_path": "proc-macro2-1.0.103/LICENSE-APACHE",
+    "source_sha256": "5ee95bc4ef87b8d5ba32e8b7714ccc834865276eab0aed5c9958d00ec45f49e8",
+    "text_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+  },
+  {
+    "component": "proc-macro2",
+    "version": "1.0.103",
+    "ecosystem": "cargo",
+    "source_path": "proc-macro2-1.0.103/LICENSE-MIT",
+    "source_sha256": "5ee95bc4ef87b8d5ba32e8b7714ccc834865276eab0aed5c9958d00ec45f49e8",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "pyo3",
+    "version": "0.29.3",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-0.29.3/LICENSE-APACHE",
+    "source_sha256": "700d18fa267b73b9b521fd7e13580e2f446916f176cacee1ab63fcc8191f1655",
+    "text_sha256": "32c76dbe0e73d79100d5ece77c158399f2e2541bc5c78548a4ba45c1cb53c5c9"
+  },
+  {
+    "component": "pyo3",
+    "version": "0.29.3",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-0.29.3/LICENSE-MIT",
+    "source_sha256": "700d18fa267b73b9b521fd7e13580e2f446916f176cacee1ab63fcc8191f1655",
+    "text_sha256": "afcbe3b2e6b37172b5a9ca869ee4c0b8cdc09316e5d4384864154482c33e5af6"
+  },
+  {
+    "component": "pyo3",
+    "version": "0.29.3",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-0.29.3/pyo3-runtime/LICENSE-APACHE",
+    "source_sha256": "700d18fa267b73b9b521fd7e13580e2f446916f176cacee1ab63fcc8191f1655",
+    "text_sha256": "32c76dbe0e73d79100d5ece77c158399f2e2541bc5c78548a4ba45c1cb53c5c9"
+  },
+  {
+    "component": "pyo3",
+    "version": "0.29.3",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-0.29.3/pyo3-runtime/LICENSE-MIT",
+    "source_sha256": "700d18fa267b73b9b521fd7e13580e2f446916f176cacee1ab63fcc8191f1655",
+    "text_sha256": "afcbe3b2e6b37172b5a9ca869ee4c0b8cdc09316e5d4384864154482c33e5af6"
+  },
+  {
+    "component": "pyo3-build-config",
+    "version": "0.29.3",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-build-config-0.29.3/LICENSE-APACHE",
+    "source_sha256": "7b3fc0c4d08f6bb10e71fe39dfb9e2f59c6eb6854e22ec8092f50c69a4499adb",
+    "text_sha256": "32c76dbe0e73d79100d5ece77c158399f2e2541bc5c78548a4ba45c1cb53c5c9"
+  },
+  {
+    "component": "pyo3-build-config",
+    "version": "0.29.3",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-build-config-0.29.3/LICENSE-MIT",
+    "source_sha256": "7b3fc0c4d08f6bb10e71fe39dfb9e2f59c6eb6854e22ec8092f50c69a4499adb",
+    "text_sha256": "afcbe3b2e6b37172b5a9ca869ee4c0b8cdc09316e5d4384864154482c33e5af6"
+  },
+  {
+    "component": "pyo3-ffi",
+    "version": "0.29.3",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-ffi-0.29.3/LICENSE-APACHE",
+    "source_sha256": "dfc0b8e19df29aad7086cf977bb0c2a2f143e30567eb113e9cf72b62ca698330",
+    "text_sha256": "32c76dbe0e73d79100d5ece77c158399f2e2541bc5c78548a4ba45c1cb53c5c9"
+  },
+  {
+    "component": "pyo3-ffi",
+    "version": "0.29.3",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-ffi-0.29.3/LICENSE-MIT",
+    "source_sha256": "dfc0b8e19df29aad7086cf977bb0c2a2f143e30567eb113e9cf72b62ca698330",
+    "text_sha256": "afcbe3b2e6b37172b5a9ca869ee4c0b8cdc09316e5d4384864154482c33e5af6"
+  },
+  {
+    "component": "pyo3-macros",
+    "version": "0.29.3",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-macros-0.29.3/LICENSE-APACHE",
+    "source_sha256": "6100e8a4b5eba53afaa5ed078364851a0b2499c553a44c31026b929049b49dc6",
+    "text_sha256": "32c76dbe0e73d79100d5ece77c158399f2e2541bc5c78548a4ba45c1cb53c5c9"
+  },
+  {
+    "component": "pyo3-macros",
+    "version": "0.29.3",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-macros-0.29.3/LICENSE-MIT",
+    "source_sha256": "6100e8a4b5eba53afaa5ed078364851a0b2499c553a44c31026b929049b49dc6",
+    "text_sha256": "afcbe3b2e6b37172b5a9ca869ee4c0b8cdc09316e5d4384864154482c33e5af6"
+  },
+  {
+    "component": "pyo3-macros-backend",
+    "version": "0.29.3",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-macros-backend-0.29.3/LICENSE-APACHE",
+    "source_sha256": "6143877a16e82b5a727b7127ff4cd86858a24a28d745d72f43e6f227c7b1bdb3",
+    "text_sha256": "32c76dbe0e73d79100d5ece77c158399f2e2541bc5c78548a4ba45c1cb53c5c9"
+  },
+  {
+    "component": "pyo3-macros-backend",
+    "version": "0.29.3",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-macros-backend-0.29.3/LICENSE-MIT",
+    "source_sha256": "6143877a16e82b5a727b7127ff4cd86858a24a28d745d72f43e6f227c7b1bdb3",
+    "text_sha256": "afcbe3b2e6b37172b5a9ca869ee4c0b8cdc09316e5d4384864154482c33e5af6"
+  },
+  {
+    "component": "quote",
+    "version": "1.0.42",
+    "ecosystem": "cargo",
+    "source_path": "quote-1.0.42/LICENSE-APACHE",
+    "source_sha256": "a338cc41d27e6cc6dce6cefc13a0729dfbb81c262b1f519331575dd80ef3067f",
+    "text_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+  },
+  {
+    "component": "quote",
+    "version": "1.0.42",
+    "ecosystem": "cargo",
+    "source_path": "quote-1.0.42/LICENSE-MIT",
+    "source_sha256": "a338cc41d27e6cc6dce6cefc13a0729dfbb81c262b1f519331575dd80ef3067f",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "rpds",
+    "version": "1.2.1",
+    "ecosystem": "cargo",
+    "source_path": "rpds-1.2.1/LICENSE.md",
+    "source_sha256": "e025feb26210bc196b908e72deb063b1b4000754304341cbc168a1e72c857ebc",
+    "text_sha256": "e326b5fef9084c437878cc2184ba6dfa15503f46e5359dd67246f51761ea709f"
+  },
+  {
+    "component": "smallvec",
+    "version": "1.15.1",
+    "ecosystem": "cargo",
+    "source_path": "smallvec-1.15.1/LICENSE-APACHE",
+    "source_sha256": "67b1b7a3b5fe4f1376887184045fcf45c69e92af734b7aaddc05fb777b6fbd03",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "smallvec",
+    "version": "1.15.1",
+    "ecosystem": "cargo",
+    "source_path": "smallvec-1.15.1/LICENSE-MIT",
+    "source_sha256": "67b1b7a3b5fe4f1376887184045fcf45c69e92af734b7aaddc05fb777b6fbd03",
+    "text_sha256": "0b28172679e0009b655da42797c03fd163a3379d5cfa67ba1f1655e974a2a1a9"
+  },
+  {
+    "component": "syn",
+    "version": "2.0.111",
+    "ecosystem": "cargo",
+    "source_path": "syn-2.0.111/LICENSE-APACHE",
+    "source_sha256": "390cc9a294ab71bdb1aa2e99d13be9c753cd2d7bd6560c77118597410c4d2e87",
+    "text_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+  },
+  {
+    "component": "syn",
+    "version": "2.0.111",
+    "ecosystem": "cargo",
+    "source_path": "syn-2.0.111/LICENSE-MIT",
+    "source_sha256": "390cc9a294ab71bdb1aa2e99d13be9c753cd2d7bd6560c77118597410c4d2e87",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "target-lexicon",
+    "version": "0.13.3",
+    "ecosystem": "cargo",
+    "source_path": "target-lexicon-0.13.3/LICENSE",
+    "source_sha256": "df7f62577c25e07834649fc3b39fafdc597c0a3527dc1c60129201ccfcbaa50c",
+    "text_sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5"
+  },
+  {
+    "component": "triomphe",
+    "version": "0.1.16",
+    "ecosystem": "cargo",
+    "source_path": "triomphe-0.1.16/LICENSE-APACHE",
+    "source_sha256": "b40688ea6389c8171614b25491f71d4a27946e0c7ce2da1c6de27e25abf1a0ae",
+    "text_sha256": "a6b7260485462860838b76ad1846d21f1605e6d239141c3aa949a601d992676c"
+  },
+  {
+    "component": "triomphe",
+    "version": "0.1.16",
+    "ecosystem": "cargo",
+    "source_path": "triomphe-0.1.16/LICENSE-MIT",
+    "source_sha256": "b40688ea6389c8171614b25491f71d4a27946e0c7ce2da1c6de27e25abf1a0ae",
+    "text_sha256": "15656cc11a8331f28c0986b8ab97220d3e76f98e60ed388b5ffad37dfac4710c"
+  },
+  {
+    "component": "unicode-ident",
+    "version": "1.0.22",
+    "ecosystem": "cargo",
+    "source_path": "unicode-ident-1.0.22/LICENSE-APACHE",
+    "source_sha256": "9312f7c4f6ff9069b165498234ce8be658059c6728633667c526e27dc2cf1df5",
+    "text_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+  },
+  {
+    "component": "unicode-ident",
+    "version": "1.0.22",
+    "ecosystem": "cargo",
+    "source_path": "unicode-ident-1.0.22/LICENSE-MIT",
+    "source_sha256": "9312f7c4f6ff9069b165498234ce8be658059c6728633667c526e27dc2cf1df5",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "unicode-ident",
+    "version": "1.0.22",
+    "ecosystem": "cargo",
+    "source_path": "unicode-ident-1.0.22/LICENSE-UNICODE",
+    "source_sha256": "9312f7c4f6ff9069b165498234ce8be658059c6728633667c526e27dc2cf1df5",
+    "text_sha256": "f7db81051789b729fea528a63ec4c938fdcb93d9d61d97dc8cc2e9df6d47f2a1"
+  },
+  {
+    "component": "ahash",
+    "version": "0.8.12",
+    "ecosystem": "cargo",
+    "source_path": "ahash-0.8.12/LICENSE-APACHE",
+    "source_sha256": "5a15f179cd60c4584b8a8c596927aadc462e27f2ca70c04e0071964a73ba7a75",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "ahash",
+    "version": "0.8.12",
+    "ecosystem": "cargo",
+    "source_path": "ahash-0.8.12/LICENSE-MIT",
+    "source_sha256": "5a15f179cd60c4584b8a8c596927aadc462e27f2ca70c04e0071964a73ba7a75",
+    "text_sha256": "0444c6991eead6822f7b9102e654448d51624431119546492e8b231db42c48bb"
+  },
+  {
+    "component": "aho-corasick",
+    "version": "1.1.3",
+    "ecosystem": "cargo",
+    "source_path": "aho-corasick-1.1.3/COPYING",
+    "source_sha256": "8e60d3430d3a69478ad0993f19238d2df97c507009a52b3c10addcd7f6bcb916",
+    "text_sha256": "01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f"
+  },
+  {
+    "component": "aho-corasick",
+    "version": "1.1.3",
+    "ecosystem": "cargo",
+    "source_path": "aho-corasick-1.1.3/LICENSE-MIT",
+    "source_sha256": "8e60d3430d3a69478ad0993f19238d2df97c507009a52b3c10addcd7f6bcb916",
+    "text_sha256": "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f"
+  },
+  {
+    "component": "arrayvec",
+    "version": "0.7.8",
+    "ecosystem": "cargo",
+    "source_path": "arrayvec-0.7.8/LICENSE-APACHE",
+    "source_sha256": "d3fb67a6e08acf24fdeccbac2cb6ac4305825bd1f117462e0e6f2f193345ad56",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "arrayvec",
+    "version": "0.7.8",
+    "ecosystem": "cargo",
+    "source_path": "arrayvec-0.7.8/LICENSE-MIT",
+    "source_sha256": "d3fb67a6e08acf24fdeccbac2cb6ac4305825bd1f117462e0e6f2f193345ad56",
+    "text_sha256": "4da95ec4ecb65b738d470b7d762894ad9c97da93e6cbfb18b570fc2c96f4b871"
+  },
+  {
+    "component": "autocfg",
+    "version": "1.3.0",
+    "ecosystem": "cargo",
+    "source_path": "autocfg-1.3.0/LICENSE-APACHE",
+    "source_sha256": "0c4b4d0bd25bd0b74681c0ad21497610ce1b7c91b1022cd21c80c6fbdd9476b0",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "autocfg",
+    "version": "1.3.0",
+    "ecosystem": "cargo",
+    "source_path": "autocfg-1.3.0/LICENSE-MIT",
+    "source_sha256": "0c4b4d0bd25bd0b74681c0ad21497610ce1b7c91b1022cd21c80c6fbdd9476b0",
+    "text_sha256": "27995d58ad5c1145c1a8cd86244ce844886958a35eb2b78c6b772748669999ac"
+  },
+  {
+    "component": "base64",
+    "version": "0.23.1",
+    "ecosystem": "cargo",
+    "source_path": "base64-0.23.1/LICENSE-APACHE",
+    "source_sha256": "ac07cdecf99051d9a5238b80f35af32cdeba5b336e55d957b318b50137e18da5",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "base64",
+    "version": "0.23.1",
+    "ecosystem": "cargo",
+    "source_path": "base64-0.23.1/LICENSE-MIT",
+    "source_sha256": "ac07cdecf99051d9a5238b80f35af32cdeba5b336e55d957b318b50137e18da5",
+    "text_sha256": "ab499c75a0f0da8e0fe83bf9ba3a27e5c39705310f07107c6c66b69958d2401c"
+  },
+  {
+    "component": "bitflags",
+    "version": "2.9.1",
+    "ecosystem": "cargo",
+    "source_path": "bitflags-2.9.1/LICENSE-APACHE",
+    "source_sha256": "1b8e56985ec62d17e9c1001dc89c88ecd7dc08e47eba5ec7c29c7b5eeecde967",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "bitflags",
+    "version": "2.9.1",
+    "ecosystem": "cargo",
+    "source_path": "bitflags-2.9.1/LICENSE-MIT",
+    "source_sha256": "1b8e56985ec62d17e9c1001dc89c88ecd7dc08e47eba5ec7c29c7b5eeecde967",
+    "text_sha256": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+  },
+  {
+    "component": "bitvec",
+    "version": "1.0.1",
+    "ecosystem": "cargo",
+    "source_path": "bitvec-1.0.1/LICENSE.txt",
+    "source_sha256": "1bc2832c24239b0141d5674bb9174f9d68a8b5b3f2753311927c172ca46f7e9c",
+    "text_sha256": "411781fd38700f2357a14126d0ab048164ab881f1dcb335c1bb932e232c9a2f5"
+  },
+  {
+    "component": "bumpalo",
+    "version": "3.19.0",
+    "ecosystem": "cargo",
+    "source_path": "bumpalo-3.19.0/LICENSE-APACHE",
+    "source_sha256": "46c5e41b57b8bba42a04676d81cb89e9ee8e859a1a66f80a5a72e1cb76b34d43",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "bumpalo",
+    "version": "3.19.0",
+    "ecosystem": "cargo",
+    "source_path": "bumpalo-3.19.0/LICENSE-MIT",
+    "source_sha256": "46c5e41b57b8bba42a04676d81cb89e9ee8e859a1a66f80a5a72e1cb76b34d43",
+    "text_sha256": "65f94e99ddaf4f5d1782a6dae23f35d4293a9a01444a13135a6887017d353cee"
+  },
+  {
+    "component": "displaydoc",
+    "version": "0.2.5",
+    "ecosystem": "cargo",
+    "source_path": "displaydoc-0.2.5/LICENSE-APACHE",
+    "source_sha256": "97369cbbc041bc366949bc74d34658d6cda5621039731c6310521892a3a20ae0",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "displaydoc",
+    "version": "0.2.5",
+    "ecosystem": "cargo",
+    "source_path": "displaydoc-0.2.5/LICENSE-MIT",
+    "source_sha256": "97369cbbc041bc366949bc74d34658d6cda5621039731c6310521892a3a20ae0",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "enum_dispatch",
+    "version": "0.3.13",
+    "ecosystem": "cargo",
+    "source_path": "enum_dispatch-0.3.13/LICENSE",
+    "source_sha256": "aa18ce2bc66555b3218614519ac839ddb759a7d6720732f979ef8d13be147ecd",
+    "text_sha256": "1e5d3ddaf5cbc111c8517df39e6f252e4c16dbda26b7cc1ad54c9e3efb0586be"
+  },
+  {
+    "component": "equivalent",
+    "version": "1.0.3",
+    "ecosystem": "cargo",
+    "source_path": "equivalent-1.0.3/LICENSE-APACHE",
+    "source_sha256": "00d174d5400e5e8fd687ad1049e2f578285fa914201b1af7e8b112a4546bd826",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "equivalent",
+    "version": "1.0.3",
+    "ecosystem": "cargo",
+    "source_path": "equivalent-1.0.3/LICENSE-MIT",
+    "source_sha256": "00d174d5400e5e8fd687ad1049e2f578285fa914201b1af7e8b112a4546bd826",
+    "text_sha256": "7365cc8878a1d7ce155a58c4ca09c3d7a6be413efa5334a80ea842912b669349"
+  },
+  {
+    "component": "foldhash",
+    "version": "0.2.0",
+    "ecosystem": "cargo",
+    "source_path": "foldhash-0.2.0/LICENSE",
+    "source_sha256": "77ce24cb58228fbb8aa041425bb1050850ac19177686ea6e0f41a70416f56fdb",
+    "text_sha256": "b1181a40b2a7b25cf66fd01481713bc1005df082c53ef73e851e55071b102744"
+  },
+  {
+    "component": "form_urlencoded",
+    "version": "1.2.2",
+    "ecosystem": "cargo",
+    "source_path": "form_urlencoded-1.2.2/LICENSE-APACHE",
+    "source_sha256": "cb4cb245038516f5f85277875cdaa4f7d2c9a0fa0468de06ed190163b1581fcf",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "form_urlencoded",
+    "version": "1.2.2",
+    "ecosystem": "cargo",
+    "source_path": "form_urlencoded-1.2.2/LICENSE-MIT",
+    "source_sha256": "cb4cb245038516f5f85277875cdaa4f7d2c9a0fa0468de06ed190163b1581fcf",
+    "text_sha256": "20c7855c364d57ea4c97889a5e8d98470a9952dade37bd9248b9a54431670e5e"
+  },
+  {
+    "component": "funty",
+    "version": "2.0.0",
+    "ecosystem": "cargo",
+    "source_path": "funty-2.0.0/LICENSE.txt",
+    "source_sha256": "e6d5a32815ae3f33302d95fdcb2ce17862f8c65363dcfd29360480ba1001fc9c",
+    "text_sha256": "f790cc576999f5998c766d3d26d7d64dc368e805a98461484f65e8d961ec6d9f"
+  },
+  {
+    "component": "getrandom",
+    "version": "0.3.3",
+    "ecosystem": "cargo",
+    "source_path": "getrandom-0.3.3/LICENSE-APACHE",
+    "source_sha256": "26145e563e54f2cadc477553f1ec5ee650b00862f0a58bcd12cbdc5f0ea2d2f4",
+    "text_sha256": "aaff376532ea30a0cd5330b9502ad4a4c8bf769c539c87ffe78819d188a18ebf"
+  },
+  {
+    "component": "getrandom",
+    "version": "0.3.3",
+    "ecosystem": "cargo",
+    "source_path": "getrandom-0.3.3/LICENSE-MIT",
+    "source_sha256": "26145e563e54f2cadc477553f1ec5ee650b00862f0a58bcd12cbdc5f0ea2d2f4",
+    "text_sha256": "29e9fe5074bd27e0e5d5d110394fbbcd841baee2651a3c4b4560a632702cede4"
+  },
+  {
+    "component": "hashbrown",
+    "version": "0.17.1",
+    "ecosystem": "cargo",
+    "source_path": "hashbrown-0.17.1/LICENSE-APACHE",
+    "source_sha256": "ed5909b6e89a2db4456e54cd5f673791d7eca6732202bbf2a9cc504fe2f9b84a",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "hashbrown",
+    "version": "0.17.1",
+    "ecosystem": "cargo",
+    "source_path": "hashbrown-0.17.1/LICENSE-MIT",
+    "source_sha256": "ed5909b6e89a2db4456e54cd5f673791d7eca6732202bbf2a9cc504fe2f9b84a",
+    "text_sha256": "ff8f68cb076caf8cefe7a6430d4ac086ce6af2ca8ce2c4e5a2004d4552ef52a2"
+  },
+  {
+    "component": "hex",
+    "version": "0.4.3",
+    "ecosystem": "cargo",
+    "source_path": "hex-0.4.3/LICENSE-APACHE",
+    "source_sha256": "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70",
+    "text_sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08"
+  },
+  {
+    "component": "hex",
+    "version": "0.4.3",
+    "ecosystem": "cargo",
+    "source_path": "hex-0.4.3/LICENSE-MIT",
+    "source_sha256": "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70",
+    "text_sha256": "f7bdb3426d045cd50efd4953026e3eb5a83d0199f458a075602611b9344da5b9"
+  },
+  {
+    "component": "icu_collections",
+    "version": "1.5.0",
+    "ecosystem": "cargo",
+    "source_path": "icu_collections-1.5.0/LICENSE",
+    "source_sha256": "db2fa452206ebee18c4b5c2274dbf1de17008e874b4dc4f0aea9d01ca79e4526",
+    "text_sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+  },
+  {
+    "component": "icu_locid",
+    "version": "1.5.0",
+    "ecosystem": "cargo",
+    "source_path": "icu_locid-1.5.0/LICENSE",
+    "source_sha256": "13acbb8371917fc971be86fc8057c41a64b521c184808a698c02acc242dbf637",
+    "text_sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+  },
+  {
+    "component": "icu_locid_transform",
+    "version": "1.5.0",
+    "ecosystem": "cargo",
+    "source_path": "icu_locid_transform-1.5.0/LICENSE",
+    "source_sha256": "01d11ac35de8e40fdeda00d9e1e9d92525f3f9d887cdd7aa81d727596788b54e",
+    "text_sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+  },
+  {
+    "component": "icu_locid_transform_data",
+    "version": "1.5.0",
+    "ecosystem": "cargo",
+    "source_path": "icu_locid_transform_data-1.5.0/LICENSE",
+    "source_sha256": "fdc8ff3388f852bede6b579ad4e978ab004f139284d7b28715f773507b946f6e",
+    "text_sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+  },
+  {
+    "component": "icu_normalizer",
+    "version": "1.5.0",
+    "ecosystem": "cargo",
+    "source_path": "icu_normalizer-1.5.0/LICENSE",
+    "source_sha256": "19ce3e0da2ec68599d193c93d088142efd7f9c5d6fc9b803774855747dc6a84f",
+    "text_sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+  },
+  {
+    "component": "icu_normalizer_data",
+    "version": "1.5.0",
+    "ecosystem": "cargo",
+    "source_path": "icu_normalizer_data-1.5.0/LICENSE",
+    "source_sha256": "f8cafbf7aa791e9b22bec55a167906f9e1215fd475cd22adfcf660e03e989516",
+    "text_sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+  },
+  {
+    "component": "icu_properties",
+    "version": "1.5.1",
+    "ecosystem": "cargo",
+    "source_path": "icu_properties-1.5.1/LICENSE",
+    "source_sha256": "93d6020766cfc6302c15dbbc9c8778c37e62c14427cb7f6e601d849e092aeef5",
+    "text_sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+  },
+  {
+    "component": "icu_properties_data",
+    "version": "1.5.0",
+    "ecosystem": "cargo",
+    "source_path": "icu_properties_data-1.5.0/LICENSE",
+    "source_sha256": "67a8effbc3dd3e4ba1afa8ad918d5684b8868b3b26500753effea8d2eed19569",
+    "text_sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+  },
+  {
+    "component": "icu_provider",
+    "version": "1.5.0",
+    "ecosystem": "cargo",
+    "source_path": "icu_provider-1.5.0/LICENSE",
+    "source_sha256": "6ed421c8a8ef78d3e2dbc98a973be2f3770cb42b606e3ab18d6237c4dfde68d9",
+    "text_sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+  },
+  {
+    "component": "icu_provider_macros",
+    "version": "1.5.0",
+    "ecosystem": "cargo",
+    "source_path": "icu_provider_macros-1.5.0/LICENSE",
+    "source_sha256": "1ec89e9337638ecdc08744df490b221a7399bf8d164eb52a665454e60e075ad6",
+    "text_sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+  },
+  {
+    "component": "idna",
+    "version": "1.1.0",
+    "ecosystem": "cargo",
+    "source_path": "idna-1.1.0/LICENSE-APACHE",
+    "source_sha256": "3b0875f23caa03898994f6ddc501886a45c7d3d62d04d2d90788d47be1b1e4de",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "idna",
+    "version": "1.1.0",
+    "ecosystem": "cargo",
+    "source_path": "idna-1.1.0/LICENSE-MIT",
+    "source_sha256": "3b0875f23caa03898994f6ddc501886a45c7d3d62d04d2d90788d47be1b1e4de",
+    "text_sha256": "b38f11f6096706e6de553dabe2a7ed142d59b6fa8c97e290c67496154745cdd5"
+  },
+  {
+    "component": "idna_adapter",
+    "version": "1.2.0",
+    "ecosystem": "cargo",
+    "source_path": "idna_adapter-1.2.0/LICENSE-APACHE",
+    "source_sha256": "daca1df1c957320b2cf139ac61e7bd64fed304c5040df000a745aa1de3b4ef71",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "idna_adapter",
+    "version": "1.2.0",
+    "ecosystem": "cargo",
+    "source_path": "idna_adapter-1.2.0/LICENSE-MIT",
+    "source_sha256": "daca1df1c957320b2cf139ac61e7bd64fed304c5040df000a745aa1de3b4ef71",
+    "text_sha256": "8b43ce8accd61e9d370b5ca9e9c4f953279b5c239926c62315b40e24df51b726"
+  },
+  {
+    "component": "indexmap",
+    "version": "2.14.0",
+    "ecosystem": "cargo",
+    "source_path": "indexmap-2.14.0/LICENSE-APACHE",
+    "source_sha256": "d466e9454f08e4a911e14806c24e16fba1b4c121d1ea474396f396069cf949d9",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "indexmap",
+    "version": "2.14.0",
+    "ecosystem": "cargo",
+    "source_path": "indexmap-2.14.0/LICENSE-MIT",
+    "source_sha256": "d466e9454f08e4a911e14806c24e16fba1b4c121d1ea474396f396069cf949d9",
+    "text_sha256": "ecc269ef87fd38a1d98e30bfac9ba964a9dbd9315c3770fed98d4d7cb5882055"
+  },
+  {
+    "component": "itoa",
+    "version": "1.0.11",
+    "ecosystem": "cargo",
+    "source_path": "itoa-1.0.11/LICENSE-APACHE",
+    "source_sha256": "49f1f14873335454500d59611f1cf4a4b0f786f9ac11f4312a78e4cf2566695b",
+    "text_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+  },
+  {
+    "component": "itoa",
+    "version": "1.0.11",
+    "ecosystem": "cargo",
+    "source_path": "itoa-1.0.11/LICENSE-MIT",
+    "source_sha256": "49f1f14873335454500d59611f1cf4a4b0f786f9ac11f4312a78e4cf2566695b",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "jiter",
+    "version": "0.18.0",
+    "ecosystem": "cargo",
+    "source_path": "jiter-0.18.0/LICENSE",
+    "source_sha256": "49e31424b61d85292bd805dbf643c3ccc44f5f3871fb751209b889ee70585029",
+    "text_sha256": "7c7134b9f7b978c03fca875517cf398db91f19bbb8109b6685e742aa3f57468e"
+  },
+  {
+    "component": "js-sys",
+    "version": "0.3.77",
+    "ecosystem": "cargo",
+    "source_path": "js-sys-0.3.77/LICENSE-APACHE",
+    "source_sha256": "1cfaf33c695fc6e08064efbc1f72ec937429614f25eef83af942d0e227c3a28f",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "js-sys",
+    "version": "0.3.77",
+    "ecosystem": "cargo",
+    "source_path": "js-sys-0.3.77/LICENSE-MIT",
+    "source_sha256": "1cfaf33c695fc6e08064efbc1f72ec937429614f25eef83af942d0e227c3a28f",
+    "text_sha256": "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397"
+  },
+  {
+    "component": "lexical-parse-float",
+    "version": "1.0.6",
+    "ecosystem": "cargo",
+    "source_path": "lexical-parse-float-1.0.6/LICENSE-APACHE",
+    "source_sha256": "52a9f232fbd6f550bc0137dcb5f99ab674071ac2d690ac69704593cb4abbea56",
+    "text_sha256": "8173d5c29b4f956d532781d2b86e4e30f83e6b7878dce18c919451d6ba707c90"
+  },
+  {
+    "component": "lexical-parse-float",
+    "version": "1.0.6",
+    "ecosystem": "cargo",
+    "source_path": "lexical-parse-float-1.0.6/LICENSE-MIT",
+    "source_sha256": "52a9f232fbd6f550bc0137dcb5f99ab674071ac2d690ac69704593cb4abbea56",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "lexical-parse-float",
+    "version": "1.0.6",
+    "ecosystem": "cargo",
+    "source_path": "lexical-parse-float-1.0.6/LICENSE.md",
+    "source_sha256": "52a9f232fbd6f550bc0137dcb5f99ab674071ac2d690ac69704593cb4abbea56",
+    "text_sha256": "99aab70a96f3ecab683d8a319d9070af2213ae4c1601fb053fbe85e1361e32fe"
+  },
+  {
+    "component": "lexical-parse-integer",
+    "version": "1.0.6",
+    "ecosystem": "cargo",
+    "source_path": "lexical-parse-integer-1.0.6/LICENSE-APACHE",
+    "source_sha256": "9a7a039f8fb9c19c996cd7b2fcce303c1b2874fe1aca544edc85c4a5f8489b34",
+    "text_sha256": "8173d5c29b4f956d532781d2b86e4e30f83e6b7878dce18c919451d6ba707c90"
+  },
+  {
+    "component": "lexical-parse-integer",
+    "version": "1.0.6",
+    "ecosystem": "cargo",
+    "source_path": "lexical-parse-integer-1.0.6/LICENSE-MIT",
+    "source_sha256": "9a7a039f8fb9c19c996cd7b2fcce303c1b2874fe1aca544edc85c4a5f8489b34",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "lexical-parse-integer",
+    "version": "1.0.6",
+    "ecosystem": "cargo",
+    "source_path": "lexical-parse-integer-1.0.6/LICENSE.md",
+    "source_sha256": "9a7a039f8fb9c19c996cd7b2fcce303c1b2874fe1aca544edc85c4a5f8489b34",
+    "text_sha256": "99aab70a96f3ecab683d8a319d9070af2213ae4c1601fb053fbe85e1361e32fe"
+  },
+  {
+    "component": "lexical-util",
+    "version": "1.0.7",
+    "ecosystem": "cargo",
+    "source_path": "lexical-util-1.0.7/LICENSE-APACHE",
+    "source_sha256": "2604dd126bb14f13fb5d1bd6a66155079cb9fa655b37f875b3a742c705dbed17",
+    "text_sha256": "8173d5c29b4f956d532781d2b86e4e30f83e6b7878dce18c919451d6ba707c90"
+  },
+  {
+    "component": "lexical-util",
+    "version": "1.0.7",
+    "ecosystem": "cargo",
+    "source_path": "lexical-util-1.0.7/LICENSE-MIT",
+    "source_sha256": "2604dd126bb14f13fb5d1bd6a66155079cb9fa655b37f875b3a742c705dbed17",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "libc",
+    "version": "0.2.185",
+    "ecosystem": "cargo",
+    "source_path": "libc-0.2.185/LICENSE-APACHE",
+    "source_sha256": "52ff2c0fe9bc6cb6b14a0592c2ff4fa9ceb83eea9db979b0487cd054946a2b8f",
+    "text_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+  },
+  {
+    "component": "libc",
+    "version": "0.2.185",
+    "ecosystem": "cargo",
+    "source_path": "libc-0.2.185/LICENSE-MIT",
+    "source_sha256": "52ff2c0fe9bc6cb6b14a0592c2ff4fa9ceb83eea9db979b0487cd054946a2b8f",
+    "text_sha256": "123a331b5dbf04c30097fa43b8f858bc85df671fe776de498d01f3d6b7c1f69e"
+  },
+  {
+    "component": "litemap",
+    "version": "0.7.3",
+    "ecosystem": "cargo",
+    "source_path": "litemap-0.7.3/LICENSE",
+    "source_sha256": "643cb0b8d4fcc284004d5fd0d67ccf61dfffadb7f75e1e71bc420f4688a3a704",
+    "text_sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+  },
+  {
+    "component": "log",
+    "version": "0.4.27",
+    "ecosystem": "cargo",
+    "source_path": "log-0.4.27/LICENSE-APACHE",
+    "source_sha256": "13dc2df351e3202783a1fe0d44375f7295ffb4049267b0f3018346dc122a1d94",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "log",
+    "version": "0.4.27",
+    "ecosystem": "cargo",
+    "source_path": "log-0.4.27/LICENSE-MIT",
+    "source_sha256": "13dc2df351e3202783a1fe0d44375f7295ffb4049267b0f3018346dc122a1d94",
+    "text_sha256": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+  },
+  {
+    "component": "lru",
+    "version": "0.18.5",
+    "ecosystem": "cargo",
+    "source_path": "lru-0.18.5/LICENSE",
+    "source_sha256": "ef9ac18847474e638e3702b76c65d4eb93428471a74778ef0f1be711717f89b5",
+    "text_sha256": "061dc50af2cd9340703daf61978af3200cf681b12ea67a323c33ba109a23a45e"
+  },
+  {
+    "component": "memchr",
+    "version": "2.7.4",
+    "ecosystem": "cargo",
+    "source_path": "memchr-2.7.4/COPYING",
+    "source_sha256": "78ca9ab1a0babb1e7d5695e3530886289c18cf2f87ec19a575a0abdce112e3a3",
+    "text_sha256": "01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f"
+  },
+  {
+    "component": "memchr",
+    "version": "2.7.4",
+    "ecosystem": "cargo",
+    "source_path": "memchr-2.7.4/LICENSE-MIT",
+    "source_sha256": "78ca9ab1a0babb1e7d5695e3530886289c18cf2f87ec19a575a0abdce112e3a3",
+    "text_sha256": "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f"
+  },
+  {
+    "component": "num-bigint",
+    "version": "0.4.6",
+    "ecosystem": "cargo",
+    "source_path": "num-bigint-0.4.6/LICENSE-APACHE",
+    "source_sha256": "a5e44f723f1133c9deac646763579fdb3ac745e418f2a7af9cd0c431da1f20b9",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "num-bigint",
+    "version": "0.4.6",
+    "ecosystem": "cargo",
+    "source_path": "num-bigint-0.4.6/LICENSE-MIT",
+    "source_sha256": "a5e44f723f1133c9deac646763579fdb3ac745e418f2a7af9cd0c431da1f20b9",
+    "text_sha256": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+  },
+  {
+    "component": "num-integer",
+    "version": "0.1.46",
+    "ecosystem": "cargo",
+    "source_path": "num-integer-0.1.46/LICENSE-APACHE",
+    "source_sha256": "7969661fd2958a5cb096e56c8e1ad0444ac2bbcd0061bd28660485a44879858f",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "num-integer",
+    "version": "0.1.46",
+    "ecosystem": "cargo",
+    "source_path": "num-integer-0.1.46/LICENSE-MIT",
+    "source_sha256": "7969661fd2958a5cb096e56c8e1ad0444ac2bbcd0061bd28660485a44879858f",
+    "text_sha256": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+  },
+  {
+    "component": "num-traits",
+    "version": "0.2.19",
+    "ecosystem": "cargo",
+    "source_path": "num-traits-0.2.19/LICENSE-APACHE",
+    "source_sha256": "071dfc062690e90b734c0b2273ce72ad0ffa95f0c74596bc250dcfd960262841",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "num-traits",
+    "version": "0.2.19",
+    "ecosystem": "cargo",
+    "source_path": "num-traits-0.2.19/LICENSE-MIT",
+    "source_sha256": "071dfc062690e90b734c0b2273ce72ad0ffa95f0c74596bc250dcfd960262841",
+    "text_sha256": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+  },
+  {
+    "component": "percent-encoding",
+    "version": "2.3.2",
+    "ecosystem": "cargo",
+    "source_path": "percent-encoding-2.3.2/LICENSE-APACHE",
+    "source_sha256": "9b4f627cb1b25917193a259e49bdad08f671f8d9708acfd5fe0a8c1455d87220",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "percent-encoding",
+    "version": "2.3.2",
+    "ecosystem": "cargo",
+    "source_path": "percent-encoding-2.3.2/LICENSE-MIT",
+    "source_sha256": "9b4f627cb1b25917193a259e49bdad08f671f8d9708acfd5fe0a8c1455d87220",
+    "text_sha256": "b38f11f6096706e6de553dabe2a7ed142d59b6fa8c97e290c67496154745cdd5"
+  },
+  {
+    "component": "proc-macro2",
+    "version": "1.0.107",
+    "ecosystem": "cargo",
+    "source_path": "proc-macro2-1.0.107/LICENSE-APACHE",
+    "source_sha256": "985e7ec9bb745e6ce6535b544d84d6cd6f7ad8bd711c398938ae983b91a766d9",
+    "text_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+  },
+  {
+    "component": "proc-macro2",
+    "version": "1.0.107",
+    "ecosystem": "cargo",
+    "source_path": "proc-macro2-1.0.107/LICENSE-MIT",
+    "source_sha256": "985e7ec9bb745e6ce6535b544d84d6cd6f7ad8bd711c398938ae983b91a766d9",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "pyo3",
+    "version": "0.30.1",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-0.30.1/LICENSE-APACHE",
+    "source_sha256": "229ca13b8a15bb0d1487b81ab975bfcd97513416499a8312011b6036e42e0de4",
+    "text_sha256": "32c76dbe0e73d79100d5ece77c158399f2e2541bc5c78548a4ba45c1cb53c5c9"
+  },
+  {
+    "component": "pyo3",
+    "version": "0.30.1",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-0.30.1/LICENSE-MIT",
+    "source_sha256": "229ca13b8a15bb0d1487b81ab975bfcd97513416499a8312011b6036e42e0de4",
+    "text_sha256": "afcbe3b2e6b37172b5a9ca869ee4c0b8cdc09316e5d4384864154482c33e5af6"
+  },
+  {
+    "component": "pyo3",
+    "version": "0.30.1",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-0.30.1/pyo3-runtime/LICENSE-APACHE",
+    "source_sha256": "229ca13b8a15bb0d1487b81ab975bfcd97513416499a8312011b6036e42e0de4",
+    "text_sha256": "32c76dbe0e73d79100d5ece77c158399f2e2541bc5c78548a4ba45c1cb53c5c9"
+  },
+  {
+    "component": "pyo3",
+    "version": "0.30.1",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-0.30.1/pyo3-runtime/LICENSE-MIT",
+    "source_sha256": "229ca13b8a15bb0d1487b81ab975bfcd97513416499a8312011b6036e42e0de4",
+    "text_sha256": "afcbe3b2e6b37172b5a9ca869ee4c0b8cdc09316e5d4384864154482c33e5af6"
+  },
+  {
+    "component": "pyo3-build-config",
+    "version": "0.30.1",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-build-config-0.30.1/LICENSE-APACHE",
+    "source_sha256": "70130e2b6dd1ee589a8788026a429561ca5c40fa7a2fa7914c2282eddae24700",
+    "text_sha256": "32c76dbe0e73d79100d5ece77c158399f2e2541bc5c78548a4ba45c1cb53c5c9"
+  },
+  {
+    "component": "pyo3-build-config",
+    "version": "0.30.1",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-build-config-0.30.1/LICENSE-MIT",
+    "source_sha256": "70130e2b6dd1ee589a8788026a429561ca5c40fa7a2fa7914c2282eddae24700",
+    "text_sha256": "afcbe3b2e6b37172b5a9ca869ee4c0b8cdc09316e5d4384864154482c33e5af6"
+  },
+  {
+    "component": "pyo3-ffi",
+    "version": "0.30.1",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-ffi-0.30.1/LICENSE-APACHE",
+    "source_sha256": "5e7ff73c555c286d212d4ce7e5fbda845a973c4f61bd5f160f5f2c3c2a04d1c4",
+    "text_sha256": "32c76dbe0e73d79100d5ece77c158399f2e2541bc5c78548a4ba45c1cb53c5c9"
+  },
+  {
+    "component": "pyo3-ffi",
+    "version": "0.30.1",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-ffi-0.30.1/LICENSE-MIT",
+    "source_sha256": "5e7ff73c555c286d212d4ce7e5fbda845a973c4f61bd5f160f5f2c3c2a04d1c4",
+    "text_sha256": "afcbe3b2e6b37172b5a9ca869ee4c0b8cdc09316e5d4384864154482c33e5af6"
+  },
+  {
+    "component": "pyo3-macros",
+    "version": "0.30.1",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-macros-0.30.1/LICENSE-APACHE",
+    "source_sha256": "c46d2e5862c7bb8207e3b639f713dda3c499933444784154c11d013c5a691b60",
+    "text_sha256": "32c76dbe0e73d79100d5ece77c158399f2e2541bc5c78548a4ba45c1cb53c5c9"
+  },
+  {
+    "component": "pyo3-macros",
+    "version": "0.30.1",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-macros-0.30.1/LICENSE-MIT",
+    "source_sha256": "c46d2e5862c7bb8207e3b639f713dda3c499933444784154c11d013c5a691b60",
+    "text_sha256": "afcbe3b2e6b37172b5a9ca869ee4c0b8cdc09316e5d4384864154482c33e5af6"
+  },
+  {
+    "component": "pyo3-macros-backend",
+    "version": "0.30.1",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-macros-backend-0.30.1/LICENSE-APACHE",
+    "source_sha256": "38b89f066f2ae72a2aef52d1537ca2fcd104440ebfadee06e97aa90738a25b9b",
+    "text_sha256": "32c76dbe0e73d79100d5ece77c158399f2e2541bc5c78548a4ba45c1cb53c5c9"
+  },
+  {
+    "component": "pyo3-macros-backend",
+    "version": "0.30.1",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-macros-backend-0.30.1/LICENSE-MIT",
+    "source_sha256": "38b89f066f2ae72a2aef52d1537ca2fcd104440ebfadee06e97aa90738a25b9b",
+    "text_sha256": "afcbe3b2e6b37172b5a9ca869ee4c0b8cdc09316e5d4384864154482c33e5af6"
+  },
+  {
+    "component": "quote",
+    "version": "1.0.44",
+    "ecosystem": "cargo",
+    "source_path": "quote-1.0.44/LICENSE-APACHE",
+    "source_sha256": "21b2ebcf727b7760c461f091f9f0f539b77b8e87f2fd88131e7f1b433b3cece4",
+    "text_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+  },
+  {
+    "component": "quote",
+    "version": "1.0.44",
+    "ecosystem": "cargo",
+    "source_path": "quote-1.0.44/LICENSE-MIT",
+    "source_sha256": "21b2ebcf727b7760c461f091f9f0f539b77b8e87f2fd88131e7f1b433b3cece4",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "radium",
+    "version": "0.7.0",
+    "ecosystem": "cargo",
+    "source_path": "radium-0.7.0/LICENSE.txt",
+    "source_sha256": "dc33ff2d4973d518d823d61aa239014831e521c75da58e3df4840d3f47749d09",
+    "text_sha256": "13f4cc9fbc8d4a447b28aa84019c10ad4abf4b5f6919db061bf6690ccc23bc02"
+  },
+  {
+    "component": "regex",
+    "version": "1.13.1",
+    "ecosystem": "cargo",
+    "source_path": "regex-1.13.1/LICENSE-APACHE",
+    "source_sha256": "f020237b6c8eed93db2e2cb53c00c60a8e1bc73da7d073199a1180401450218d",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "regex",
+    "version": "1.13.1",
+    "ecosystem": "cargo",
+    "source_path": "regex-1.13.1/LICENSE-MIT",
+    "source_sha256": "f020237b6c8eed93db2e2cb53c00c60a8e1bc73da7d073199a1180401450218d",
+    "text_sha256": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+  },
+  {
+    "component": "regex-automata",
+    "version": "0.4.18",
+    "ecosystem": "cargo",
+    "source_path": "regex-automata-0.4.18/LICENSE-APACHE",
+    "source_sha256": "ad8553b9b26413251cbf30e620595c7a41b3887f03da04579c0e6b0d6a06b4b2",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "regex-automata",
+    "version": "0.4.18",
+    "ecosystem": "cargo",
+    "source_path": "regex-automata-0.4.18/LICENSE-MIT",
+    "source_sha256": "ad8553b9b26413251cbf30e620595c7a41b3887f03da04579c0e6b0d6a06b4b2",
+    "text_sha256": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+  },
+  {
+    "component": "regex-syntax",
+    "version": "0.8.11",
+    "ecosystem": "cargo",
+    "source_path": "regex-syntax-0.8.11/LICENSE-APACHE",
+    "source_sha256": "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "regex-syntax",
+    "version": "0.8.11",
+    "ecosystem": "cargo",
+    "source_path": "regex-syntax-0.8.11/LICENSE-MIT",
+    "source_sha256": "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4",
+    "text_sha256": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+  },
+  {
+    "component": "regex-syntax",
+    "version": "0.8.11",
+    "ecosystem": "cargo",
+    "source_path": "regex-syntax-0.8.11/src/unicode_tables/LICENSE-UNICODE",
+    "source_sha256": "d6f6ff9a378485b298a5286656da665ba74413d36db0979633275d2e708145d4",
+    "text_sha256": "74db5baf44a41b1000312c673544b3374e4198af5605c7f9080a402cec42cfa3"
+  },
+  {
+    "component": "serde",
+    "version": "1.0.229",
+    "ecosystem": "cargo",
+    "source_path": "serde-1.0.229/LICENSE-APACHE",
+    "source_sha256": "4148590afebada386688f18773da617792bf2ef03ffc1e4cbd2b1d45b023e0ba",
+    "text_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+  },
+  {
+    "component": "serde",
+    "version": "1.0.229",
+    "ecosystem": "cargo",
+    "source_path": "serde-1.0.229/LICENSE-MIT",
+    "source_sha256": "4148590afebada386688f18773da617792bf2ef03ffc1e4cbd2b1d45b023e0ba",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "serde_core",
+    "version": "1.0.229",
+    "ecosystem": "cargo",
+    "source_path": "serde_core-1.0.229/LICENSE-APACHE",
+    "source_sha256": "67dca2c9c51e58a4791a4b1ed58308b39c64224d349a935ab5039aa360942a48",
+    "text_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+  },
+  {
+    "component": "serde_core",
+    "version": "1.0.229",
+    "ecosystem": "cargo",
+    "source_path": "serde_core-1.0.229/LICENSE-MIT",
+    "source_sha256": "67dca2c9c51e58a4791a4b1ed58308b39c64224d349a935ab5039aa360942a48",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "serde_derive",
+    "version": "1.0.229",
+    "ecosystem": "cargo",
+    "source_path": "serde_derive-1.0.229/LICENSE-APACHE",
+    "source_sha256": "e7a5d71263a5a7d47b41f6b3f06ba276f10cc18b0931f1799f710578e2309348",
+    "text_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+  },
+  {
+    "component": "serde_derive",
+    "version": "1.0.229",
+    "ecosystem": "cargo",
+    "source_path": "serde_derive-1.0.229/LICENSE-MIT",
+    "source_sha256": "e7a5d71263a5a7d47b41f6b3f06ba276f10cc18b0931f1799f710578e2309348",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "serde_json",
+    "version": "1.0.151",
+    "ecosystem": "cargo",
+    "source_path": "serde_json-1.0.151/LICENSE-APACHE",
+    "source_sha256": "c841b55ecdae098c80dcae9cf767f6f8a0c2cdb3416bbef72181df4d0fe73f14",
+    "text_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+  },
+  {
+    "component": "serde_json",
+    "version": "1.0.151",
+    "ecosystem": "cargo",
+    "source_path": "serde_json-1.0.151/LICENSE-MIT",
+    "source_sha256": "c841b55ecdae098c80dcae9cf767f6f8a0c2cdb3416bbef72181df4d0fe73f14",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "smallvec",
+    "version": "1.16.2",
+    "ecosystem": "cargo",
+    "source_path": "smallvec-1.16.2/LICENSE-APACHE",
+    "source_sha256": "f9395f0f0eee849a9b707b2f06bb92a6a422090e2123bb2ef8e87a0e61892a8e",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "smallvec",
+    "version": "1.16.2",
+    "ecosystem": "cargo",
+    "source_path": "smallvec-1.16.2/LICENSE-MIT",
+    "source_sha256": "f9395f0f0eee849a9b707b2f06bb92a6a422090e2123bb2ef8e87a0e61892a8e",
+    "text_sha256": "0b28172679e0009b655da42797c03fd163a3379d5cfa67ba1f1655e974a2a1a9"
+  },
+  {
+    "component": "speedate",
+    "version": "0.18.0",
+    "ecosystem": "cargo",
+    "source_path": "speedate-0.18.0/LICENSE",
+    "source_sha256": "da8f8c5f7f7ea2811a17f99bca4fec7f9ef0b0734713a5cbfc9baee203eba8eb",
+    "text_sha256": "2afdd30d54b4d62b6f488a6bcc1546e84ec5061f13f4209c03d012348783795a"
+  },
+  {
+    "component": "stable_deref_trait",
+    "version": "1.2.0",
+    "ecosystem": "cargo",
+    "source_path": "stable_deref_trait-1.2.0/LICENSE-APACHE",
+    "source_sha256": "a8f112729512f8e442d81f95a8a7ddf2b7c6b8a1a6f509a95864142b30cab2d3",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "stable_deref_trait",
+    "version": "1.2.0",
+    "ecosystem": "cargo",
+    "source_path": "stable_deref_trait-1.2.0/LICENSE-MIT",
+    "source_sha256": "a8f112729512f8e442d81f95a8a7ddf2b7c6b8a1a6f509a95864142b30cab2d3",
+    "text_sha256": "5e05b024f653a5ce199e77cbbbd42fb5553562ec714b819421ed0c3e552a75d7"
+  },
+  {
+    "component": "strum",
+    "version": "0.28.0",
+    "ecosystem": "cargo",
+    "source_path": "strum-0.28.0/LICENSE",
+    "source_sha256": "9628de9b8791db39ceda2b119bbe13134770b56c138ec1d3af810d045c04f9bd",
+    "text_sha256": "8bce3b45e49ecd1461f223b46de133d8f62cd39f745cfdaf81bee554b908bd42"
+  },
+  {
+    "component": "strum_macros",
+    "version": "0.28.0",
+    "ecosystem": "cargo",
+    "source_path": "strum_macros-0.28.0/LICENSE",
+    "source_sha256": "ab85eea0270ee17587ed4156089e10b9e6880ee688791d45a905f5b1ca36f664",
+    "text_sha256": "8bce3b45e49ecd1461f223b46de133d8f62cd39f745cfdaf81bee554b908bd42"
+  },
+  {
+    "component": "syn",
+    "version": "2.0.82",
+    "ecosystem": "cargo",
+    "source_path": "syn-2.0.82/LICENSE-APACHE",
+    "source_sha256": "83540f837a8afc019423a8edb95b52a8effe46957ee402287f4292fae35be021",
+    "text_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+  },
+  {
+    "component": "syn",
+    "version": "2.0.82",
+    "ecosystem": "cargo",
+    "source_path": "syn-2.0.82/LICENSE-MIT",
+    "source_sha256": "83540f837a8afc019423a8edb95b52a8effe46957ee402287f4292fae35be021",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "syn",
+    "version": "3.0.6",
+    "ecosystem": "cargo",
+    "source_path": "syn-3.0.6/LICENSE-APACHE",
+    "source_sha256": "8593e8e72159ed2257d083c7a454a85cbf854f37a0966d8d483aff8c8a3ebcee",
+    "text_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+  },
+  {
+    "component": "syn",
+    "version": "3.0.6",
+    "ecosystem": "cargo",
+    "source_path": "syn-3.0.6/LICENSE-MIT",
+    "source_sha256": "8593e8e72159ed2257d083c7a454a85cbf854f37a0966d8d483aff8c8a3ebcee",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "synstructure",
+    "version": "0.13.1",
+    "ecosystem": "cargo",
+    "source_path": "synstructure-0.13.1/LICENSE",
+    "source_sha256": "c8af7666ab7b6390ab78131fb5b0fce11d6b7a6951602017c35fa82800708971",
+    "text_sha256": "219920e865eee70b7dcfc948a86b099e7f4fe2de01bcca2ca9a20c0a033f2b59"
+  },
+  {
+    "component": "tap",
+    "version": "1.0.1",
+    "ecosystem": "cargo",
+    "source_path": "tap-1.0.1/LICENSE.txt",
+    "source_sha256": "55937e1799185b12863d447f42597ed69d9928686b8d88a1df17376a097d8369",
+    "text_sha256": "8b4e95f5cf0dc40269c99f7b787203ffe04ded245ca2427422c196efa2b2f42a"
+  },
+  {
+    "component": "target-lexicon",
+    "version": "0.13.4",
+    "ecosystem": "cargo",
+    "source_path": "target-lexicon-0.13.4/LICENSE",
+    "source_sha256": "b1dd07eb858a2067e2f3c7155d54e929265c264e6f37efe3ee7a8d1b5a1dd0ba",
+    "text_sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5"
+  },
+  {
+    "component": "tinystr",
+    "version": "0.7.6",
+    "ecosystem": "cargo",
+    "source_path": "tinystr-0.7.6/LICENSE",
+    "source_sha256": "9117f5d4db391c1cf6927e7bea3db74b9a1c1add8f7eda9ffd5364f40f57b82f",
+    "text_sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+  },
+  {
+    "component": "url",
+    "version": "2.5.8",
+    "ecosystem": "cargo",
+    "source_path": "url-2.5.8/LICENSE-APACHE",
+    "source_sha256": "ff67a8a4397373c3ef660812acab3268222035010ab8680ec4215f38ba3d0eed",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "url",
+    "version": "2.5.8",
+    "ecosystem": "cargo",
+    "source_path": "url-2.5.8/LICENSE-MIT",
+    "source_sha256": "ff67a8a4397373c3ef660812acab3268222035010ab8680ec4215f38ba3d0eed",
+    "text_sha256": "b38f11f6096706e6de553dabe2a7ed142d59b6fa8c97e290c67496154745cdd5"
+  },
+  {
+    "component": "utf16_iter",
+    "version": "1.0.5",
+    "ecosystem": "cargo",
+    "source_path": "utf16_iter-1.0.5/COPYRIGHT",
+    "source_sha256": "c8232dd3cdaed5356e0f716d285e4b40b932ac434100fe9b7e0e8e935b9e6246",
+    "text_sha256": "b84efe109a420fa3ca98be33f4227327af7ffa426195812c270feb1268bc2426"
+  },
+  {
+    "component": "utf16_iter",
+    "version": "1.0.5",
+    "ecosystem": "cargo",
+    "source_path": "utf16_iter-1.0.5/LICENSE-APACHE",
+    "source_sha256": "c8232dd3cdaed5356e0f716d285e4b40b932ac434100fe9b7e0e8e935b9e6246",
+    "text_sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "component": "utf16_iter",
+    "version": "1.0.5",
+    "ecosystem": "cargo",
+    "source_path": "utf16_iter-1.0.5/LICENSE-MIT",
+    "source_sha256": "c8232dd3cdaed5356e0f716d285e4b40b932ac434100fe9b7e0e8e935b9e6246",
+    "text_sha256": "3fa4ca83dcc9237839b1bdeb2e6d16bdfb5ec0c5ce42b24694d8bbf0dcbef72c"
+  },
+  {
+    "component": "utf8_iter",
+    "version": "1.0.4",
+    "ecosystem": "cargo",
+    "source_path": "utf8_iter-1.0.4/COPYRIGHT",
+    "source_sha256": "b6c140620e7ffbb22c2dee59cafe6084a59b5ffc27a8859a5f0d494b5d52b6be",
+    "text_sha256": "c30152c94a6d75e021adbc52b3a52470366a46edb917e17deae3259251af244c"
+  },
+  {
+    "component": "utf8_iter",
+    "version": "1.0.4",
+    "ecosystem": "cargo",
+    "source_path": "utf8_iter-1.0.4/LICENSE-APACHE",
+    "source_sha256": "b6c140620e7ffbb22c2dee59cafe6084a59b5ffc27a8859a5f0d494b5d52b6be",
+    "text_sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "component": "utf8_iter",
+    "version": "1.0.4",
+    "ecosystem": "cargo",
+    "source_path": "utf8_iter-1.0.4/LICENSE-MIT",
+    "source_sha256": "b6c140620e7ffbb22c2dee59cafe6084a59b5ffc27a8859a5f0d494b5d52b6be",
+    "text_sha256": "3fa4ca83dcc9237839b1bdeb2e6d16bdfb5ec0c5ce42b24694d8bbf0dcbef72c"
+  },
+  {
+    "component": "uuid",
+    "version": "1.23.4",
+    "ecosystem": "cargo",
+    "source_path": "uuid-1.23.4/LICENSE-APACHE",
+    "source_sha256": "bf80a72845275afea99e7f2b434723d3bc7e38470fcd1c7ed39a599c73319a53",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "uuid",
+    "version": "1.23.4",
+    "ecosystem": "cargo",
+    "source_path": "uuid-1.23.4/LICENSE-MIT",
+    "source_sha256": "bf80a72845275afea99e7f2b434723d3bc7e38470fcd1c7ed39a599c73319a53",
+    "text_sha256": "436bc5a105d8e57dcd8778730f3754f7bf39c14d2f530e4cde4bd2d17a83ec3d"
+  },
+  {
+    "component": "version_check",
+    "version": "0.9.5",
+    "ecosystem": "cargo",
+    "source_path": "version_check-0.9.5/LICENSE-APACHE",
+    "source_sha256": "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "version_check",
+    "version": "0.9.5",
+    "ecosystem": "cargo",
+    "source_path": "version_check-0.9.5/LICENSE-MIT",
+    "source_sha256": "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a",
+    "text_sha256": "b7e650f3fce5c53249d1cdc608b54df156a97edd636cf9d23498d0cfe7aec63e"
+  },
+  {
+    "component": "wasi",
+    "version": "0.14.2+wasi-0.2.4",
+    "ecosystem": "cargo",
+    "source_path": "wasi-0.14.2+wasi-0.2.4/LICENSE-APACHE",
+    "source_sha256": "9683f9a5a998d873c0d21fcbe3c083009670149a8fab228644b8bd36b2c48cb3",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "wasi",
+    "version": "0.14.2+wasi-0.2.4",
+    "ecosystem": "cargo",
+    "source_path": "wasi-0.14.2+wasi-0.2.4/LICENSE-Apache-2.0_WITH_LLVM-exception",
+    "source_sha256": "9683f9a5a998d873c0d21fcbe3c083009670149a8fab228644b8bd36b2c48cb3",
+    "text_sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5"
+  },
+  {
+    "component": "wasi",
+    "version": "0.14.2+wasi-0.2.4",
+    "ecosystem": "cargo",
+    "source_path": "wasi-0.14.2+wasi-0.2.4/LICENSE-MIT",
+    "source_sha256": "9683f9a5a998d873c0d21fcbe3c083009670149a8fab228644b8bd36b2c48cb3",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "wasm-bindgen",
+    "version": "0.2.100",
+    "ecosystem": "cargo",
+    "source_path": "wasm-bindgen-0.2.100/LICENSE-APACHE",
+    "source_sha256": "1edc8929d7499fc4e8f0be2262a241556cfc54a0bea223790e71446f2aab1ef5",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "wasm-bindgen",
+    "version": "0.2.100",
+    "ecosystem": "cargo",
+    "source_path": "wasm-bindgen-0.2.100/LICENSE-MIT",
+    "source_sha256": "1edc8929d7499fc4e8f0be2262a241556cfc54a0bea223790e71446f2aab1ef5",
+    "text_sha256": "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397"
+  },
+  {
+    "component": "wasm-bindgen-backend",
+    "version": "0.2.100",
+    "ecosystem": "cargo",
+    "source_path": "wasm-bindgen-backend-0.2.100/LICENSE-APACHE",
+    "source_sha256": "2f0a0651a5c2bc21487bde11ee802ccaf4c51935d0d3d42a6101f98161700bc6",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "wasm-bindgen-backend",
+    "version": "0.2.100",
+    "ecosystem": "cargo",
+    "source_path": "wasm-bindgen-backend-0.2.100/LICENSE-MIT",
+    "source_sha256": "2f0a0651a5c2bc21487bde11ee802ccaf4c51935d0d3d42a6101f98161700bc6",
+    "text_sha256": "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397"
+  },
+  {
+    "component": "wasm-bindgen-macro",
+    "version": "0.2.100",
+    "ecosystem": "cargo",
+    "source_path": "wasm-bindgen-macro-0.2.100/LICENSE-APACHE",
+    "source_sha256": "7fe63fc6d09ed3792bd0897b314f53de8e16568c2b3f7982f468c0bf9bd0b407",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "wasm-bindgen-macro",
+    "version": "0.2.100",
+    "ecosystem": "cargo",
+    "source_path": "wasm-bindgen-macro-0.2.100/LICENSE-MIT",
+    "source_sha256": "7fe63fc6d09ed3792bd0897b314f53de8e16568c2b3f7982f468c0bf9bd0b407",
+    "text_sha256": "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397"
+  },
+  {
+    "component": "wasm-bindgen-macro-support",
+    "version": "0.2.100",
+    "ecosystem": "cargo",
+    "source_path": "wasm-bindgen-macro-support-0.2.100/LICENSE-APACHE",
+    "source_sha256": "8ae87ea40c9f689fc23f209965b6fb8a99ad69aeeb0231408be24920604395de",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "wasm-bindgen-macro-support",
+    "version": "0.2.100",
+    "ecosystem": "cargo",
+    "source_path": "wasm-bindgen-macro-support-0.2.100/LICENSE-MIT",
+    "source_sha256": "8ae87ea40c9f689fc23f209965b6fb8a99ad69aeeb0231408be24920604395de",
+    "text_sha256": "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397"
+  },
+  {
+    "component": "wasm-bindgen-shared",
+    "version": "0.2.100",
+    "ecosystem": "cargo",
+    "source_path": "wasm-bindgen-shared-0.2.100/LICENSE-APACHE",
+    "source_sha256": "1a05d73b933a847d6cccdda8f838a22ff101ad9bf93e33684f39c1f5f0eece3d",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "wasm-bindgen-shared",
+    "version": "0.2.100",
+    "ecosystem": "cargo",
+    "source_path": "wasm-bindgen-shared-0.2.100/LICENSE-MIT",
+    "source_sha256": "1a05d73b933a847d6cccdda8f838a22ff101ad9bf93e33684f39c1f5f0eece3d",
+    "text_sha256": "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397"
+  },
+  {
+    "component": "write16",
+    "version": "1.0.0",
+    "ecosystem": "cargo",
+    "source_path": "write16-1.0.0/COPYRIGHT",
+    "source_sha256": "d1890f4022759daae28ed4fe62859b1236caebfc61ede2f63ed4e695f3f6d936",
+    "text_sha256": "3210be7332b5bdf48eb24a945258b9f38616a2cceb0dfc06e3c3c7e9740475a0"
+  },
+  {
+    "component": "write16",
+    "version": "1.0.0",
+    "ecosystem": "cargo",
+    "source_path": "write16-1.0.0/LICENSE-APACHE",
+    "source_sha256": "d1890f4022759daae28ed4fe62859b1236caebfc61ede2f63ed4e695f3f6d936",
+    "text_sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  },
+  {
+    "component": "write16",
+    "version": "1.0.0",
+    "ecosystem": "cargo",
+    "source_path": "write16-1.0.0/LICENSE-MIT",
+    "source_sha256": "d1890f4022759daae28ed4fe62859b1236caebfc61ede2f63ed4e695f3f6d936",
+    "text_sha256": "3fa4ca83dcc9237839b1bdeb2e6d16bdfb5ec0c5ce42b24694d8bbf0dcbef72c"
+  },
+  {
+    "component": "writeable",
+    "version": "0.5.5",
+    "ecosystem": "cargo",
+    "source_path": "writeable-0.5.5/LICENSE",
+    "source_sha256": "1e9df38ee2d2c3c5948ea468a8406ff0db0b29ae1ffde1bcf20ef305bcc95c51",
+    "text_sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+  },
+  {
+    "component": "wyz",
+    "version": "0.5.1",
+    "ecosystem": "cargo",
+    "source_path": "wyz-0.5.1/LICENSE.txt",
+    "source_sha256": "05f360fc0b24296329c78fda852a1e9ae82de9cf7b27dae4b7f62f118f77b9ed",
+    "text_sha256": "411781fd38700f2357a14126d0ab048164ab881f1dcb335c1bb932e232c9a2f5"
+  },
+  {
+    "component": "yoke",
+    "version": "0.7.4",
+    "ecosystem": "cargo",
+    "source_path": "yoke-0.7.4/LICENSE",
+    "source_sha256": "6c5b1314b079b0930c31e3af543d8ee1757b1951ae1e1565ec704403a7240ca5",
+    "text_sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+  },
+  {
+    "component": "yoke-derive",
+    "version": "0.7.4",
+    "ecosystem": "cargo",
+    "source_path": "yoke-derive-0.7.4/LICENSE",
+    "source_sha256": "28cc31741b18cb6f1d5ff12f5b7523e3d6eb0852bbbad19d73905511d9849b95",
+    "text_sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+  },
+  {
+    "component": "zerocopy",
+    "version": "0.8.25",
+    "ecosystem": "cargo",
+    "source_path": "zerocopy-0.8.25/LICENSE-APACHE",
+    "source_sha256": "a1702d9583232ddb9174e01bb7c15a2ab8fb1bc6f227aa1233858c351a3ba0cb",
+    "text_sha256": "9d185ac6703c4b0453974c0d85e9eee43e6941009296bb1f5eb0b54e2329e9f3"
+  },
+  {
+    "component": "zerocopy",
+    "version": "0.8.25",
+    "ecosystem": "cargo",
+    "source_path": "zerocopy-0.8.25/LICENSE-BSD",
+    "source_sha256": "a1702d9583232ddb9174e01bb7c15a2ab8fb1bc6f227aa1233858c351a3ba0cb",
+    "text_sha256": "83c1763356e822adde0a2cae748d938a73fdc263849ccff6b27776dff213bd32"
+  },
+  {
+    "component": "zerocopy",
+    "version": "0.8.25",
+    "ecosystem": "cargo",
+    "source_path": "zerocopy-0.8.25/LICENSE-MIT",
+    "source_sha256": "a1702d9583232ddb9174e01bb7c15a2ab8fb1bc6f227aa1233858c351a3ba0cb",
+    "text_sha256": "1a2f5c12ddc934d58956aa5dbdd3255fe55fd957633ab7d0d39e4f0daa73f7df"
+  },
+  {
+    "component": "zerocopy-derive",
+    "version": "0.8.25",
+    "ecosystem": "cargo",
+    "source_path": "zerocopy-derive-0.8.25/LICENSE-APACHE",
+    "source_sha256": "28a6e20d751156648aa063f3800b706ee209a32c0b4d9f24be3d980b01be55ef",
+    "text_sha256": "9d185ac6703c4b0453974c0d85e9eee43e6941009296bb1f5eb0b54e2329e9f3"
+  },
+  {
+    "component": "zerocopy-derive",
+    "version": "0.8.25",
+    "ecosystem": "cargo",
+    "source_path": "zerocopy-derive-0.8.25/LICENSE-BSD",
+    "source_sha256": "28a6e20d751156648aa063f3800b706ee209a32c0b4d9f24be3d980b01be55ef",
+    "text_sha256": "83c1763356e822adde0a2cae748d938a73fdc263849ccff6b27776dff213bd32"
+  },
+  {
+    "component": "zerocopy-derive",
+    "version": "0.8.25",
+    "ecosystem": "cargo",
+    "source_path": "zerocopy-derive-0.8.25/LICENSE-MIT",
+    "source_sha256": "28a6e20d751156648aa063f3800b706ee209a32c0b4d9f24be3d980b01be55ef",
+    "text_sha256": "1a2f5c12ddc934d58956aa5dbdd3255fe55fd957633ab7d0d39e4f0daa73f7df"
+  },
+  {
+    "component": "zerofrom",
+    "version": "0.1.4",
+    "ecosystem": "cargo",
+    "source_path": "zerofrom-0.1.4/LICENSE",
+    "source_sha256": "91ec111ce797d0e0784a1116d0ddcdbea84322cd79e5d5ad173daeba4f93ab55",
+    "text_sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+  },
+  {
+    "component": "zerofrom-derive",
+    "version": "0.1.4",
+    "ecosystem": "cargo",
+    "source_path": "zerofrom-derive-0.1.4/LICENSE",
+    "source_sha256": "0ea7b4a3637ea8669cedf0f1fd5c286a17f3de97b8dd5a70a6c167a1730e63a5",
+    "text_sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+  },
+  {
+    "component": "zerovec",
+    "version": "0.10.4",
+    "ecosystem": "cargo",
+    "source_path": "zerovec-0.10.4/LICENSE",
+    "source_sha256": "aa2b893d79df23bfb12d5461018d408ea19dfafe76c2c7ef6d4eba614f8ff079",
+    "text_sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+  },
+  {
+    "component": "zerovec-derive",
+    "version": "0.10.3",
+    "ecosystem": "cargo",
+    "source_path": "zerovec-derive-0.10.3/LICENSE",
+    "source_sha256": "6eafa6dfb17584ea3e2bd6e76e0cc15ad7af12b09abdd1ca55961bed9b1063c6",
+    "text_sha256": "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+  },
+  {
+    "component": "zmij",
+    "version": "1.0.6",
+    "ecosystem": "cargo",
+    "source_path": "zmij-1.0.6/LICENSE-MIT",
+    "source_sha256": "aac060176f7020d62c3bcc1cdbcec619d54f48b07ad1963a3f80ce7a0c17755f",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "asn1",
+    "version": "0.24.1",
+    "ecosystem": "cargo",
+    "source_path": "asn1-0.24.1/LICENSE",
+    "source_sha256": "c9795210620c0cb3f9a7ce4f882808c38e1ef7b347c90591dceae0886e031fb1",
+    "text_sha256": "c6deb2d156619439e147f8b62e1b3928598c8e3652ec8b56cc039490696b3985"
+  },
+  {
+    "component": "asn1_derive",
+    "version": "0.24.1",
+    "ecosystem": "cargo",
+    "source_path": "asn1_derive-0.24.1/LICENSE",
+    "source_sha256": "909e307f1cc32bb8bccbd98f446e6d1bf03fa30f7b53a4337da7181ad30fa11a",
+    "text_sha256": "c6deb2d156619439e147f8b62e1b3928598c8e3652ec8b56cc039490696b3985"
+  },
+  {
+    "component": "base64",
+    "version": "0.23.0",
+    "ecosystem": "cargo",
+    "source_path": "base64-0.23.0/LICENSE-APACHE",
+    "source_sha256": "b25655df2c3cdd83c5e5b293b88acd880332b2ddadd7c30ac43144fdc0033da9",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "base64",
+    "version": "0.23.0",
+    "ecosystem": "cargo",
+    "source_path": "base64-0.23.0/LICENSE-MIT",
+    "source_sha256": "b25655df2c3cdd83c5e5b293b88acd880332b2ddadd7c30ac43144fdc0033da9",
+    "text_sha256": "ab499c75a0f0da8e0fe83bf9ba3a27e5c39705310f07107c6c66b69958d2401c"
+  },
+  {
+    "component": "bitflags",
+    "version": "2.13.1",
+    "ecosystem": "cargo",
+    "source_path": "bitflags-2.13.1/LICENSE-APACHE",
+    "source_sha256": "b588b76d00fde79687d7646a9b5bdf3cc0f655e0bbd080335a95d7e96f3587da",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "bitflags",
+    "version": "2.13.1",
+    "ecosystem": "cargo",
+    "source_path": "bitflags-2.13.1/LICENSE-MIT",
+    "source_sha256": "b588b76d00fde79687d7646a9b5bdf3cc0f655e0bbd080335a95d7e96f3587da",
+    "text_sha256": "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+  },
+  {
+    "component": "cc",
+    "version": "1.4.0",
+    "ecosystem": "cargo",
+    "source_path": "cc-1.4.0/LICENSE-APACHE",
+    "source_sha256": "5add81bb678e6cb321aff7fa0dc7689ad82b112dbc032cea19f91d6b8e3582b9",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "cc",
+    "version": "1.4.0",
+    "ecosystem": "cargo",
+    "source_path": "cc-1.4.0/LICENSE-MIT",
+    "source_sha256": "5add81bb678e6cb321aff7fa0dc7689ad82b112dbc032cea19f91d6b8e3582b9",
+    "text_sha256": "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397"
+  },
+  {
+    "component": "cfg-if",
+    "version": "1.0.4",
+    "ecosystem": "cargo",
+    "source_path": "cfg-if-1.0.4/LICENSE-APACHE",
+    "source_sha256": "9330f8b2ff13f34540b44e946ef35111825727b38d33286ef986142615121801",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "cfg-if",
+    "version": "1.0.4",
+    "ecosystem": "cargo",
+    "source_path": "cfg-if-1.0.4/LICENSE-MIT",
+    "source_sha256": "9330f8b2ff13f34540b44e946ef35111825727b38d33286ef986142615121801",
+    "text_sha256": "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397"
+  },
+  {
+    "component": "find-msvc-tools",
+    "version": "0.1.9",
+    "ecosystem": "cargo",
+    "source_path": "find-msvc-tools-0.1.9/LICENSE-APACHE",
+    "source_sha256": "5baebc0774151f905a1a2cc41989300b1e6fbb29aff0ceffa1064fdd3088d582",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "find-msvc-tools",
+    "version": "0.1.9",
+    "ecosystem": "cargo",
+    "source_path": "find-msvc-tools-0.1.9/LICENSE-MIT",
+    "source_sha256": "5baebc0774151f905a1a2cc41989300b1e6fbb29aff0ceffa1064fdd3088d582",
+    "text_sha256": "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397"
+  },
+  {
+    "component": "foreign-types",
+    "version": "0.3.2",
+    "ecosystem": "cargo",
+    "source_path": "foreign-types-0.3.2/LICENSE-APACHE",
+    "source_sha256": "f6f339eb8adc052cd2ca78910fda869aefa38d22d5cb648e6485e4d3fc06f3b1",
+    "text_sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08"
+  },
+  {
+    "component": "foreign-types",
+    "version": "0.3.2",
+    "ecosystem": "cargo",
+    "source_path": "foreign-types-0.3.2/LICENSE-MIT",
+    "source_sha256": "f6f339eb8adc052cd2ca78910fda869aefa38d22d5cb648e6485e4d3fc06f3b1",
+    "text_sha256": "333ea3aaa3cadb819f4acd9f9153f9feee060a995ca8710f32bc5bd9a4b91734"
+  },
+  {
+    "component": "foreign-types-shared",
+    "version": "0.1.1",
+    "ecosystem": "cargo",
+    "source_path": "foreign-types-shared-0.1.1/LICENSE-APACHE",
+    "source_sha256": "00b0228411908ca8685dba7fc2cdd70ec9990a6e753e89b6ac91a84c40fbaf4b",
+    "text_sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08"
+  },
+  {
+    "component": "foreign-types-shared",
+    "version": "0.1.1",
+    "ecosystem": "cargo",
+    "source_path": "foreign-types-shared-0.1.1/LICENSE-MIT",
+    "source_sha256": "00b0228411908ca8685dba7fc2cdd70ec9990a6e753e89b6ac91a84c40fbaf4b",
+    "text_sha256": "333ea3aaa3cadb819f4acd9f9153f9feee060a995ca8710f32bc5bd9a4b91734"
+  },
+  {
+    "component": "itoa",
+    "version": "1.0.18",
+    "ecosystem": "cargo",
+    "source_path": "itoa-1.0.18/LICENSE-APACHE",
+    "source_sha256": "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682",
+    "text_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+  },
+  {
+    "component": "itoa",
+    "version": "1.0.18",
+    "ecosystem": "cargo",
+    "source_path": "itoa-1.0.18/LICENSE-MIT",
+    "source_sha256": "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "libc",
+    "version": "0.2.189",
+    "ecosystem": "cargo",
+    "source_path": "libc-0.2.189/LICENSE-APACHE",
+    "source_sha256": "3eaf3ede3fee6db1a4c2ee091bf8a8b4dccdc6d17f656fb07896ee72867612f2",
+    "text_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+  },
+  {
+    "component": "libc",
+    "version": "0.2.189",
+    "ecosystem": "cargo",
+    "source_path": "libc-0.2.189/LICENSE-MIT",
+    "source_sha256": "3eaf3ede3fee6db1a4c2ee091bf8a8b4dccdc6d17f656fb07896ee72867612f2",
+    "text_sha256": "123a331b5dbf04c30097fa43b8f858bc85df671fe776de498d01f3d6b7c1f69e"
+  },
+  {
+    "component": "once_cell",
+    "version": "1.21.4",
+    "ecosystem": "cargo",
+    "source_path": "once_cell-1.21.4/LICENSE-APACHE",
+    "source_sha256": "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "once_cell",
+    "version": "1.21.4",
+    "ecosystem": "cargo",
+    "source_path": "once_cell-1.21.4/LICENSE-MIT",
+    "source_sha256": "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "openssl",
+    "version": "0.10.81",
+    "ecosystem": "cargo",
+    "source_path": "openssl-0.10.81/LICENSE",
+    "source_sha256": "77823a27f0babb03091cb9ed9ef80af3b39dbc82f97e8fa530374b7dafd87a45",
+    "text_sha256": "f3d4287b4a21c5176fea2f9bd4ae800696004e2fb8e05cbc818be513f188a941"
+  },
+  {
+    "component": "openssl",
+    "version": "0.10.81",
+    "ecosystem": "cargo",
+    "source_path": "openssl-0.10.81/LICENSE-APACHE",
+    "source_sha256": "77823a27f0babb03091cb9ed9ef80af3b39dbc82f97e8fa530374b7dafd87a45",
+    "text_sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08"
+  },
+  {
+    "component": "openssl-macros",
+    "version": "0.1.1",
+    "ecosystem": "cargo",
+    "source_path": "openssl-macros-0.1.1/LICENSE-APACHE",
+    "source_sha256": "a948666b637a0f465e8564c73e89d4dde00d72d4d473cc972f390fc3dcee7d9c",
+    "text_sha256": "c6596eb7be8581c18be736c846fb9173b69eccf6ef94c5135893ec56bd92ba08"
+  },
+  {
+    "component": "openssl-macros",
+    "version": "0.1.1",
+    "ecosystem": "cargo",
+    "source_path": "openssl-macros-0.1.1/LICENSE-MIT",
+    "source_sha256": "a948666b637a0f465e8564c73e89d4dde00d72d4d473cc972f390fc3dcee7d9c",
+    "text_sha256": "ea5ab440900ab271811d5c2dc02a9de6e03a6956ac5727e85c11d76df5883d30"
+  },
+  {
+    "component": "openssl-sys",
+    "version": "0.9.117",
+    "ecosystem": "cargo",
+    "source_path": "openssl-sys-0.9.117/LICENSE-MIT",
+    "source_sha256": "b47e7e6bb2c38cd930d25a23b40fa52e068c10e85f3e03a7f5ba5aaca5713695",
+    "text_sha256": "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397"
+  },
+  {
+    "component": "pem",
+    "version": "4.0.0",
+    "ecosystem": "cargo",
+    "source_path": "pem-4.0.0/LICENSE.md",
+    "source_sha256": "d354a98a3d1251555de99e8fdd8afda05573c31b82f59063a7b0a29b5527f120",
+    "text_sha256": "b7c76ff4466a3aeb6a7d903e81b651335e97d64ecb857e2ee9812a36c6fd1acf"
+  },
+  {
+    "component": "pkg-config",
+    "version": "0.3.33",
+    "ecosystem": "cargo",
+    "source_path": "pkg-config-0.3.33/LICENSE-APACHE",
+    "source_sha256": "19f132c84eca552bf34cab8ec81f1c1dcc229b811638f9d283dceabe58c5569e",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "pkg-config",
+    "version": "0.3.33",
+    "ecosystem": "cargo",
+    "source_path": "pkg-config-0.3.33/LICENSE-MIT",
+    "source_sha256": "19f132c84eca552bf34cab8ec81f1c1dcc229b811638f9d283dceabe58c5569e",
+    "text_sha256": "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397"
+  },
+  {
+    "component": "portable-atomic",
+    "version": "1.14.0",
+    "ecosystem": "cargo",
+    "source_path": "portable-atomic-1.14.0/LICENSE-APACHE",
+    "source_sha256": "3d20d5497ef88037a52ff98267d066e7f11fcc5e99bbfbd58a42336193aacec3",
+    "text_sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+  },
+  {
+    "component": "portable-atomic",
+    "version": "1.14.0",
+    "ecosystem": "cargo",
+    "source_path": "portable-atomic-1.14.0/LICENSE-MIT",
+    "source_sha256": "3d20d5497ef88037a52ff98267d066e7f11fcc5e99bbfbd58a42336193aacec3",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "pyo3",
+    "version": "0.29.2",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-0.29.2/LICENSE-APACHE",
+    "source_sha256": "4688ddedf473e32662b9b067670129a8afb8c18e351482c70d62ba4a88171e8b",
+    "text_sha256": "32c76dbe0e73d79100d5ece77c158399f2e2541bc5c78548a4ba45c1cb53c5c9"
+  },
+  {
+    "component": "pyo3",
+    "version": "0.29.2",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-0.29.2/LICENSE-MIT",
+    "source_sha256": "4688ddedf473e32662b9b067670129a8afb8c18e351482c70d62ba4a88171e8b",
+    "text_sha256": "afcbe3b2e6b37172b5a9ca869ee4c0b8cdc09316e5d4384864154482c33e5af6"
+  },
+  {
+    "component": "pyo3",
+    "version": "0.29.2",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-0.29.2/pyo3-runtime/LICENSE-APACHE",
+    "source_sha256": "4688ddedf473e32662b9b067670129a8afb8c18e351482c70d62ba4a88171e8b",
+    "text_sha256": "32c76dbe0e73d79100d5ece77c158399f2e2541bc5c78548a4ba45c1cb53c5c9"
+  },
+  {
+    "component": "pyo3",
+    "version": "0.29.2",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-0.29.2/pyo3-runtime/LICENSE-MIT",
+    "source_sha256": "4688ddedf473e32662b9b067670129a8afb8c18e351482c70d62ba4a88171e8b",
+    "text_sha256": "afcbe3b2e6b37172b5a9ca869ee4c0b8cdc09316e5d4384864154482c33e5af6"
+  },
+  {
+    "component": "pyo3-build-config",
+    "version": "0.29.2",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-build-config-0.29.2/LICENSE-APACHE",
+    "source_sha256": "f41027e41b4bd03f6e60f9f417fe24a6341a6bb744edd62b6f709f2a52ea30e9",
+    "text_sha256": "32c76dbe0e73d79100d5ece77c158399f2e2541bc5c78548a4ba45c1cb53c5c9"
+  },
+  {
+    "component": "pyo3-build-config",
+    "version": "0.29.2",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-build-config-0.29.2/LICENSE-MIT",
+    "source_sha256": "f41027e41b4bd03f6e60f9f417fe24a6341a6bb744edd62b6f709f2a52ea30e9",
+    "text_sha256": "afcbe3b2e6b37172b5a9ca869ee4c0b8cdc09316e5d4384864154482c33e5af6"
+  },
+  {
+    "component": "pyo3-ffi",
+    "version": "0.29.2",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-ffi-0.29.2/LICENSE-APACHE",
+    "source_sha256": "e591a95526fead067432c3b3a33fc74770b87b1e04e73671090d9c2055a2b327",
+    "text_sha256": "32c76dbe0e73d79100d5ece77c158399f2e2541bc5c78548a4ba45c1cb53c5c9"
+  },
+  {
+    "component": "pyo3-ffi",
+    "version": "0.29.2",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-ffi-0.29.2/LICENSE-MIT",
+    "source_sha256": "e591a95526fead067432c3b3a33fc74770b87b1e04e73671090d9c2055a2b327",
+    "text_sha256": "afcbe3b2e6b37172b5a9ca869ee4c0b8cdc09316e5d4384864154482c33e5af6"
+  },
+  {
+    "component": "pyo3-macros",
+    "version": "0.29.2",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-macros-0.29.2/LICENSE-APACHE",
+    "source_sha256": "73225868fc1cd84eef2c3c230ddb91273bf1de46aeb8a4248da76d32a0924a1c",
+    "text_sha256": "32c76dbe0e73d79100d5ece77c158399f2e2541bc5c78548a4ba45c1cb53c5c9"
+  },
+  {
+    "component": "pyo3-macros",
+    "version": "0.29.2",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-macros-0.29.2/LICENSE-MIT",
+    "source_sha256": "73225868fc1cd84eef2c3c230ddb91273bf1de46aeb8a4248da76d32a0924a1c",
+    "text_sha256": "afcbe3b2e6b37172b5a9ca869ee4c0b8cdc09316e5d4384864154482c33e5af6"
+  },
+  {
+    "component": "pyo3-macros-backend",
+    "version": "0.29.2",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-macros-backend-0.29.2/LICENSE-APACHE",
+    "source_sha256": "571575aa3749fa6216757dd47d2a3e7ef360f329a40f0666a9fbd14889024952",
+    "text_sha256": "32c76dbe0e73d79100d5ece77c158399f2e2541bc5c78548a4ba45c1cb53c5c9"
+  },
+  {
+    "component": "pyo3-macros-backend",
+    "version": "0.29.2",
+    "ecosystem": "cargo",
+    "source_path": "pyo3-macros-backend-0.29.2/LICENSE-MIT",
+    "source_sha256": "571575aa3749fa6216757dd47d2a3e7ef360f329a40f0666a9fbd14889024952",
+    "text_sha256": "afcbe3b2e6b37172b5a9ca869ee4c0b8cdc09316e5d4384864154482c33e5af6"
+  },
+  {
+    "component": "quote",
+    "version": "1.0.47",
+    "ecosystem": "cargo",
+    "source_path": "quote-1.0.47/LICENSE-APACHE",
+    "source_sha256": "1fbf4db142a473a8d80c26bbf18454ed458bf8d26c8219c331daecfdbd079001",
+    "text_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+  },
+  {
+    "component": "quote",
+    "version": "1.0.47",
+    "ecosystem": "cargo",
+    "source_path": "quote-1.0.47/LICENSE-MIT",
+    "source_sha256": "1fbf4db142a473a8d80c26bbf18454ed458bf8d26c8219c331daecfdbd079001",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "self_cell",
+    "version": "1.3.0",
+    "ecosystem": "cargo",
+    "source_path": "self_cell-1.3.0/LICENSE-APACHE",
+    "source_sha256": "2ab42ca02749e120097e328d91d415325bdf43b1c72c4c8badf37375fe40a813",
+    "text_sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+  },
+  {
+    "component": "self_cell",
+    "version": "1.3.0",
+    "ecosystem": "cargo",
+    "source_path": "self_cell-1.3.0/LICENSE-GPLv2",
+    "source_sha256": "2ab42ca02749e120097e328d91d415325bdf43b1c72c4c8badf37375fe40a813",
+    "text_sha256": "f9c375a1be4a41f7b70301dd83c91cb89e41567478859b77eef375a52d782505"
+  },
+  {
+    "component": "shlex",
+    "version": "2.0.1",
+    "ecosystem": "cargo",
+    "source_path": "shlex-2.0.1/LICENSE-APACHE",
+    "source_sha256": "f8fadd59c855ef2080decdef8ff161eb6661b86933c9d82e5ba29dc602a55aba",
+    "text_sha256": "553fffcd9b1cb158bc3e9edc35da85ca5c3b3d7d2e61c883ebcfa8a65814b583"
+  },
+  {
+    "component": "shlex",
+    "version": "2.0.1",
+    "ecosystem": "cargo",
+    "source_path": "shlex-2.0.1/LICENSE-MIT",
+    "source_sha256": "f8fadd59c855ef2080decdef8ff161eb6661b86933c9d82e5ba29dc602a55aba",
+    "text_sha256": "4455bf75a91154108304cb283e0fea9948c14f13e20d60887cf2552449dea3b1"
+  },
+  {
+    "component": "syn",
+    "version": "2.0.119",
+    "ecosystem": "cargo",
+    "source_path": "syn-2.0.119/LICENSE-APACHE",
+    "source_sha256": "872831b642d1a07999a962a351ed35b955ea2cfc8f3862091e2a240a84f17297",
+    "text_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+  },
+  {
+    "component": "syn",
+    "version": "2.0.119",
+    "ecosystem": "cargo",
+    "source_path": "syn-2.0.119/LICENSE-MIT",
+    "source_sha256": "872831b642d1a07999a962a351ed35b955ea2cfc8f3862091e2a240a84f17297",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "unicode-ident",
+    "version": "1.0.24",
+    "ecosystem": "cargo",
+    "source_path": "unicode-ident-1.0.24/LICENSE-APACHE",
+    "source_sha256": "e6e4313cd5fcd3dad5cafa179702e2b244f760991f45397d14d4ebf38247da75",
+    "text_sha256": "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a"
+  },
+  {
+    "component": "unicode-ident",
+    "version": "1.0.24",
+    "ecosystem": "cargo",
+    "source_path": "unicode-ident-1.0.24/LICENSE-MIT",
+    "source_sha256": "e6e4313cd5fcd3dad5cafa179702e2b244f760991f45397d14d4ebf38247da75",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "unicode-ident",
+    "version": "1.0.24",
+    "ecosystem": "cargo",
+    "source_path": "unicode-ident-1.0.24/LICENSE-UNICODE",
+    "source_sha256": "e6e4313cd5fcd3dad5cafa179702e2b244f760991f45397d14d4ebf38247da75",
+    "text_sha256": "f7db81051789b729fea528a63ec4c938fdcb93d9d61d97dc8cc2e9df6d47f2a1"
+  },
+  {
+    "component": "vcpkg",
+    "version": "0.2.15",
+    "ecosystem": "cargo",
+    "source_path": "vcpkg-0.2.15/LICENSE-APACHE",
+    "source_sha256": "accd4ea62f7bb7a82fe23066fb0957d48ef677f6eeb8215f372f52e48bb32426",
+    "text_sha256": "60c93a31f490375aadf64098b75f10715010379541021e00261045d7800611d3"
+  },
+  {
+    "component": "vcpkg",
+    "version": "0.2.15",
+    "ecosystem": "cargo",
+    "source_path": "vcpkg-0.2.15/LICENSE-MIT",
+    "source_sha256": "accd4ea62f7bb7a82fe23066fb0957d48ef677f6eeb8215f372f52e48bb32426",
+    "text_sha256": "016d20f335060a70e79d9fcf8dfaa6201114d65d592211f4bdfb8ae9ca2bc1dc"
+  },
+  {
+    "component": "openssl",
+    "version": "4.0.3",
+    "ecosystem": "openssl",
+    "source_path": "openssl-4.0.3/LICENSE.txt",
+    "source_sha256": "325b5c806167c13b40b1ffeadfe0248197c00eccc4cf123ec1e28d2d2fd216d9",
+    "text_sha256": "7d5450cb2d142651b8afa315b5f238efc805dad827d91ba367d8516bc9d49e7a"
+  },
+  {
+    "component": "openssl",
+    "version": "4.0.3",
+    "ecosystem": "openssl",
+    "source_path": "openssl-4.0.3/external/perl/Text-Template-1.56/LICENSE",
+    "source_sha256": "325b5c806167c13b40b1ffeadfe0248197c00eccc4cf123ec1e28d2d2fd216d9",
+    "text_sha256": "9837f05336ef3cbacb6a96e1672a0426d81ad01191f214b8d48e22ca62338181"
+  },
+  {
+    "component": "openssl",
+    "version": "4.0.3",
+    "ecosystem": "openssl",
+    "source_path": "openssl-4.0.3/util/perl/OpenSSL/copyright.pm",
+    "source_sha256": "325b5c806167c13b40b1ffeadfe0248197c00eccc4cf123ec1e28d2d2fd216d9",
+    "text_sha256": "04213b69dbebc8ba0dd8a6216af1d9422f9b63619c1cf2f1d8aa107b83bbb608"
+  },
+  {
+    "component": "r-efi",
+    "version": "5.2.0",
+    "ecosystem": "supplemental",
+    "source_path": "AUTHORS",
+    "source_sha256": "c42285aa32440c3b5358fd4805b817cd8d6e1795111d2e4c547530be41896b2d",
+    "text_sha256": "c42285aa32440c3b5358fd4805b817cd8d6e1795111d2e4c547530be41896b2d"
+  },
+  {
+    "component": "wit-bindgen-rt",
+    "version": "0.39.0",
+    "ecosystem": "supplemental",
+    "source_path": "LICENSE-APACHE",
+    "source_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+    "text_sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2"
+  },
+  {
+    "component": "wit-bindgen-rt",
+    "version": "0.39.0",
+    "ecosystem": "supplemental",
+    "source_path": "LICENSE-Apache-2.0_WITH_LLVM-exception",
+    "source_sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5",
+    "text_sha256": "268872b9816f90fd8e85db5a28d33f8150ebb8dd016653fb39ef1f94f2686bc5"
+  },
+  {
+    "component": "wit-bindgen-rt",
+    "version": "0.39.0",
+    "ecosystem": "supplemental",
+    "source_path": "LICENSE-MIT",
+    "source_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3",
+    "text_sha256": "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+  },
+  {
+    "component": "libffi",
+    "version": "3.4.6",
+    "ecosystem": "supplemental",
+    "source_path": "libffi-3.4.6/LICENSE",
+    "source_sha256": "9ac790464c1eb2f5ab5809e978a1683e9393131aede72d1b0a0703771d3c6cda",
+    "text_sha256": "67894089811f93fca47a76f85e017da6f8582d4ba0905963c6e0f1ad6df7a195"
+  }
+]

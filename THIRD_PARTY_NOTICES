@@ -31,9 +31,11 @@ copyright notices are retained under /usr/share/doc/<package>/copyright and in
 Python's installation. Debian source packages are available through the Debian
 archive and https://snapshot.debian.org/ for the corresponding package version.
 Some system tools have copyleft licenses; redistributors must satisfy their
-source-distribution requirements as well as retaining notices. Before publishing
-a release image, audit its exact installed versions and provide any required
-corresponding-source materials. A Keywright image license label describes the
+source-distribution requirements as well as retaining notices. The release workflow verifies exact installed versions against a reviewed source
+lock and publishes matching source materials before publishing the application
+image. The image label io.keywright.source-image identifies the matching source
+image in the same registry package; retain it while distributing the application.
+Version-tag builds also attach source and notice assets to a draft GitHub Release. A Keywright image license label describes the
 Keywright application, not every component in the image.
 
 Optional services
@@ -41,3 +43,13 @@ Optional services
 PostgreSQL, pgvector, LiteLLM and any embedding server/model are separate services
 with their own upstream terms. Check the particular image and model version you
 deploy or redistribute. Keywright's license does not relicense those services.
+
+Supplemental native notices and source coverage
+---------------------------------------------
+Prebuilt images include supplemental upstream notices under
+/usr/share/keywright/licenses/LICENSES.txt and a verified dependency inventory.
+The source lock and notice provenance are maintained under third_party/ in the
+repository. This covers bundled native libraries in addition to installed package
+notices, including libffi, libuv, OpenSSL and Rust components. See
+https://github.com/johnrcarty/keywright/blob/main/third_party/README.md for obtaining
+and verifying the matching source archive without running the source image.

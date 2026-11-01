@@ -22,19 +22,24 @@ Before tagging or making the repository public:
       See `RELEASE_AUDIT.json` for exact digests, methods and scope. Repeat for a changed candidate.
 - [x] Adopt Apache-2.0 across the server, client and router; ship license and notice files
       with Python distributions, container images and installation bundles.
-- [ ] Audit third-party licenses in the exact release images, retain notices and provide
-      any required corresponding-source materials for redistributed components.
-      Audit completed for `f3e4e5f`, with remediation still required (see `RELEASE_AUDIT.json`):
-      install/review supplemental native-library notices and CFFI/libffi provenance; remove
-      pip build caches; publish version-matched corresponding-source and notice assets.
-      Prepared review materials contain 520 verified source files and 443 notice texts.
-      They are not yet a complete approved release bundle. `THIRD_PARTY_NOTICES` describes
-      the licensing boundary; the application license remains Apache-2.0.
+- [x] Implement third-party license remediation: reviewed supplemental native notices,
+      immutable source lock and native hashes, pinned container dependencies, no pip cache,
+      and source-material images published before application images. Source digests are
+      recorded on the application image and verified after pulling both architectures.
+      Version tags prepare draft release assets with source archives, notices and checksums.
+      See `third_party/README.md`; `RELEASE_AUDIT.json` preserves the original audit findings.
 - [x] Pass CI on Python 3.12–3.14 and test wheel/source/container installs for candidate
       `10af43c`; final release changes must retain passing checks.
 - [x] Complete core and knowledge acceptance on a clean AMD64 VM using the published bundle.
       See `VM_ACCEPTANCE.json`; optional proxy and external notification checks remain separate.
-- [ ] Add a security reporting route and contribution guidance.
+- [x] Add `SECURITY.md`, `SUPPORT.md` and `CONTRIBUTING.md`, with private vulnerability
+      reporting, latest-release support scope and Apache-2.0 contribution terms.
+- [ ] At public launch, enable and verify GitHub private vulnerability reporting; GitHub
+      only exposes this feature for public repositories. Do not publish the release until
+      its private reporting form is working.
+- [ ] Before making GHCR public, remove superseded unaudited preview versions from public
+      distribution or provide equivalent source/notice coverage. Retain every source-image
+      version referenced by a distributed application image.
 - [x] Complete the knowledge release gates below, including real PostgreSQL/pgvector tests.
 - [ ] Confirm Python package-name access and trusted publishing, then add a tested PyPI workflow.
 - [ ] Approve public repository/package visibility and verify anonymous image pulls.
@@ -73,7 +78,8 @@ check whether citations support the question. Search scores are not answer-confi
 ## Owner todos and Python package publishing
 
 - [x] Choose Apache-2.0 and align all three package metadata files.
-- [ ] Confirm the security-reporting destination and release support scope.
+- [x] Use GitHub private vulnerability reporting and document latest-0.0.x support.
+      Activation and a working-form check remain part of the public launch.
 - [ ] Create or sign in to PyPI and TestPyPI accounts, verify email and configure required
       account security. Keep credentials and recovery codes outside the repository and knowledge.
 - [ ] Confirm access to package names `keywright`, `keywright-server` and `keywright-router`.

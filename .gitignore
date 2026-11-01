@@ -38,3 +38,11 @@ artifacts/
 backups/
 *.tar.gz
 *.zip
+
+# Generated release material outputs (never source inputs)
+/inventory.json
+/materials/
+/source-link.Dockerfile
+/release-input/
+/release-assets/
+/release-state.json

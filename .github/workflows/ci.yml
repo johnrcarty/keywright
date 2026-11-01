@@ -140,18 +140,64 @@ jobs:
           cache-to: type=gha,mode=max,scope=broker-${{ matrix.arch }}
       - name: Test image through standalone Compose
         run: bash scripts/smoke-image.sh "$CANDIDATE" "${{ needs.image-meta.outputs.version }}" never
+      - name: Export verified license inventory
+        run: |
+          docker run --rm --network none --entrypoint python "$CANDIDATE" \
+            /usr/share/keywright/release_materials.py inventory > inventory.json
+      - uses: actions/cache@v4
+        with:
+          path: /tmp/keywright-source-cache
+          key: third-party-sources-${{ hashFiles('third_party/sources.lock.json') }}
+      - name: Prepare exact source and notice materials
+        run: |
+          python3 scripts/release_materials.py collect --license-root third_party \
+            --inventory inventory.json --output materials \
+            --cache /tmp/keywright-source-cache --repository .
+      - uses: actions/upload-artifact@v4
+        if: startsWith(github.ref, 'refs/tags/v')
+        with:
+          name: third-party-source-${{ matrix.arch }}
+          path: materials/sources.tar
+          compression-level: 0
+          retention-days: 7
       - name: Sign in to GHCR
         uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish corresponding source before the application image
+        run: |
+          source_tag="$IMAGE:sources-${GITHUB_SHA}-${{ matrix.arch }}"
+          docker build --label "org.opencontainers.image.revision=$GITHUB_SHA" \
+            --label "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
+            -t "$source_tag" materials
+          docker push "$source_tag"
+          source_ref=$(docker image inspect --format '{{index .RepoDigests 0}}' "$source_tag")
+          [[ "$source_ref" =~ ^ghcr.io/.+@sha256:[0-9a-f]{64}$ ]]
+          printf 'ARG BASE\nFROM ${BASE}\nARG SOURCE\nLABEL io.keywright.source-image="${SOURCE}"\n' > source-link.Dockerfile
+          docker build -f source-link.Dockerfile --build-arg "BASE=$CANDIDATE" \
+            --build-arg "SOURCE=$source_ref" -t "$CANDIDATE" .
+          test "$(docker image inspect --format '{{index .Config.Labels "io.keywright.source-image"}}' "$CANDIDATE")" = "$source_ref"
+          printf '%s\n' "$source_ref" > materials/source-image.txt
       - name: Publish tested architecture and record its digest
         run: |
           docker push "$CANDIDATE"
           mkdir -p digests
           docker image inspect --format '{{index .RepoDigests 0}}' "$CANDIDATE" > "digests/${{ matrix.arch }}.txt"
           grep -Eq '^ghcr.io/.+@sha256:[0-9a-f]{64}$' "digests/${{ matrix.arch }}.txt"
+      - name: Bind material checksums to the published application image
+        run: |
+          cp "digests/${{ matrix.arch }}.txt" materials/application-image.txt
+          (cd materials && sha256sum source-image.txt application-image.txt >> SHA256SUMS)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: third-party-${{ matrix.arch }}
+          path: |
+            materials/*.json
+            materials/*.txt
+            materials/SHA256SUMS
+          retention-days: 30
       - uses: actions/upload-artifact@v4
         with:
           name: digest-${{ matrix.arch }}
@@ -255,3 +301,45 @@ jobs:
           print("Downloaded knowledge and LLM configurations verified without a source checkout")
           PYCONFIG
           bash scripts/smoke-image.sh "${{ needs.image-meta.outputs.image }}@${{ needs.publish-image.outputs.digest }}" "${{ needs.image-meta.outputs.version }}" always install/compose.yaml
+          image="${{ needs.image-meta.outputs.image }}@${{ needs.publish-image.outputs.digest }}"
+          source_ref=$(docker image inspect --format '{{index .Config.Labels "io.keywright.source-image"}}' "$image")
+          [[ "$source_ref" =~ ^ghcr.io/.+@sha256:[0-9a-f]{64}$ ]]
+          docker run --rm --network none --entrypoint python "$image" \
+            /usr/share/keywright/release_materials.py inventory > published-inventory.json
+          docker pull "$source_ref"
+          source_container=$(docker create "$source_ref" /unused)
+          trap 'docker rm -f "$source_container" >/dev/null' EXIT
+          docker cp "$source_container:/" fetched-sources
+          python3 scripts/check-published-sources.py published-inventory.json fetched-sources
+
+
+  release-draft:
+    needs: [publish-image, verify-published-image]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: third-party-*
+          path: release-input
+      - uses: actions/download-artifact@v4
+        with:
+          name: keywright-install
+          path: release-input/install
+      - name: Assemble reviewed release assets
+        run: python3 scripts/prepare-release-assets.py release-input release-assets
+      - name: Attach assets to a draft release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          if gh release view "$RELEASE_TAG" --json isDraft > release-state.json 2>/dev/null; then
+            python3 -c 'import json; assert json.load(open("release-state.json"))["isDraft"], "Refusing to modify a published release"'
+          else
+            gh release create "$RELEASE_TAG" --verify-tag --draft --title "Keywright $RELEASE_TAG" --notes-file release-assets/RELEASE-NOTES.txt
+          fi
+          gh release upload "$RELEASE_TAG" release-assets/* --clobber

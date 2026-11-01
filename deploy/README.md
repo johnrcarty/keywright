@@ -166,3 +166,10 @@ used for deployment.
 The installation bundle includes `LICENSE`, `NOTICE` and `THIRD_PARTY_NOTICES`.
 Keywright is Apache-2.0 licensed. Container images retain dependency license files
 and system copyright notices; third-party components keep their own licenses.
+
+Prebuilt images identify matching third-party source materials in the
+`io.keywright.source-image` image label. The source image uses the same GHCR package
+and access rules as the application image. See the repository's
+[third-party materials guide](https://github.com/johnrcarty/keywright/blob/main/third_party/README.md)
+for extraction and verification. The installer also includes the security, support
+and contribution policies.

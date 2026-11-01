@@ -96,6 +96,8 @@ Never point test configuration at a production database.
   a disposable VM acceptance checklist.
 - [Mail router](router/README.md): optional agent that routes mail through brokered tools.
 - [Release checklist](docs/RELEASE_PLAN.md): remaining work before v0.0.1.
+- [Security reporting](SECURITY.md), [support scope](SUPPORT.md), and [contributing](CONTRIBUTING.md).
+- [Third-party source and notice materials](third_party/README.md).
 
 Knowledge chunking changes are experimental pending retrieval evaluation. Optional
 features are not all covered by the minimal-stack installation check.

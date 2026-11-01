@@ -34,3 +34,12 @@
 !router/LICENSE
 !router/NOTICE
 !router/THIRD_PARTY_NOTICES
+
+# Reviewed license inputs and the verifier; never copy general local tooling.
+!third_party/
+!third_party/LICENSES.txt
+!third_party/notices.json
+!third_party/sources.lock.json
+!scripts/
+!scripts/release_materials.py
+!deploy/runtime-constraints.txt

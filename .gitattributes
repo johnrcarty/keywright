@@ -1,0 +1,2 @@
+# Preserve upstream license text verbatim, including its original whitespace.
+third_party/LICENSES.txt -whitespace
