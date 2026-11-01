@@ -18,8 +18,11 @@ Completed in the initial migration:
 Before tagging or making the repository public:
 
 - [ ] Review a dedicated secret scan and privacy audit of the exact candidate and artifacts.
-- [ ] Select a project-level license and align package metadata. The client's existing MIT
-      declaration does not settle the license of the whole project.
+- [x] Adopt Apache-2.0 across the server, client and router; ship license and notice files
+      with Python distributions, container images and installation bundles.
+- [ ] Audit third-party licenses in the exact release images, retain notices and provide
+      any required corresponding-source materials for redistributed components.
+      `THIRD_PARTY_NOTICES` identifies source/notice locations and the audit boundary.
 - [x] Pass CI on Python 3.12–3.14 and test wheel/source/container installs for candidate
       `10af43c`; final release changes must retain passing checks.
 - [x] Complete core and knowledge acceptance on a clean AMD64 VM using the published bundle.
@@ -61,7 +64,7 @@ check whether citations support the question. Search scores are not answer-confi
 
 ## Owner todos and Python package publishing
 
-- [ ] Choose the project-wide license; align all three package metadata files.
+- [x] Choose Apache-2.0 and align all three package metadata files.
 - [ ] Confirm the security-reporting destination and release support scope.
 - [ ] Create or sign in to PyPI and TestPyPI accounts, verify email and configure required
       account security. Keep credentials and recovery codes outside the repository and knowledge.

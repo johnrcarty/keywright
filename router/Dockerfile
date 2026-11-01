@@ -2,6 +2,8 @@
 # The router carries no secrets: only its Keywright token, from the environment.
 FROM python:3.13-slim
 WORKDIR /app
+COPY LICENSE NOTICE THIRD_PARTY_NOTICES ./
+LABEL org.opencontainers.image.licenses="Apache-2.0"
 COPY client ./client
 COPY router ./router
 # The client from this tree, never from PyPI (acall landed with the router).

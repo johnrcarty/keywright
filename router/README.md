@@ -110,3 +110,11 @@ not silently redirect an existing job: restore its original destination before r
 
 The budget token stays in Keywright's protected settings database and is never rendered back
 into the form or included in audit details. Back up that database as a credential-bearing file.
+
+## License
+
+Keywright is licensed under [Apache-2.0](LICENSE). Copyright 2026 Keywright
+contributors. See [NOTICE](NOTICE) and [third-party notices](THIRD_PARTY_NOTICES).
+Commercial use and proprietary extensions are permitted under the license's terms.
+Unless explicitly stated otherwise, contributions intentionally submitted for
+inclusion in Keywright are provided under Apache-2.0.

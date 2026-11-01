@@ -49,3 +49,11 @@ present, then Linux process ancestry. The metadata path was observed in Codex de
 that do not supply it retain the fallback. Compare `kw session` inside and outside the sandbox
 to check attribution. Process fallback is per process, not necessarily per conversation.
 Switching from process to thread identity requires fresh session-scoped approvals.
+
+## License
+
+Keywright is licensed under [Apache-2.0](LICENSE). Copyright 2026 Keywright
+contributors. See [NOTICE](NOTICE) and [third-party notices](THIRD_PARTY_NOTICES).
+Commercial use and proprietary extensions are permitted under the license's terms.
+Unless explicitly stated otherwise, contributions intentionally submitted for
+inclusion in Keywright are provided under Apache-2.0.

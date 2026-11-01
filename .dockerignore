@@ -23,3 +23,14 @@
 **/.env*
 **/*.key
 **/*.pem
+
+# License files must accompany each independently built distribution.
+!LICENSE
+!NOTICE
+!THIRD_PARTY_NOTICES
+!client/LICENSE
+!client/NOTICE
+!client/THIRD_PARTY_NOTICES
+!router/LICENSE
+!router/NOTICE
+!router/THIRD_PARTY_NOTICES

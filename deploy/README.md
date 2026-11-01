@@ -160,3 +160,9 @@ administrator setup, MCP version, the optional database driver and persistence a
 container replacement. After publication, fresh runners pull the manifest by digest and
 repeat the install checks on each architecture. Only a successful complete run should be
 used for deployment.
+
+## License files
+
+The installation bundle includes `LICENSE`, `NOTICE` and `THIRD_PARTY_NOTICES`.
+Keywright is Apache-2.0 licensed. Container images retain dependency license files
+and system copyright notices; third-party components keep their own licenses.

@@ -21,6 +21,8 @@ def main():
     for name in ("README.md", ".env.example", "knowledge.compose.yml", "knowledge-schema.sql",
                  "knowledge.env.example", "llm.compose.yml", "litellm.yaml", "litellm.env.example"):
         files[name] = (source / name).read_bytes()
+    for name in ("LICENSE", "NOTICE", "THIRD_PARTY_NOTICES"):
+        files[name] = (source.parent / name).read_bytes()
     # The sample configuration must not undo the pinned broker selection.
     files[".env.example"] = re.sub(rb"(?m)^KEYWRIGHT_IMAGE=.*\n", b"", files[".env.example"])
     args.output.mkdir(parents=True, exist_ok=False)

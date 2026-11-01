@@ -1,0 +1,43 @@
+Third-party components
+======================
+
+Apache-2.0 applies to Keywright's own code and documentation. Dependencies,
+container base images, optional services and embedding models retain their own
+licenses. This file is a guide to those components, not a replacement for their
+license texts or a complete inventory of a particular image.
+
+Python dependencies
+-------------------
+Keywright distributions declare dependencies rather than vendoring them. pip
+installs their license files alongside their package metadata, typically under
+/usr/local/lib/python3.13/site-packages/<distribution>.dist-info/ in the supplied
+images. Preserve those files when redistributing an installation or image.
+The pyproject.toml files declare the dependency ranges; resolved versions may
+change between builds.
+
+AsyncSSH is used as an unmodified library under EPL-2.0. Its installed asyncssh/
+directory contains the Python source, including upstream copyright headers;
+its distribution metadata includes the Eclipse Public License text. Source and
+release history: https://github.com/ronf/asyncssh
+
+Certifi uses MPL-2.0 for its certificate bundle. The installed certifi/ directory
+contains the bundle and Python source, and its distribution metadata includes
+the license. Source and release history: https://github.com/certifi/python-certifi
+
+Container operating-system packages
+-----------------------------------
+The images use the official Python slim image and Debian packages. License and
+copyright notices are retained under /usr/share/doc/<package>/copyright and in
+Python's installation. Debian source packages are available through the Debian
+archive and https://snapshot.debian.org/ for the corresponding package version.
+Some system tools have copyleft licenses; redistributors must satisfy their
+source-distribution requirements as well as retaining notices. Before publishing
+a release image, audit its exact installed versions and provide any required
+corresponding-source materials. A Keywright image license label describes the
+Keywright application, not every component in the image.
+
+Optional services
+-----------------
+PostgreSQL, pgvector, LiteLLM and any embedding server/model are separate services
+with their own upstream terms. Check the particular image and model version you
+deploy or redistribute. Keywright's license does not relicense those services.

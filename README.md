@@ -104,3 +104,11 @@ Keywright is a credential trust boundary. Protect its host and backups. Command 
 matching is not a shell sandbox, and output inspection cannot prove arbitrary text is
 secret-free. The [historical source security review](docs/SECURITY_REVIEW.md) records
 prior findings; it is not a certification of this candidate.
+
+## License
+
+Keywright is licensed under [Apache-2.0](LICENSE). Copyright 2026 Keywright
+contributors. See [NOTICE](NOTICE) and [third-party notices](THIRD_PARTY_NOTICES).
+Commercial use and proprietary extensions are permitted under the license's terms.
+Unless explicitly stated otherwise, contributions intentionally submitted for
+inclusion in Keywright are provided under Apache-2.0.
