@@ -1,10 +1,21 @@
 # Keywright v0.0.1 release checklist
 
-Status: unreleased preparation. The repository starts with a sanitized source snapshot
-and fresh history. Server, client and optional router share the planned 0.0.1 version.
+Status: v0.0.1 published on 2026-11-02 from frozen commit
+`307b3da1773127cbe8e2bd3ab7a74f07d453353e`. The repository starts with a sanitized source
+snapshot and fresh history. Server, client and optional router share version 0.0.1.
 The supported first-run target includes the core SSH/MCP approval and revocation flow
 and shared knowledge. Knowledge stays in v0.0.1; semantic search adds an optional
 PostgreSQL/pgvector index and embedding endpoint.
+
+Publication evidence:
+
+- [Public release, installer, sources and checksums](https://github.com/johnrcarty/keywright/releases/tag/v0.0.1).
+- [Final tag CI](https://github.com/johnrcarty/keywright/actions/runs/41540163307): passed.
+- [Production PyPI publication and downloaded wheel/source installs](https://github.com/johnrcarty/keywright/actions/runs/41544947436): passed.
+- Release assets `FINAL-RELEASE-REVIEW.json` and `LAUNCH-VERIFICATION.json` record the audit,
+  artifact hashes, anonymous image/source checks, clean installation and preview cleanup.
+- The v0.0.1 tag and published Python files remain frozen. Later documentation updates on
+  `main` do not change those artifacts. Use a new shared version for the next package release.
 
 Completed in the initial migration:
 
@@ -13,9 +24,9 @@ Completed in the initial migration:
 - Added a broker-only Compose path with loopback binding and optional service overlays.
 - Added test/package-build CI and prebuilt broker image publishing for AMD64 and ARM64.
 - Standard Compose installations pull images; local builds use an explicit development overlay.
-- Image installation bundles pin the manifest digest. Python package publishing remains pending.
+- Image installation bundles pin the manifest digest. All three Python packages are published on PyPI.
 
-Before tagging or making the repository public:
+Completed release gates:
 
 - [x] Audit source/history, Python artifacts, installer and both image architectures for
       candidate `f3e4e5f`; no confirmed setup/family identifiers or first-party secrets found.
@@ -35,17 +46,18 @@ Before tagging or making the repository public:
       See `VM_ACCEPTANCE.json`; optional proxy and external notification checks remain separate.
 - [x] Add `SECURITY.md`, `SUPPORT.md` and `CONTRIBUTING.md`, with private vulnerability
       reporting, latest-release support scope and Apache-2.0 contribution terms.
-- [ ] At public launch, enable and verify GitHub private vulnerability reporting; GitHub
-      only exposes this feature for public repositories. Do not publish the release until
-      its private reporting form is working.
-- [ ] Before making GHCR public, remove superseded unaudited preview versions from public
-      distribution or provide equivalent source/notice coverage. Retain every source-image
-      version referenced by a distributed application image.
+- [x] Enable GitHub private vulnerability reporting and verify its public security-page entry point.
+- [x] Remove the 15 inventoried pre-remediation preview versions before making GHCR public.
+      All 25 covered application/source versions present at cleanup were retained, including
+      every linked source-image digest. Preserve corresponding sources for distributed images.
 - [x] Complete the knowledge release gates below, including real PostgreSQL/pgvector tests.
-- [ ] Confirm Python package-name access and trusted publishing, then add a tested PyPI workflow.
-- [ ] Approve public repository/package visibility and verify anonymous image pulls.
-- [ ] Freeze the source commit, record artifact hashes, and write release notes. Recheck
-      privacy and third-party licensing against any rebuilt images or changed dependencies.
+- [x] Confirm all three Python package names through successful TestPyPI and PyPI trusted publication.
+- [x] Obtain owner launch approval, make the repository/package public, and verify anonymous
+      pulls for both image architectures and both matching source images.
+- [x] Freeze the source commit, record artifact hashes, and publish release notes. Final review
+      covered retained runtime layers/configuration, installer, source archives, CI logs/build
+      records and Python artifacts; no confirmed secrets or setup/family identifiers were found.
+      Recheck privacy and licensing for future changed candidates.
 
 ## Knowledge release gates
 
@@ -80,24 +92,22 @@ check whether citations support the question. Search scores are not answer-confi
 
 - [x] Choose Apache-2.0 and align all three package metadata files.
 - [x] Use GitHub private vulnerability reporting and document latest-0.0.x support.
-      Activation and a working-form check remain part of the public launch.
-- [ ] Create or sign in to PyPI and TestPyPI accounts, verify email and configure required
-      account security. Keep credentials and recovery codes outside the repository and knowledge.
-- [ ] Confirm access to package names `keywright`, `keywright-server` and `keywright-router`.
-      A missing project page does not reserve a name or guarantee it can be registered.
+      Reporting was enabled and its entry point verified at public launch.
+- [x] Owner configured PyPI and TestPyPI accounts and publishers; successful OIDC uploads verified
+      publishing access. Keep credentials and recovery codes outside the repository and knowledge.
+- [x] Publish `keywright`, `keywright-server` and `keywright-router` version 0.0.1 on both indexes.
 - [x] Register all three pending Trusted Publishers on PyPI: owner
-      `johnrcarty`, repository `keywright`, planned workflow filename `publish-python.yml`.
+      `johnrcarty`, repository `keywright`, workflow filename `publish-python.yml`.
       Use distinct environments per package as listed below. Pending publishers cannot share
       the same owner/repository/workflow/environment configuration across project names.
       The owner screenshot confirms `keywright` / `pypi`, `keywright-server` / `pypi-server`
-      and `keywright-router` / `pypi-router`. These are pending, not active publishers.
-      The workflow is still to be implemented and must match these settings exactly.
-      Pending publishers do not reserve package names before first publication.
+      and `keywright-router` / `pypi-router`. First publication used all three successfully.
+      Preserve the matching workflow and environment settings for future releases.
 - [x] Register the three pending Trusted Publishers on TestPyPI using the settings below;
-      the owner screenshot confirms all three package, workflow and environment mappings.
+      the owner screenshot confirmed all mappings, and the rehearsal used all three successfully.
 - [x] Create all six matching GitHub environments. TestPyPI permits `main` and `v*` tags;
-      PyPI permits only `v*` tags. Production required-reviewer protection must still be enabled
-      at public launch; the workflow refuses production uploads until that protection is present.
+      PyPI permits only `v*` tags. All three production environments require owner review;
+      the workflow refuses production uploads until that protection is present.
 - [x] Implement `publish-python.yml` with a validation-only default and `id-token: write`
       only on upload jobs. Each publisher receives only its own package files. Local validation
       passed strict wheel/sdist metadata checks for all six artifacts, clean wheel/source installs,
@@ -107,12 +117,12 @@ check whether citations support the question. Search scores are not answer-confi
       and [full CI](https://github.com/johnrcarty/keywright/actions/runs/41535548976).
       All index upload jobs were skipped. Full CI includes Python 3.12–3.14 and both native
       image/source-material retrieval checks. Repeat for a changed upload candidate.
-- [ ] Freeze/review the upload candidate, run TestPyPI upload and clean downloaded-artifact
+- [x] Freeze/review the upload candidate, run TestPyPI upload and clean downloaded-artifact
       install checks, then publish the same reviewed bytes to PyPI and verify them again.
       Index SHA-256 checks reject existing versions with different bytes. Ordinary dependencies
       come from PyPI separately from the TestPyPI artifacts. See `PYTHON_PUBLISHING.md`.
-- [ ] Confirm the final release and repository/container visibility change after acceptance;
-      verify anonymous pulls and attach installation assets and checksums to the GitHub Release.
+- [x] Complete the owner-approved public launch after acceptance, verify anonymous installation,
+      and publish the GitHub Release with installation assets, sources, notices and checksums.
 
 | Package | PyPI environment | TestPyPI environment |
 | --- | --- | --- |

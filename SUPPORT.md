@@ -1,8 +1,7 @@
 # Support scope
 
-Keywright v0.0.1 is an experimental first release. Until the release is published,
-all images and packages are previews. After publication, maintenance targets the
-latest 0.0.x patch release; there is no long-term support or guaranteed compatibility
+Keywright v0.0.1 is an experimental first release. Maintenance targets the latest
+published 0.0.x patch release; there is no long-term support or guaranteed compatibility
 between experimental releases. Back up the broker data and review release notes
 before upgrading. No commercial support commitment is implied by this policy.
 

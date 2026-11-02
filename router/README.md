@@ -55,8 +55,8 @@ keywright-router run        # the container's command
    what is new.
 4. **Rules.** Edit `./rules.yaml` (seeded from the example).
    Set `llm.gateway` to the name of the LLM gateway resource.
-5. **Start.** Deploy your chosen email MCP service separately. Install the router from
-   source with `uv pip install ./client ./router`, then run
+5. **Start.** Deploy your chosen email MCP service separately. With Python 3.12 or newer,
+   install the published router with `pipx install keywright-router==0.0.1`, then run
    `keywright-router dry-run --config ./rules.yaml` before enabling
    `keywright-router run --config ./rules.yaml`. Supply `KW_URL` and `KW_TOKEN` through
    the environment. This optional integration is not part of the minimal Compose stack.

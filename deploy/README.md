@@ -5,29 +5,28 @@ The standard installation pulls a prebuilt broker image from
 The database, SSH keys and signing secret live in the `keywright-data` volume.
 The core broker needs no external service.
 
-Download the **keywright-install** artifact from a successful image publishing run.
+Download `keywright-install.tar.gz` and `SHA256SUMS` from the
+[v0.0.1 release](https://github.com/johnrcarty/keywright/releases/tag/v0.0.1).
 It contains `compose.yaml`, `image.txt`, `SHA256SUMS`, this guide, and the optional LLM
 and knowledge overlays, schema and environment examples. The broker image is pinned to
-its exact digest. Extract into a dedicated installation directory; no source checkout is needed.
+its exact digest. Use a dedicated installation directory; no source checkout is needed.
 
 ```bash
-# Private preview only: use a classic GitHub token with read:packages and package access.
-docker login ghcr.io -u YOUR_GITHUB_USERNAME
+sha256sum --ignore-missing -c SHA256SUMS
+tar -xzf keywright-install.tar.gz
 sha256sum -c SHA256SUMS
 docker compose up -d --wait
 curl --fail http://127.0.0.1:8700/healthz
 ```
 
-The package remains private during release preparation. A public image will allow
-anonymous pulls. Credentials entered at the login prompt stay out of shell history.
-See [GitHub's registry authentication guide](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-to-the-container-registry).
+The image and corresponding source materials are public. Registry login is not required.
 
 ## Image versions and updates
 
 - `0.0.1-preview` follows successful builds from the current development series on `main`.
 - `sha-<full commit>` identifies the source revision. Pin the registry digest to select exact image bytes.
 - A matching `v0.0.1` Git tag publishes image tag `0.0.1` after tests and both native image checks pass.
-  The stable tag has not been published yet. The workflow does not publish a `latest` alias.
+  The `0.0.1` tag is published. The workflow does not publish a `latest` alias.
 
 The downloadable install file pins the multi-platform digest and supports either architecture.
 To update it, back up the stopped broker's full data volume, download a new successful install

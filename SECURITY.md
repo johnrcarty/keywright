@@ -4,10 +4,8 @@ Report suspected vulnerabilities through [GitHub private vulnerability reporting
 Do not include vulnerability details, credentials, private hostnames or personal data
 in a public issue, discussion or pull request.
 
-The repository is currently a private release preview. GitHub's reporting form will
-be enabled and verified when the repository becomes public. During the private
-preview, use the private communication channel through which access was arranged.
-If the form is unavailable after launch, open an issue asking the maintainer to
+Private vulnerability reporting is enabled. If the form is unavailable, open an issue
+asking the maintainer to
 restore private reporting, without including details of the vulnerability.
 
 Include the affected version or image digest, a description of the impact, and
@@ -22,8 +20,8 @@ scope. Please also report relevant dependency vulnerabilities. The maintainer wi
 assess reports privately and coordinate fixes and disclosure with the reporter.
 This is a best-effort project; there is no guaranteed response time or bug bounty.
 
-There is no published supported release yet. Once v0.0.1 is published, security fixes
-will target the latest published 0.0.x release. Older patch releases, arbitrary
+Security fixes target the latest published 0.0.x release, currently v0.0.1. Older patch
+releases, arbitrary
 commits and preview images have no separate maintenance commitment. Upgrade to the
 latest release when a fix is published. See [support scope](SUPPORT.md).
 

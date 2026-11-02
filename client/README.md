@@ -6,10 +6,10 @@ The client half of [Keywright](https://github.com/johnrcarty/keywright), a just-
 - `kw hazards --hook` is the destructive-command tripwire, usable as a Claude Code PreToolUse hook.
 - `kw setup claude-code|codex|check` configures the agent machine.
 
-This is an unreleased source preview. Run installation commands from the repository root.
+Install the published v0.0.1 client with Python 3.12 or newer and pipx:
 
 ```bash
-pipx install ./client
+pipx install keywright==0.0.1
 kw login https://keywright.example.org/mcp --paste
 kw setup claude-code
 kw setup check
@@ -20,12 +20,14 @@ an older system Python, [uv](https://docs.astral.sh/uv/guides/tools/) can instal
 separate runtime for the client:
 
 ```bash
-uv tool install --python 3.13 ./client
+uv tool install --python 3.13 keywright==0.0.1
 ```
 
 Run agent setup as the user who runs the agents. `kw setup check` validates the
 integrations present on that machine; a Codex-only installation does not require
 Claude Code hooks.
+
+For development, run `pipx install ./client` from the repository root instead.
 
 ## Codex sandbox and approvals
 

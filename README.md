@@ -4,34 +4,30 @@ Give AI agents temporary access to infrastructure without handing them your cred
 Keywright is a self-hosted broker for SSH hosts and MCP tools, with human approval,
 scoped access, revocation and an audit trail.
 
-**v0.0.1 is in preparation.** Prebuilt preview images are published to GitHub Container
-Registry for Linux x86-64 and ARM64. The repository and image remain private during
-release preparation; the stable release, public availability and licensing review are pending.
+**[v0.0.1 is available](https://github.com/johnrcarty/keywright/releases/tag/v0.0.1).**
+This first experimental release includes public prebuilt images for Linux x86-64 and
+ARM64, Python packages, and verified source and license materials. Keywright is Apache-2.0.
 
 ## Install the prebuilt broker
 
 You need Docker Engine with the Compose plugin. No Git checkout, Python installation
 or local image build is needed.
 
-1. Download the **keywright-install** artifact from a successful
-   [test build and publish workflow](https://github.com/johnrcarty/keywright/actions/workflows/ci.yml).
-   Extract it into a dedicated installation directory. Its `compose.yaml` pins the exact
-   multi-platform image digest; `SHA256SUMS` covers the installation files.
-2. For the private preview, sign in with a GitHub personal access token (classic) that has
-   `read:packages` and access to this package. Enter the token at Docker's password prompt:
+1. Download `keywright-install.tar.gz` and `SHA256SUMS` from the
+   [v0.0.1 release](https://github.com/johnrcarty/keywright/releases/tag/v0.0.1)
+   into a dedicated installation directory. The bundle pins the exact multi-platform image digest.
+2. Verify the archive, extract it, verify its files, and start the broker:
    ```bash
-   docker login ghcr.io -u YOUR_GITHUB_USERNAME
-   ```
-3. In the installation directory:
-   ```bash
+   sha256sum --ignore-missing -c SHA256SUMS
+   tar -xzf keywright-install.tar.gz
    sha256sum -c SHA256SUMS
    docker compose up -d --wait
    ```
 
 The source copy at `deploy/compose.yaml` also works on its own; it follows
 `ghcr.io/johnrcarty/keywright:0.0.1-preview` unless `KEYWRIGHT_IMAGE` selects another tag
-or digest. The install artifact is the reproducible choice for testing a particular build.
-When the image becomes public, registry login will no longer be required.
+or digest. Use the release bundle for the pinned stable installation.
+Public image downloads do not require a registry login.
 
 Open <http://localhost:8700/ui> and set the administrator password. The default port is
 bound to loopback. For a remote VM, use an SSH tunnel first:
@@ -47,12 +43,26 @@ agent machines and use disposable targets for initial tests.
 1. Add an SSH host or upstream MCP server under **Resources**.
 2. Create an agent and copy its token once.
 3. Point an MCP client at `/mcp` with `Authorization: Bearer <agent-token>`, or install
-   the CLI from source using the instructions below.
+   the published CLI using the instructions below.
 4. Request one operation, approve it in the UI, and inspect its audit record.
 5. Revoke the access and verify the operation needs approval again.
 
 Phone notifications through Home Assistant or a webhook are optional. The base stack
 needs no cloud account, model provider, identity provider or external database.
+
+## Install the client
+
+With Python 3.12 or newer and pipx:
+
+```bash
+pipx install keywright==0.0.1
+kw login http://localhost:8700 --paste
+kw setup check
+```
+
+Paste the agent token at the prompt. Run setup as the user who runs the agent.
+Optional integration commands are `kw setup claude-code` and `kw setup codex`.
+See the [client guide](client/README.md) for installing a separate Python runtime.
 
 ## Develop from source
 
@@ -95,12 +105,13 @@ Never point test configuration at a production database.
 - [Deployment guide](deploy/README.md): base stack, optional LLM/knowledge services and
   a disposable VM acceptance checklist.
 - [Mail router](router/README.md): optional agent that routes mail through brokered tools.
-- [Release checklist](docs/RELEASE_PLAN.md): remaining work before v0.0.1.
+- [Release checklist](docs/RELEASE_PLAN.md): release evidence and publication record.
 - [Security reporting](SECURITY.md), [support scope](SUPPORT.md), and [contributing](CONTRIBUTING.md).
 - [Third-party source and notice materials](third_party/README.md).
 
-Knowledge chunking changes are experimental pending retrieval evaluation. Optional
-features are not all covered by the minimal-stack installation check.
+Knowledge retrieval remains experimental; the synthetic evaluation does not establish
+quality for every corpus or reliable no-answer detection. Optional features are not all
+covered by the minimal-stack installation check.
 
 Keywright is a credential trust boundary. Protect its host and backups. Command scope
 matching is not a shell sandbox, and output inspection cannot prove arbitrary text is
