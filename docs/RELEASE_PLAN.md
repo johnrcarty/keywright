@@ -102,7 +102,11 @@ check whether citations support the question. Search scores are not answer-confi
       only on upload jobs. Each publisher receives only its own package files. Local validation
       passed strict wheel/sdist metadata checks for all six artifacts, clean wheel/source installs,
       entry-point and hazard checks, workflow lint and six publication guard regression tests.
-- [ ] Pass the workflow's GitHub Actions validation-only run and the exact candidate's full CI.
+- [x] Pass the workflow's GitHub Actions validation-only run and full CI at `fffef4c`:
+      [Python validation](https://github.com/johnrcarty/keywright/actions/runs/41536560022)
+      and [full CI](https://github.com/johnrcarty/keywright/actions/runs/41535548976).
+      All index upload jobs were skipped. Full CI includes Python 3.12–3.14 and both native
+      image/source-material retrieval checks. Repeat for a changed upload candidate.
 - [ ] Freeze/review the upload candidate, run TestPyPI upload and clean downloaded-artifact
       install checks, then publish the same reviewed bytes to PyPI and verify them again.
       Index SHA-256 checks reject existing versions with different bytes. Ordinary dependencies
