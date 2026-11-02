@@ -85,21 +85,39 @@ check whether citations support the question. Search scores are not answer-confi
       account security. Keep credentials and recovery codes outside the repository and knowledge.
 - [ ] Confirm access to package names `keywright`, `keywright-server` and `keywright-router`.
       A missing project page does not reserve a name or guarantee it can be registered.
-- [ ] After the publishing workflow is implemented, configure a Trusted Publisher for each
-      package on both indexes: owner `johnrcarty`, repository `keywright`, planned workflow
-      filename `publish-python.yml`, environments `pypi` and `testpypi` respectively.
-      Match the final workflow filename exactly; these are planned settings, not configured ones.
-      New names use pending publishers, which do not reserve the names before first publication.
-- [ ] Create matching GitHub environments; restrict production publication to the reviewed
-      release and configure the desired release approval protection.
-- [ ] Implement a tested OIDC publishing workflow with `id-token: write` only on upload jobs.
-      Build and check wheel/sdist metadata, test TestPyPI upload/install in a clean environment,
-      then publish the reviewed distributions to PyPI and verify CLI/server/router entry points.
-      Install ordinary dependencies from PyPI separately from the TestPyPI package artifacts.
+- [x] Register all three pending Trusted Publishers on PyPI: owner
+      `johnrcarty`, repository `keywright`, planned workflow filename `publish-python.yml`.
+      Use distinct environments per package as listed below. Pending publishers cannot share
+      the same owner/repository/workflow/environment configuration across project names.
+      The owner screenshot confirms `keywright` / `pypi`, `keywright-server` / `pypi-server`
+      and `keywright-router` / `pypi-router`. These are pending, not active publishers.
+      The workflow is still to be implemented and must match these settings exactly.
+      Pending publishers do not reserve package names before first publication.
+- [x] Register the three pending Trusted Publishers on TestPyPI using the settings below;
+      the owner screenshot confirms all three package, workflow and environment mappings.
+- [x] Create all six matching GitHub environments. TestPyPI permits `main` and `v*` tags;
+      PyPI permits only `v*` tags. Production required-reviewer protection must still be enabled
+      at public launch; the workflow refuses production uploads until that protection is present.
+- [x] Implement `publish-python.yml` with a validation-only default and `id-token: write`
+      only on upload jobs. Each publisher receives only its own package files. Local validation
+      passed strict wheel/sdist metadata checks for all six artifacts, clean wheel/source installs,
+      entry-point and hazard checks, workflow lint and six publication guard regression tests.
+- [ ] Pass the workflow's GitHub Actions validation-only run and the exact candidate's full CI.
+- [ ] Freeze/review the upload candidate, run TestPyPI upload and clean downloaded-artifact
+      install checks, then publish the same reviewed bytes to PyPI and verify them again.
+      Index SHA-256 checks reject existing versions with different bytes. Ordinary dependencies
+      come from PyPI separately from the TestPyPI artifacts. See `PYTHON_PUBLISHING.md`.
 - [ ] Confirm the final release and repository/container visibility change after acceptance;
       verify anonymous pulls and attach installation assets and checksums to the GitHub Release.
 
-Publishing references: [PyPI pending publishers](https://docs.pypi.org/trusted-publishers/creating-a-project-through-oidc/)
+| Package | PyPI environment | TestPyPI environment |
+| --- | --- | --- |
+| `keywright` | `pypi` | `testpypi` |
+| `keywright-server` | `pypi-server` | `testpypi-server` |
+| `keywright-router` | `pypi-router` | `testpypi-router` |
+
+Publishing references: [PyPI pending publishers](https://docs.pypi.org/trusted-publishers/creating-a-project-through-oidc/),
+[publisher configuration uniqueness](https://github.com/pypi/warehouse/blob/main/warehouse/oidc/models/github.py)
 and [PyPA GitHub Actions publishing guide](https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/).
 
 LLM gateways, OIDC, inventory, semantic advice and mail are optional integrations.

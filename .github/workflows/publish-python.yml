@@ -1,0 +1,193 @@
+name: Python package release
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Validate only, rehearse on TestPyPI, or publish a reviewed version tag
+        type: choice
+        options: [validate, testpypi, pypi]
+        default: validate
+        required: true
+      reviewed_commit:
+        description: Full reviewed commit SHA (required for either upload target)
+        type: string
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: python-package-release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      version: ${{ steps.metadata.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Check package identities and publication prerequisites
+        id: metadata
+        env:
+          TARGET: ${{ inputs.target }}
+          REVIEWED_COMMIT: ${{ inputs.reviewed_commit }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(python scripts/python_release.py version)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "SOURCE_DATE_EPOCH=$(git show -s --format=%ct HEAD)" >> "$GITHUB_ENV"
+          if [[ "$TARGET" != validate ]]; then
+            test "$REVIEWED_COMMIT" = "$GITHUB_SHA"
+            [[ "$GITHUB_REF" == refs/heads/main || "$GITHUB_REF" == "refs/tags/v$version" ]]
+            gh api "repos/$GITHUB_REPOSITORY/actions/workflows/ci.yml/runs?head_sha=$GITHUB_SHA&per_page=100" > /tmp/ci-runs.json
+            python - <<'PY'
+          import json
+          runs = json.load(open('/tmp/ci-runs.json'))['workflow_runs']
+          assert any(r['conclusion'] == 'success' and r['event'] in ('push', 'workflow_dispatch')
+                     for r in runs), 'Full CI must pass for the exact reviewed commit before upload'
+          PY
+          fi
+          if [[ "$TARGET" == pypi ]]; then
+            test "$GITHUB_REF" = "refs/tags/v$version"
+            test "$(gh api "repos/$GITHUB_REPOSITORY" --jq .visibility)" = public
+            for environment in pypi pypi-server pypi-router; do
+              gh api "repos/$GITHUB_REPOSITORY/environments/$environment" > /tmp/environment.json
+              python - <<'PY'
+          import json
+          environment = json.load(open('/tmp/environment.json'))
+          assert any(r['type'] == 'required_reviewers' and r.get('reviewers')
+                     for r in environment['protection_rules']), 'Production requires environment review'
+          PY
+            done
+          fi
+      - name: Build and inspect all distributions
+        run: |
+          python -m pip install build twine
+          python -m build client --outdir dist/python-release/keywright
+          python -m build . --outdir dist/python-release/keywright-server
+          python -m build router --outdir dist/python-release/keywright-router
+          python scripts/python_release.py validate
+          python -m twine check --strict dist/python-release/*/*
+      - name: Test wheel and source installs in clean environments
+        run: python scripts/python_release.py smoke
+      - uses: actions/upload-artifact@v4
+        with:
+          name: python-release
+          path: dist/python-release/
+          if-no-files-found: error
+          retention-days: 30
+
+  testpypi:
+    if: inputs.target != 'validate'
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - package: keywright
+            environment: testpypi
+          - package: keywright-server
+            environment: testpypi-server
+          - package: keywright-router
+            environment: testpypi-router
+    environment:
+      name: ${{ matrix.environment }}
+      url: https://test.pypi.org/project/${{ matrix.package }}/
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: python-release
+          path: distributions
+      - name: Publish one package with its matching trusted identity
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          packages-dir: distributions/${{ matrix.package }}/
+          # Retries are allowed, but the following job requires byte-for-byte equality.
+          skip-existing: true
+
+  verify-testpypi:
+    needs: [build, testpypi]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v4
+        with:
+          name: python-release
+          path: dist/python-release
+      - name: Download and verify the exact TestPyPI artifacts
+        run: python scripts/python_release.py fetch --index testpypi --output dist/from-testpypi
+      - name: Test downloaded wheels and sources with dependencies from PyPI
+        run: python scripts/python_release.py smoke --root dist/from-testpypi
+
+  pypi:
+    if: inputs.target == 'pypi'
+    needs: [build, verify-testpypi]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      id-token: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - package: keywright
+            environment: pypi
+          - package: keywright-server
+            environment: pypi-server
+          - package: keywright-router
+            environment: pypi-router
+    environment:
+      name: ${{ matrix.environment }}
+      url: https://pypi.org/project/${{ matrix.package }}/
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: python-release
+          path: distributions
+      - name: Publish the distributions verified on TestPyPI
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # release/v1
+        with:
+          packages-dir: distributions/${{ matrix.package }}/
+          skip-existing: true
+
+  verify-pypi:
+    needs: [build, pypi]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v4
+        with:
+          name: python-release
+          path: dist/python-release
+      - name: Download and verify the exact PyPI artifacts
+        run: python scripts/python_release.py fetch --index pypi --output dist/from-pypi
+      - name: Verify published wheel and source installations
+        run: python scripts/python_release.py smoke --root dist/from-pypi

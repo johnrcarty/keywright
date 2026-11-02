@@ -2,6 +2,7 @@
 name = "keywright-router"
 version = "0.0.1"
 description = "Keywright router: routes incoming mail with boolean rules, acting only through Keywright."
+readme = "README.md"
 requires-python = ">=3.12"
 license = "Apache-2.0"
 license-files = ["LICENSE", "NOTICE", "THIRD_PARTY_NOTICES"]
