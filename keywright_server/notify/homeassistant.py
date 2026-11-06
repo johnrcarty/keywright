@@ -159,6 +159,17 @@ class HomeAssistantNotifier(Notifier):
                 if r.status_code >= 400:
                     log.error("HA notify.%s failed: %s %s", t, r.status_code, r.text[:200])
 
+    async def send_task(self, event_id: str, url: str) -> None:
+        targets = self.config.get("targets") or []
+        if not targets:
+            raise RuntimeError("No notification targets configured")
+        payload = {"title": "Keywright work", "message": "A task assigned to you needs attention.",
+                   "data": {"tag": event_id, "group": "keywright-work", "url": url, "clickAction": url}}
+        async with httpx.AsyncClient(timeout=15, headers=self._headers()) as client:
+            for target in targets:
+                response = await client.post(f"{self._base()}/api/services/notify/{target}", json=payload)
+                response.raise_for_status()
+
     async def clear(self, req: AccessRequest) -> None:
         await self._clear_tag(req.id)
 

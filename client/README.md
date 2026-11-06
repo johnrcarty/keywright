@@ -100,3 +100,22 @@ Use `kw shop DoorDash guide` for the reviewed CLI contract, then `kw shop DoorDa
 for a 20-minute browsing/cart session. `kw shop DoorDash status` reports the remaining time.
 Checkout uses `kw shop DoorDash checkout --cart-uuid ID --card-id ID --tip-cents CENTS`: a live
 priced approval, rechecked before submission. See [DoorDash setup and ordering](../docs/DOORDASH.md).
+
+### Native work boards
+
+`kw work boards` lists authorized project boards and General; `kw work list`
+combines authorized tasks across them. Use `--data` for JSON filters or mutation
+fields and `--json` for machine-readable output. Read a task with `kw work get ID`;
+updates require its `expected_version`, and comments require an `idempotency_key`.
+Agents need explicit board access configured in **Work → Board access**.
+
+```sh
+kw work create --data '{"title":"Review the checklist","assignee":"owner"}' --json
+kw work list --data '{"status":"ready","limit":20}' --json
+kw work update tsk_EXAMPLE --data '{"expected_version":1,"notes":"Plan the checks"}' --json
+kw work comment tsk_EXAMPLE --data '{"body":"Checked examples","idempotency_key":"check-1"}' --json
+```
+
+This initial interface supports planning and comments. Claims, execution, and
+structured handoffs follow in a later slice. Assignment launches nothing and
+grants no host access. See [Native work boards](../docs/WORK_BOARDS.md).

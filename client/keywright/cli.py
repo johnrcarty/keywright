@@ -32,6 +32,8 @@ ERROR_EXIT = {
     "unauthorized": EXIT_TRANSPORT, "invalid_arguments": EXIT_USAGE,
     "ssh_failed": EXIT_FAILED, "put_failed": EXIT_FAILED, "get_failed": EXIT_FAILED, "capture_failed": EXIT_FAILED,
     "upstream_failed": EXIT_FAILED, "internal": EXIT_FAILED,
+    "forbidden": EXIT_DENIED, "invalid_assignee": EXIT_USAGE, "invalid_transition": EXIT_USAGE,
+    "stale_version": EXIT_FAILED, "conflict": EXIT_FAILED,
 }
 # Approvals arrive on a phone; 300 s produced timeouts in normal use (F3 in the 2026-09-20 field
 # report). KW_WAIT sets the default per machine or per profile without repeating --wait everywhere.
@@ -65,6 +67,12 @@ def build_parser() -> argparse.ArgumentParser:
         sp.add_argument("-q", "--quiet", action="store_true", help="no kw: handle line on stderr")
 
     sp = sub.add_parser("resources", help="brokered resources and your standing on each")
+    sp.add_argument("--json", action="store_true")
+
+    sp = sub.add_parser("work", help="native task boards: boards, list, get, create, update, comment")
+    sp.add_argument("action", choices=("boards", "list", "get", "create", "update", "comment"))
+    sp.add_argument("task_id", nargs="?")
+    sp.add_argument("--data", default="{}", help="JSON fields or filters; updates require expected_version")
     sp.add_argument("--json", action="store_true")
 
     sp = sub.add_parser("shop", help="DoorDash shopping session, cached guide, status or reviewed checkout")
@@ -547,6 +555,35 @@ def cmd_resources(args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def cmd_work(args: argparse.Namespace) -> int:
+    from .transport import AuthError, TransportError, payload
+
+    try:
+        fields = json.loads(args.data)
+        if not isinstance(fields, dict):
+            raise ValueError
+    except ValueError:
+        return _usage("--data must be a JSON object")
+    if args.action in ("get", "update", "comment"):
+        if not args.task_id:
+            return _usage("this work action requires a task ID")
+        fields["task_id"] = args.task_id
+    elif args.task_id:
+        return _usage("this work action does not take a task ID")
+    names = {"boards": "work_list_boards", "list": "work_list_tasks", "get": "work_get_task",
+             "create": "work_create_task", "update": "work_update_task", "comment": "work_comment_task"}
+    gate = Gate(args)
+    try:
+        result = gate.call(names[args.action], fields)
+    except (AuthError, TransportError):
+        return _fail("Work call failed; inspect current state before retrying a mutation.", EXIT_TRANSPORT)[1]
+    data = payload(result)
+    code = ERROR_EXIT.get(data.get("error"), EXIT_FAILED) if result.is_error else EXIT_OK
+    if not args.json:
+        sys.stdout.write(json.dumps(data, indent=2) + "\n")
+    return emit(data, code, args.json)
+
+
 def cmd_shop(args: argparse.Namespace) -> int:
     gate = Gate(args)
     arguments = {key: getattr(args, key) for key in ("host", "action", "cart_uuid", "card_id", "tip_cents",
@@ -759,6 +796,8 @@ def main(argv: list[str] | None = None) -> int:
 
         return run(args)
     try:
+        if args.cmd == "work":
+            return cmd_work(args)
         if args.cmd == "run":
             return cmd_run(args, rest)
         if args.cmd == "shop":

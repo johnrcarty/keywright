@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import secrets
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from typing import Any, ClassVar
 
-from sqlalchemy import JSON, DateTime, ForeignKey, Index, Integer, String, Text, TypeDecorator
+from sqlalchemy import JSON, CheckConstraint, Date, DateTime, ForeignKey, Index, Integer, String, Text, TypeDecorator
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -468,3 +468,105 @@ class DiscoveryLink(Base):
     interface_id: Mapped[str | None] = mapped_column(ForeignKey("inventory_interfaces.id"), nullable=True)
     reviewed_data: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
     reviewed_at: Mapped[datetime] = mapped_column(UTCDateTime, default=now)
+
+
+# Work records coordinate people and agents; they confer no infrastructure access.
+class Project(Base):
+    __tablename__ = "work_projects"
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: new_id("prj"))
+    key: Mapped[str] = mapped_column(String, unique=True)
+    name: Mapped[str] = mapped_column(String)
+    description: Mapped[str] = mapped_column(Text, default="")
+    archived: Mapped[bool] = mapped_column(default=False)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=now)
+
+
+class Board(Base):
+    __tablename__ = "work_boards"
+    __table_args__ = (CheckConstraint(
+        "(kind = 'general' AND key = 'kw' AND project_id IS NULL) OR "
+        "(kind = 'project' AND key <> 'kw' AND project_id IS NOT NULL)", name="work_board_kind"),)
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: new_id("brd"))
+    key: Mapped[str] = mapped_column(String, unique=True)
+    name: Mapped[str] = mapped_column(String)
+    kind: Mapped[str] = mapped_column(String)
+    project_id: Mapped[str | None] = mapped_column(ForeignKey("work_projects.id"), unique=True, nullable=True)
+
+
+class BoardAgentAccess(Base):
+    __tablename__ = "work_board_agent_access"
+    board_id: Mapped[str] = mapped_column(ForeignKey("work_boards.id"), primary_key=True)
+    agent_id: Mapped[str] = mapped_column(ForeignKey("agents.id", ondelete="CASCADE"), primary_key=True)
+    read: Mapped[bool] = mapped_column(default=False)
+    write: Mapped[bool] = mapped_column(default=False)
+    claim: Mapped[bool] = mapped_column(default=False)
+    request_human_action: Mapped[bool] = mapped_column(default=False)
+
+
+class Task(Base):
+    __tablename__ = "work_tasks"
+    __table_args__ = (
+        CheckConstraint("status IN ('backlog','ready','in_progress','blocked','review','done')", name="work_task_status"),
+        CheckConstraint("priority BETWEEN 0 AND 3", name="work_task_priority"),
+        CheckConstraint("version > 0", name="work_task_version"),
+        CheckConstraint("(assignee_kind = 'agent' AND assignee_agent_id IS NOT NULL) OR "
+                        "(assignee_kind IN ('owner','unassigned') AND assignee_agent_id IS NULL)",
+                        name="work_task_assignee"),
+        Index("work_task_board_order", "board_id", "status", "position"),
+        Index("work_task_owner_queue", "assignee_kind", "archived", "status"),
+    )
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: new_id("tsk"))
+    board_id: Mapped[str] = mapped_column(ForeignKey("work_boards.id"))
+    title: Mapped[str] = mapped_column(String)
+    description: Mapped[str] = mapped_column(Text, default="")
+    notes: Mapped[str] = mapped_column(Text, default="")
+    acceptance: Mapped[str] = mapped_column(Text, default="")
+    status: Mapped[str] = mapped_column(String, default="backlog")
+    priority: Mapped[int] = mapped_column(Integer, default=2)
+    due_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    labels: Mapped[list[Any]] = mapped_column(JSON, default=list)
+    assignee_kind: Mapped[str] = mapped_column(String, default="unassigned")
+    assignee_agent_id: Mapped[str | None] = mapped_column(ForeignKey("agents.id"), nullable=True)
+    creator: Mapped[str] = mapped_column(String)
+    position: Mapped[int] = mapped_column(Integer, default=1024)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    archived: Mapped[bool] = mapped_column(default=False)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=now)
+    updated_at: Mapped[datetime] = mapped_column(UTCDateTime, default=now)
+
+
+class TaskActivity(Base):
+    __tablename__ = "work_task_activity"
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: new_id("act"))
+    task_id: Mapped[str] = mapped_column(ForeignKey("work_tasks.id"), index=True)
+    actor: Mapped[str] = mapped_column(String)
+    kind: Mapped[str] = mapped_column(String)
+    data: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=now)
+
+
+class TaskComment(Base):
+    __tablename__ = "work_task_comments"
+    __table_args__ = (Index("work_comment_retry", "task_id", "actor", "idempotency_key", unique=True),)
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: new_id("cmt"))
+    task_id: Mapped[str] = mapped_column(ForeignKey("work_tasks.id"), index=True)
+    actor: Mapped[str] = mapped_column(String)
+    body: Mapped[str] = mapped_column(Text)
+    idempotency_key: Mapped[str] = mapped_column(String)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=now)
+
+
+class TaskNotification(Base):
+    __tablename__ = "work_task_notifications"
+    __table_args__ = (Index("work_notification_event", "activity_id", "recipient", unique=True),)
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: new_id("ntf"))
+    task_id: Mapped[str] = mapped_column(ForeignKey("work_tasks.id"), index=True)
+    activity_id: Mapped[str] = mapped_column(ForeignKey("work_task_activity.id"))
+    recipient: Mapped[str] = mapped_column(String, default="owner")
+    read_at: Mapped[datetime | None] = mapped_column(UTCDateTime, nullable=True)
+    delivered_at: Mapped[datetime | None] = mapped_column(UTCDateTime, nullable=True)
+    attempts: Mapped[int] = mapped_column(Integer, default=0)
+    next_attempt_at: Mapped[datetime] = mapped_column(UTCDateTime, default=now)
+    error: Mapped[str] = mapped_column(String, default="")
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=now)

@@ -34,6 +34,8 @@ from . import (
     shopping,
     shopping_mcp,
     ssh,
+    tasks,
+    tasks_mcp,
 )
 from .db import session
 from .models import Agent, AuditEvent, Resource, now
@@ -314,6 +316,8 @@ async def on_list_tools(ctx, params) -> types.ListToolsResult:
             return types.ListToolsResult(tools=[])
         sid = _session_id(ctx, headers)
         tools = list(ACCESS_TOOLS)
+        if (await tasks.list_boards(db, agent, include_archived=True, limit=1))["boards"]:
+            tools += tasks_mcp.list_tools()
         resources = (await db.execute(select(Resource))).scalars().all()
         if any(r.kind == "ssh" for r in resources):
             tools += [SSH_TOOL, SSH_PUT_TOOL, SSH_GET_TOOL, SSH_CAPTURE_TOOL]
@@ -351,6 +355,12 @@ async def on_call_tool(ctx, params: types.CallToolRequestParams) -> types.CallTo
         sid = _session_id(ctx, headers)
         name = params.name
         try:
+            if name in tasks_mcp.OPERATIONS:
+                try:
+                    return _result(await tasks_mcp.execute(db, agent, name, args))
+                except tasks.TaskError as exc:
+                    await db.rollback()
+                    return _result(exc.payload(), is_error=True)
             if name == "access_list_resources":
                 out = {"agent": agent.name, "session": sid,
                        "resources": await policy.effective_access(db, agent, sid)}

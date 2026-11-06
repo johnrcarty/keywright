@@ -121,6 +121,8 @@ def create_app() -> FastAPI:
         janitor = asyncio.create_task(_janitor(), name="janitor")
         watch = asyncio.create_task(_tool_watch(), name="tool-watch")
         mail_worker = asyncio.create_task(mail.worker(), name="mail-inbox")
+        from .. import task_notifications
+        task_worker = asyncio.create_task(task_notifications.worker(), name="task-notifications")
         async with sm.run():
             log.info("Keywright listening; MCP at /mcp, admin at /ui")
             try:
@@ -129,6 +131,9 @@ def create_app() -> FastAPI:
                 janitor.cancel()
                 watch.cancel()
                 mail_worker.cancel()
+                task_worker.cancel()
+                with contextlib.suppress(asyncio.CancelledError):
+                    await task_worker
                 await cli_setup.shutdown()
                 with contextlib.suppress(asyncio.CancelledError):
                     await mail_worker
@@ -139,6 +144,8 @@ def create_app() -> FastAPI:
     app.add_middleware(BrowserSecurityHeaders)
     app.mount("/assets", StaticFiles(directory=Path(__file__).parent / "assets"), name="assets")
     app.include_router(admin.router)
+    from . import work_ui
+    app.include_router(work_ui.router)
     app.include_router(cli_setup_ui.router)
     app.include_router(oidc.router)
     app.include_router(mcp_oauth_ui.router)

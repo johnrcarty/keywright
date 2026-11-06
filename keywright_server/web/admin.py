@@ -627,6 +627,13 @@ async def agent_create(name: str = Form(...), note: str = Form("")):
 @router.post("/ui/agents/{aid}/{action}", dependencies=[Depends(auth.require_admin)])
 async def agent_action(aid: str, action: str, next: str = Form("/ui/agents")):
     async with session() as db:
+        if action == "delete":
+            from ..models import Task
+            from ..tasks import lock
+
+            await lock(db)
+            if await db.scalar(select(Task.id).where(Task.assignee_agent_id == aid).limit(1)):
+                return redirect(next, "Reassign this agent's tasks before deleting it, or disable it to retain its work history.")
         a = await db.get(Agent, aid)
         if a is None:
             return redirect("/ui/agents", "No such agent.")

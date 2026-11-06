@@ -73,6 +73,10 @@ class Notifier(ABC):
     async def clear_nudge(self, nudge: Nudge) -> None:
         """Called once the human has cleared it; drivers may retract the notification."""
 
+    async def send_task(self, event_id: str, url: str) -> None:
+        """Notify the owner without copying private task content or offering access decisions."""
+        raise NotImplementedError
+
     async def start(self, on_decision: DecisionCallback) -> None:
         """Optional: start a background listener that feeds decisions back."""
 

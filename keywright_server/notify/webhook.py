@@ -16,6 +16,18 @@ class WebhookNotifier(Notifier):
     id = "webhook"
     label = "Webhook (JSON POST)"
     description = "POST {title, body, request, links} to a URL. Humans decide via the signed links."
+
+    async def send_task(self, event_id: str, url: str) -> None:
+        title, body = "Keywright work", "A task assigned to you needs attention. Open Keywright to review it."
+        headers = {"Authorization": self.config["auth_header"]} if self.config.get("auth_header") else {}
+        async with httpx.AsyncClient(timeout=10) as client:
+            if self.config.get("format") == "ntfy":
+                headers.update({"Title": title, "Actions": f"view, Open task, {url}"})
+                response = await client.post(self.config["url"], content=body.encode(), headers=headers)
+            else:
+                response = await client.post(self.config["url"], headers=headers, json={
+                    "event_id": event_id, "title": title, "body": body, "links": {"open": url}})
+            response.raise_for_status()
     fields: ClassVar[list[Field]] = [
         Field("url", "Webhook URL", "url", required=True),
         Field("auth_header", "Authorization header value", "password", help="Optional, sent as-is."),

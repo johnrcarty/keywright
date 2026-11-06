@@ -160,6 +160,7 @@ input,select,textarea{min-width:0;max-width:100%}input[type=checkbox]{flex-shrin
 <a href="/ui/access" class="{{ 'active' if request.url.path.startswith('/ui/access') }}">Access</a>
 <a href="/ui/resources" class="{{ 'active' if (request.url.path.startswith('/ui/resources') or request.url.path.startswith('/ui/inventory')) }}">Resources</a>
 <a href="/ui/agents" class="{{ 'active' if request.url.path.startswith('/ui/agents') }}">Agents</a>
+<a href="/ui/work" class="{{ 'active' if request.url.path.startswith('/ui/work') }}">Work</a>
 <a href="/ui/knowledge" class="{{ 'active' if request.url.path.startswith('/ui/knowledge') }}">Knowledge</a>
 <a href="/ui/mail" class="{{ 'active' if request.url.path.startswith('/ui/mail') }}">Mail</a>
 <a href="/ui/usage" class="{{ 'active' if request.url.path.startswith('/ui/usage') }}">Usage</a>
@@ -177,6 +178,7 @@ input,select,textarea{min-width:0;max-width:100%}input[type=checkbox]{flex-shrin
 <summary>{{ icon('more') }}More</summary>
 <div class="mobile-more-menu">
 <a href="/ui/knowledge" class="{{ 'active' if request.url.path.startswith('/ui/knowledge') }}">Knowledge</a>
+<a href="/ui/work" class="{{ 'active' if request.url.path.startswith('/ui/work') }}">Work</a>
 <a href="/ui/mail" class="{{ 'active' if request.url.path.startswith('/ui/mail') }}">Mail</a>
 <a href="/ui/usage" class="{{ 'active' if request.url.path.startswith('/ui/usage') }}">Usage</a>
 <a href="/ui/grants" class="{{ 'active' if request.url.path.startswith('/ui/grants') }}">Grants</a>

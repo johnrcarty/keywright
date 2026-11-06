@@ -47,6 +47,8 @@ async def init_db() -> None:
     settings.ensure_dirs()
     async with engine().begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        from .tasks import seed
+        await seed(conn)
         await conn.run_sync(_upgrade_knowledge_columns)
         await conn.run_sync(_upgrade_knowledge_graph_columns)
         from .knowledge_index import init_local
@@ -123,5 +125,7 @@ async def reset_for_tests(url: str) -> None:
     _sessionmaker = async_sessionmaker(_engine, expire_on_commit=False)
     async with _engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        from .tasks import seed
+        await seed(conn)
         from .knowledge_index import init_local
         await conn.run_sync(init_local)

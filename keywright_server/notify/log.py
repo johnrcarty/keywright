@@ -18,6 +18,9 @@ class LogNotifier(Notifier):
     description = "No push channel. Pending requests show on the dashboard."
     fields: ClassVar[list] = []
 
+    async def send_task(self, event_id: str, url: str) -> None:
+        log.info("WORK ASSIGNMENT %s: %s", event_id, url)
+
     async def probe(self) -> ProbeResult:
         return ProbeResult(ok=True, message="Nothing to configure.")
 

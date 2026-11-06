@@ -1,0 +1,26 @@
+{% extends "base.html" %}{% block title %}{{ task.title }} · Work{% endblock %}{% block body %}
+<link rel="stylesheet" href="/assets/work.css">
+<p><a href="/ui/work">All work</a> / <a href="/ui/work?board_id={{ task.board_id }}">{{ task.board_name }}{{ ' / General' if task.board_kind == 'general' }}</a></p>
+<h1>{{ task.title }}</h1><p class="mut">{{ statuses[task.status] }} · Created by {{ task.creator }} · {{ task.created_at }} · Version {{ task.version }}</p>
+<p id="work-updates" class="card" role="status" hidden>Work has changed. <a href="{{ request.url }}">Refresh when you’re ready</a>.</p>
+{% if task.archived %}<p class="card">This task is archived.</p>{% else %}
+<form method="post" action="/ui/work/tasks/{{ task.id }}" class="card">
+<input type="hidden" name="expected_version" value="{{ task.version }}">
+<label>Title<input type="text" name="title" value="{{ task.title }}" required maxlength="240"></label>
+<label>Description<textarea name="description" rows="5" maxlength="64000">{{ task.description }}</textarea></label>
+<label>Local notes<textarea name="notes" rows="5" maxlength="64000">{{ task.notes }}</textarea></label>
+<label>Acceptance criteria<textarea name="acceptance" rows="4" maxlength="16000">{{ task.acceptance }}</textarea></label>
+<div class="work-filters"><label>Status<select name="status">{% for key, label in statuses.items() %}<option value="{{ key }}" {{ 'selected' if task.status == key }}>{{ label }}</option>{% endfor %}</select></label><label>Priority<select name="priority">{% for key, label in priorities.items() %}<option value="{{ key }}" {{ 'selected' if task.priority == key }}>{{ label }}</option>{% endfor %}</select></label>
+<label>Assignee<select name="assignee"><option value="unassigned" {{ 'selected' if task.assignee == 'unassigned' }}>Unassigned</option><option value="owner" {{ 'selected' if task.assignee == 'owner' }}>{{ owner }}</option>{% for agent in agents %}<option value="agent:{{ agent.id }}" {{ 'selected' if task.assignee == 'agent:' + agent.id }}>{{ agent.name }}{{ ' (disabled)' if agent.disabled }}</option>{% endfor %}</select></label><label>Due date<input name="due_date" type="date" value="{{ task.due_date or '' }}"></label></div>
+<p class="help">Assign agents after granting them access to this board. Assignment does not start an agent.</p><label>Labels (comma separated)<input type="text" name="labels" value="{{ task.labels|join(', ') }}" maxlength="1200"></label><button class="btn p">Save task</button></form>
+{% endif %}
+<details class="card"><summary>Move to another board</summary><p>Moving transfers the task, comments, and activity to the destination audience. Repository and host permissions stay separate.</p>
+{% for board in boards if board.id != task.board_id %}<form method="post" action="/ui/work/tasks/{{ task.id }}/move"><input type="hidden" name="expected_version" value="{{ task.version }}"><input type="hidden" name="board_id" value="{{ board.id }}"><h3>{{ board.name }}{{ ' / General' if board.kind == 'general' }}</h3><p>Destination audience: owner{% for name in audiences[board.id] %}, {{ name }}{% endfor %}.</p><label><input type="checkbox" name="confirm_audience" required> Share this task with that audience</label><button class="btn">Move here</button></form>{% endfor %}</details>
+<form method="post" action="/ui/work/tasks/{{ task.id }}" class="card"><input type="hidden" name="expected_version" value="{{ task.version }}"><input type="hidden" name="archived" value="{{ 'false' if task.archived else 'true' }}"><button class="btn">{{ 'Unarchive' if task.archived else 'Archive' }} task</button></form>
+<h2>Local comments</h2><form method="post" action="/ui/work/tasks/{{ task.id }}/comments" class="card"><input type="hidden" name="idempotency_key" value="{{ comment_key }}"><label>Comment<textarea name="body" required maxlength="16000" rows="3"></textarea></label><button class="btn">Add comment</button></form>
+{% for comment in task.comments %}<article class="card"><p class="mut">{{ comment.actor }} · {{ comment.created_at }}</p><p class="work-prose">{{ comment.body }}</p></article>{% else %}<p>No local comments.</p>{% endfor %}
+{% if task.comments_next_offset is not none %}<a href="?offset={{ task.comments_next_offset }}">Older comments</a>{% endif %}
+<h2>Activity</h2>{% for entry in task.activity %}<p>{{ entry.actor }} · {{ entry.kind }} · {{ entry.created_at }}{% if entry.data.status %} · {{ statuses[entry.data.status.from] }} → {{ statuses[entry.data.status.to] }}{% elif entry.data.fields %} · {{ entry.data.fields|join(', ') }}{% endif %}{% if entry.data.assignee %} · Assignee: {{ entry.data.assignee.from }} → {{ entry.data.assignee.to }}{% endif %}</p>{% endfor %}
+{% if task.activity_next_offset is not none %}<a href="?offset={{ task.activity_next_offset }}">Older activity</a>{% endif %}
+<script src="/assets/work.js" defer></script>
+{% endblock %}
