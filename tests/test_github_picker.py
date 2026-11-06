@@ -121,3 +121,51 @@ async def test_picker_http_single_bulk_protection_and_filter_preservation(db, ca
         assert await db.scalar(select(func.count()).select_from(Repository)) == 2
         resources = await browser.get('/ui/resources')
         assert url in resources.text and 'Browse repositories' in resources.text
+
+
+async def test_picker_attach_preserves_manual_repo_and_locations(db, catalog, monkeypatch):
+    from keywright_server import repositories, tasks
+    from keywright_server.models import InventoryAsset, RepositoryLocation
+
+    cid, rows, _ = catalog
+    project = await tasks.create_project(db, tasks.ProjectCreate(key='manual', name='Manual project'))
+    manual = await repositories.save_repository(db, repositories.RepositorySave(
+        name='Custom name', description='My local notes', project_id=project['project_id']))
+    asset = InventoryAsset(name='Development host')
+    db.add(asset)
+    await db.commit()
+    location = await repositories.save_location(db, manual['id'], repositories.LocationSave(
+        name='Development', environment='dev', asset_id=asset.id, directory='/srv/app'))
+    # Exercise both catalog discovery and the identity-checked attach endpoint.
+    def handler(request):
+        if request.url.path == '/user/repos':
+            return httpx.Response(200, json=rows)
+        assert request.url.path == '/repos/owner/OldSchoolwork'
+        return httpx.Response(200, json=rows[0])
+    monkeypatch.setattr(gh, 'Client', lambda cid: Client(cid, transport=httpx.MockTransport(handler)))
+    await auth.set_password(db, 'fixture-password')
+    root = f'/ui/integrations/github/connections/{cid}'
+    query = {'owner': 'owner', 'name': rows[0]['name'], 'provider_id': str(rows[0]['id'])}
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=create_app()), base_url='http://gk.test',
+                                headers={'Origin': 'http://gk.test'}) as browser:
+        assert (await browser.get(root + '/attach', params=query)).status_code in (303, 401)
+        await browser.post('/ui/login', data={'password': 'fixture-password'})
+        picker = await browser.get(root + '/repositories')
+        assert root + '/attach?' in picker.text
+        page = await browser.get(root + '/attach', params=query)
+        assert page.status_code == 200 and manual['id'] in page.text
+        data = {**query, 'local_repository_id': manual['id']}
+        assert (await browser.post(root + '/select', data=data,
+                                  headers={'Origin': 'http://evil.test'})).status_code == 403
+        for _ in range(2):
+            result = await browser.post(root + '/select', data=data)
+            assert result.status_code == 303 and manual['id'] in result.headers['location']
+        page = await browser.get(root + '/attach', params=query)
+        assert manual['id'] not in page.text  # Already attached records cannot be chosen again.
+    await db.refresh(await db.get(Repository, manual['id']))
+    repo = await db.get(Repository, manual['id'])
+    assert repo.name == 'Custom name' and repo.description == 'My local notes'
+    assert repo.project_id == project['project_id'] and repo.provider_id == query['provider_id']
+    assert not repo.import_enabled and (await db.get(GitHubSync, repo.id)).status == 'paused'
+    assert (await db.get(RepositoryLocation, location['id'])).repository_id == manual['id']
+    assert await db.scalar(select(func.count()).select_from(Repository)) == 1

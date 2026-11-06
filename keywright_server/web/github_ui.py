@@ -4,7 +4,7 @@ from urllib.parse import urlencode
 from fastapi import APIRouter, Depends, Request
 from pydantic import ValidationError
 
-from .. import github, tasks
+from .. import github, repositories, tasks
 from ..db import session
 from ..github_client import GitHubError
 from ..models import GitHubSync
@@ -112,6 +112,23 @@ async def select_repository(request: Request, connection_id: str):
         result = await github.select_repository(connection_id, github.Selection(**form))
         return redirect('/ui/work/repositories/' + result['id'],
                         'Already registered; existing ownership and sync connection were retained.' if result['existing'] else 'Repository selected.')
+    except ERRORS as exc:
+        return failure(exc)
+
+
+@router.get('/ui/integrations/github/connections/{connection_id}/attach')
+async def attach_repository(request: Request, connection_id: str, owner: str, name: str, provider_id: str,
+                            q: str = '', offset: int = 0):
+    try:
+        selection = github.Selection(owner=owner, name=name, provider_id=provider_id, import_enabled=False)
+        filters = repositories.RepositoryFilter(manual_only=True, q=q, offset=offset)
+        async with session() as db:
+            available = await repositories.list_repositories(db, filters)
+        def page_url(number):
+            return '?' + urlencode({'owner': owner, 'name': name, 'provider_id': provider_id,
+                                    'q': q, 'offset': number})
+        return render(request, 'work_github_attach.html', connection_id=connection_id, selection=selection,
+                      available=available, q=q, offset=offset, page_url=page_url)
     except ERRORS as exc:
         return failure(exc)
 

@@ -304,3 +304,20 @@ async def test_agent_deletion_preserves_assigned_tasks_and_disabling_does_not_bl
         assert response.status_code == 200, response.text
         assert response.headers["cache-control"] == "no-store"
         assert response.json()["assignee"] == "agent:" + agent_id
+
+
+async def test_archived_content_remains_readable_without_mutation(db, live_server):
+    task = await new_task(db, description='Retained description <script>unsafe()</script>',
+                          notes='Retained local notes', acceptance='Retained acceptance criteria')
+    await tasks.update_task(db, task['id'], tasks.TaskPatch(expected_version=1, archived=True))
+    async with httpx.AsyncClient(base_url=live_server, headers={"Origin": live_server}) as browser:
+        await browser.post('/ui/login', data={'password': 'adminpass123'})
+        page = await browser.get('/ui/work/tasks/' + task['id'])
+        assert page.status_code == 200
+        for text in ('Retained description &lt;script&gt;unsafe()&lt;/script&gt;',
+                     'Retained local notes', 'Retained acceptance criteria'):
+            assert text in page.text
+        assert '<script>unsafe()</script>' not in page.text
+        assert 'name="description"' not in page.text and 'name="notes"' not in page.text
+    retained = await tasks.get_task(db, task['id'])
+    assert retained['archived'] and retained['version'] == 2

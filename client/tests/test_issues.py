@@ -82,3 +82,26 @@ def test_invalid_report_never_submits(monkeypatch, capsys, title, body):
 def test_missing_report_file(capsys, tmp_path):
     assert cli.main(["issue", "bug", "--title", "Bug", "--body-file", str(tmp_path / "missing"), "--json"]) == 2
     assert json.loads(capsys.readouterr().out)["error"] == "invalid_arguments"
+
+
+@pytest.mark.parametrize('source_kind', ['file', 'stdin'])
+@pytest.mark.parametrize('submit', [False, True])
+@pytest.mark.parametrize('body,expected', [('x' * 50000, 0), ('x' * 50000 + '\nmore text', 2)])
+def test_bounded_inputs_reject_raw_overflow(monkeypatch, tmp_path, capsys, source_kind, submit, body, expected):
+    submissions = []
+    monkeypatch.setattr(issues, 'submit', lambda report: submissions.append(report) or issues.ISSUES_URL + '/1')
+    if source_kind == 'stdin':
+        monkeypatch.setattr('sys.stdin', io.StringIO(body))
+        filename = '-'
+    else:
+        path = tmp_path / 'report.txt'
+        path.write_text(body)
+        filename = str(path)
+    args = ['issue', 'bug', '--title', 'Bug', '--body-file', filename, '--json']
+    assert cli.main(args + (['--submit'] if submit else [])) == expected
+    result = json.loads(capsys.readouterr().out)
+    assert len(submissions) == int(submit and expected == 0)
+    if expected:
+        assert result['error'] == 'invalid_arguments'
+    elif not submit:
+        assert result['body'].startswith(body + '\n')

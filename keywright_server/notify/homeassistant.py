@@ -101,14 +101,14 @@ class HomeAssistantNotifier(Notifier):
         if not targets:
             raise RuntimeError("Home Assistant driver has no notify targets selected")
         title, body = request_summary(req, agent)
-        from ..approvals import SCOPE_LABELS, notification_action
+        from ..approvals import SCOPE_LABELS, notification_action, public_url
 
         # Compact action IDs are authenticated; knowledge of a request ID grants no authority.
         actions = [
             {"action": notification_action(req.id, s), "title": SCOPE_LABELS[s], "destructive": s == "deny"}
             for s in self.capped(buttons)
         ]
-        open_url = links.get("once", "").rsplit("/d/", 1)[0] + f"/ui/requests/{req.id}"
+        open_url = f"{public_url()}/ui/requests/{req.id}"
         data: dict[str, Any] = {
             "tag": req.id,
             "group": "keywright",

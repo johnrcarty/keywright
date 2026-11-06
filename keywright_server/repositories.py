@@ -109,6 +109,7 @@ class LocationSave(tasks.Input):
 
 class RepositoryFilter(tasks.Input):
     project_id: str | None = None
+    manual_only: bool = False
     q: str = Field(default='', max_length=120)
     include_archived: bool = False
     offset: int = Field(default=0, ge=0, le=1000000)
@@ -157,6 +158,8 @@ async def list_repositories(db, data: RepositoryFilter, agent=None):
         stmt = stmt.where(Repository.archived.is_(False), or_(Project.id.is_(None), Project.archived.is_(False)))
     if data.project_id:
         stmt = stmt.where(Repository.project_id == data.project_id)
+    if data.manual_only:
+        stmt = stmt.where(Repository.provider_id.is_(None))
     if data.q:
         stmt = stmt.where(Repository.name.icontains(data.q, autoescape=True))
     total = await db.scalar(select(func.count()).select_from(stmt.subquery()))

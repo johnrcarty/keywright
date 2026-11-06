@@ -65,6 +65,9 @@ def run(args) -> int:
                 body = source.read(50001)
         else:
             body = args.body
+        # Check the bounded read's overflow sentinel before whitespace normalization.
+        if args.body_file and len(body) > 50000:
+            raise ValueError("Report exceeds the input limit.")
         report = prepare(args.kind, args.title, body)
     except (ValueError, OSError):
         message = "Could not read a valid report. Use a one-line title (1–200 characters) and body (1–50,000)."
