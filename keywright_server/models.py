@@ -707,3 +707,11 @@ class GitHubDiscussionPage(Base):
     comments: Mapped[list] = mapped_column(JSON, default=list)
     has_next: Mapped[bool] = mapped_column(default=False)
     refreshed_at: Mapped[datetime] = mapped_column(UTCDateTime, default=now)
+
+
+class GitHubIgnoredRepository(Base):
+    """Owner's picker preferences survive token replacement, renames and rediscovery."""
+    __tablename__ = "work_github_ignored_repositories"
+    provider_host: Mapped[str] = mapped_column(String, primary_key=True, default="github.com")
+    provider_id: Mapped[str] = mapped_column(String, primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=now)

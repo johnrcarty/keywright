@@ -149,8 +149,8 @@ projects/repositories retain their locations and must be unarchived before editi
 locations.
 
 Manual registration assigns an internal ID, not a fabricated GitHub provider ID.
-Manual URLs are descriptive. Attach a manually registered repository from the
-GitHub picker to record its provider identity while retaining its location IDs.
+Manual URLs are descriptive. The advanced repository-selection endpoint supports
+attaching a provider identity to a manual repository while retaining its location IDs.
 Registration and location saves never clone or fetch a working checkout.
 
 Each location records an environment, name, existing inventory host and/or SSH
@@ -229,10 +229,19 @@ Contents permission is not required. Fine-grained tokens have one resource owner
 use separate named connections for different owners. Test the connection, then
 choose repositories from the picker. Nothing is selected automatically. The picker
 shows 100 repositories per GitHub page, with page-local name/description and owner
-filters; use Next to browse further. You can choose an existing project, create one
-in the picker, or leave the destination unselected with imports paused. To preserve
-manually configured environment locations, explicitly attach the GitHub repository
-to that existing manual record in the picker.
+filters; use Next to browse further. Each table row has quick Add and Ignore actions;
+checkboxes and Select all apply bulk actions to the current page. Add uses the bare
+repository name, leaves the local description, project and environments blank, and
+keeps issue import disabled. Source identity and GitHub metadata are retained.
+Use Manage or Work → Repositories to fill in settings later; create projects in Work.
+Adding an already registered repository preserves its existing configuration.
+
+Ignore persistently hides a repository from the picker, including across renames,
+token replacements and other connections. Show ignored exposes hidden rows with
+Restore actions. Ignoring an added repository does not archive it or affect imports,
+tasks or locations. Adding an ignored repository also restores its picker visibility.
+Bulk add reports partial failures; retries do not duplicate registered repositories.
+Configured GitHub connections in Resources have a direct **Browse repositories** link.
 
 Tokens use the existing Fernet sealing pattern in dedicated connection records.
 They are never returned to browser responses or agent tools. Replace a token by
@@ -304,7 +313,8 @@ with jitter. 403 permission failures are distinguished from rate limiting. Crede
 replacement/configuration edits fence in-flight results before they can commit.
 
 Startup adds `work_github_connections`, `work_github_cache`, `work_github_sync`,
-`work_external_issues`, and `work_github_discussion_pages`, plus additive repository
+`work_external_issues`, `work_github_discussion_pages`, and
+`work_github_ignored_repositories` (stable repository-ID picker preferences), plus additive repository
 configuration columns for installations that already have manual repository records.
 No existing task rows are rewritten. Job state retains the latest outcome/counts;
 audits record configuration changes and sync outcomes without source bodies or tokens.

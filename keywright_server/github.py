@@ -4,6 +4,7 @@ import logging
 import random
 import re
 from datetime import UTC, datetime, timedelta
+from typing import Literal
 from urllib.parse import urlencode
 
 from pydantic import Field
@@ -18,6 +19,7 @@ from .models import (
     GitHubCache,
     GitHubConnection,
     GitHubDiscussionPage,
+    GitHubIgnoredRepository,
     GitHubSync,
     Project,
     Repository,
@@ -131,17 +133,31 @@ def metadata(data):
             'archived': bool(data.get('archived')), 'disabled': bool(data.get('disabled'))}
 
 
-async def discover(connection_id, page=1, q='', owner=''):
+async def catalog_page(connection_id, page):
     if not 1 <= page <= 10000:
         raise tasks.TaskError('invalid_arguments', 'Invalid repository page.')
-    payload, next_url = await Client(connection_id).get('/user/repos?' + urlencode({
+    client = Client(connection_id)
+    payload, next_url = await client.get('/user/repos?' + urlencode({
         'per_page': 100, 'page': page, 'sort': 'full_name', 'direction': 'asc'}))
-    if not isinstance(payload, list):
+    if not isinstance(payload, list) or len(payload) > 100:
         raise GitHubError('invalid_response', 'GitHub returned invalid repository data.')
-    rows = [metadata(r) for r in payload]
-    return {'repositories': [r for r in rows if q.casefold() in (r['full_name'] + ' ' + r['description']).casefold()
+    return [metadata(r) for r in payload], next_url, client.version
+
+
+async def discover(connection_id, page=1, q='', owner='', show_ignored=False):
+    rows, next_url, _ = await catalog_page(connection_id, page)
+    ids = [r['id'] for r in rows]
+    async with session() as db:
+        ignored = set(await db.scalars(select(GitHubIgnoredRepository.provider_id).where(
+            GitHubIgnoredRepository.provider_host == 'github.com', GitHubIgnoredRepository.provider_id.in_(ids))))
+        registered = {r.provider_id: r.id for r in await db.scalars(select(Repository).where(
+            Repository.provider_host == 'github.com', Repository.provider_id.in_(ids)))}
+    return {'repositories': [{**r, 'ignored': r['id'] in ignored, 'registered_id': registered.get(r['id'])}
+                            for r in rows if (show_ignored or r['id'] not in ignored)
+                            and q.casefold() in (r['full_name'] + ' ' + r['description']).casefold()
                             and (not owner or owner.casefold() == r['owner'].casefold())],
-            'next_page': page + 1 if next_url else None, 'page': page}
+            'next_page': page + 1 if next_url else None, 'page': page,
+            'ignored_on_page': len(ignored)}
 
 
 async def select_repository(connection_id, data: Selection):
@@ -151,51 +167,108 @@ async def select_repository(connection_id, data: Selection):
     if meta['id'] != data.provider_id:
         raise tasks.TaskError('conflict', 'Repository identity changed. Refresh the picker.')
     async with session() as db:
-        await tasks.lock(db)
-        connection = await db.get(GitHubConnection, connection_id)
-        if not connection.enabled or connection.version != client.version:
-            raise tasks.TaskError('conflict', 'Connection changed. Refresh the picker.')
-        row = await db.scalar(select(Repository).where(Repository.provider_host == 'github.com', Repository.provider_id == meta['id']))
-        if row:
-            # Discovering through another connection must not reassign ownership or credentials.
-            return {'id': row.id, 'existing': True}
-        if data.new_project_key:
-            if data.project_id:
-                raise tasks.TaskError('invalid_arguments', 'Choose an existing project or create a new one.')
-            project_data = tasks.ProjectCreate(key=data.new_project_key, name=data.new_project_name)
-            if await db.scalar(select(Project.id).where(Project.key == project_data.key)):
-                raise tasks.TaskError('conflict', 'Project key is already in use.')
-            project = Project(**project_data.model_dump())
-            db.add(project)
-            await db.flush()
-            db.add(Board(key='project_' + project.id, name=project.name, kind='project', project_id=project.id))
-            project_id = project.id
-        else:
-            project_id = data.project_id
-        if project_id:
-            project = await db.get(Project, project_id)
-            if not project or project.archived:
-                raise tasks.TaskError('invalid_arguments', 'Choose an active project.')
-        row = await db.get(Repository, data.local_repository_id) if data.local_repository_id else None
-        if data.local_repository_id and (not row or row.provider_id):
-            raise tasks.TaskError('invalid_arguments', 'Choose a manually registered repository without a provider identity.')
-        if row:
-            # Explicitly attach to manual metadata to preserve all environment location IDs.
-            if not project_id:
-                project_id = row.project_id
-            row.version += 1
-        else:
-            row = Repository(name=meta['full_name'][:120], description=meta['description'], project_id=project_id)
-            db.add(row)
-        row.project_id, row.web_url = project_id, meta['web_url']
-        row.provider_host, row.provider_id, row.sync_connection_id = 'github.com', meta['id'], connection_id
-        row.source_metadata, row.last_refreshed_at = meta, now()
-        row.import_enabled, row.include_closed = bool(project_id and data.import_enabled), data.include_closed
+        return await register_repository(db, connection_id, client.version, meta, data)
+
+
+async def register_repository(db, connection_id, connection_version, meta, data, *, minimal=False):
+    await tasks.lock(db)
+    connection = await db.get(GitHubConnection, connection_id)
+    if not connection or not connection.enabled or connection.version != connection_version:
+        raise tasks.TaskError('conflict', 'Connection changed. Refresh the picker.')
+    row = await db.scalar(select(Repository).where(Repository.provider_host == 'github.com', Repository.provider_id == meta['id']))
+    if row:
+        # Discovering through another connection must not reassign ownership or credentials.
+        await db.execute(delete(GitHubIgnoredRepository).where(
+            GitHubIgnoredRepository.provider_host == 'github.com', GitHubIgnoredRepository.provider_id == meta['id']))
+        await tasks.commit(db, 'github')
+        return {'id': row.id, 'existing': True}
+    if data.new_project_key:
+        if data.project_id:
+            raise tasks.TaskError('invalid_arguments', 'Choose an existing project or create a new one.')
+        project_data = tasks.ProjectCreate(key=data.new_project_key, name=data.new_project_name)
+        if await db.scalar(select(Project.id).where(Project.key == project_data.key)):
+            raise tasks.TaskError('conflict', 'Project key is already in use.')
+        project = Project(**project_data.model_dump())
+        db.add(project)
         await db.flush()
-        db.add(GitHubSync(repository_id=row.id, status='queued' if row.import_enabled else 'paused'))
-        await audit.record(db, tool='work.github.select', decision='saved', detail={'repository_id': row.id}, commit=False)
-        await tasks.commit(db, 'repository', repository_id=row.id)
-        return {'id': row.id, 'existing': False}
+        db.add(Board(key='project_' + project.id, name=project.name, kind='project', project_id=project.id))
+        project_id = project.id
+    else:
+        project_id = data.project_id
+    if project_id:
+        project = await db.get(Project, project_id)
+        if not project or project.archived:
+            raise tasks.TaskError('invalid_arguments', 'Choose an active project.')
+    row = await db.get(Repository, data.local_repository_id) if data.local_repository_id else None
+    if data.local_repository_id and (not row or row.provider_id):
+        raise tasks.TaskError('invalid_arguments', 'Choose a manually registered repository without a provider identity.')
+    if row:
+        # Explicitly attach to manual metadata to preserve all environment location IDs.
+        if not project_id:
+            project_id = row.project_id
+        row.version += 1
+    else:
+        row = Repository(name=meta['name'] if minimal else meta['full_name'][:120],
+                         description='' if minimal else meta['description'], project_id=project_id)
+        db.add(row)
+    row.project_id, row.web_url = project_id, meta['web_url']
+    row.provider_host, row.provider_id, row.sync_connection_id = 'github.com', meta['id'], connection_id
+    row.source_metadata, row.last_refreshed_at = meta, now()
+    row.import_enabled, row.include_closed = bool(project_id and data.import_enabled), data.include_closed
+    await db.flush()
+    db.add(GitHubSync(repository_id=row.id, status='queued' if row.import_enabled else 'paused'))
+    await db.execute(delete(GitHubIgnoredRepository).where(
+        GitHubIgnoredRepository.provider_host == 'github.com', GitHubIgnoredRepository.provider_id == meta['id']))
+    await audit.record(db, tool='work.github.select', decision='saved', detail={'repository_id': row.id}, commit=False)
+    await tasks.commit(db, 'repository', repository_id=row.id)
+    return {'id': row.id, 'existing': False}
+
+class PickerAction(tasks.Input):
+    action: Literal['add', 'ignore', 'restore']
+    provider_ids: list[str] = Field(min_length=1, max_length=100)
+    page: int = Field(default=1, ge=1, le=10000)
+
+
+async def picker_action(connection_id, data: PickerAction):
+    ids = list(dict.fromkeys(identifier(value) for value in data.provider_ids))
+    if data.action == 'add':
+        # One authenticated catalog request for the whole batch, never one request per row.
+        rows, _, version = await catalog_page(connection_id, data.page)
+        by_id = {r['id']: r for r in rows}
+        results = []
+        for provider_id in ids:
+            meta = by_id.get(provider_id)
+            if meta is None:
+                results.append({'id': provider_id, 'status': 'failed', 'message': 'Repository moved off this page. Refresh and retry.'})
+                continue
+            try:
+                async with session() as db:
+                    result = await register_repository(db, connection_id, version, meta, Selection(
+                        owner=meta['owner'], name=meta['name'], provider_id=provider_id, import_enabled=False), minimal=True)
+                results.append({'id': provider_id, 'status': 'already_added' if result['existing'] else 'added'})
+            except tasks.TaskError as exc:
+                results.append({'id': provider_id, 'status': 'failed', 'message': str(exc)})
+        return results
+    async with session() as db:
+        await tasks.lock(db)
+        if not await db.get(GitHubConnection, connection_id):
+            raise tasks.TaskError('not_found', 'GitHub connection not found.')
+        results = []
+        for provider_id in ids:
+            row = await db.get(GitHubIgnoredRepository, ('github.com', provider_id))
+            if data.action == 'restore':
+                if row:
+                    await db.delete(row)
+                status = 'restored'
+            else:
+                if row is None:
+                    db.add(GitHubIgnoredRepository(provider_id=provider_id))
+                status = 'ignored'
+            results.append({'id': provider_id, 'status': status})
+        await audit.record(db, tool='work.github.picker.' + data.action, decision='saved',
+                           detail={'connection_id': connection_id, 'count': len(ids)}, commit=False)
+        await tasks.commit(db, 'github')
+        return results
 
 
 async def configure_import(db, repository_id, data: ImportSettings):

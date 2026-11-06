@@ -3,12 +3,11 @@ from urllib.parse import urlencode
 
 from fastapi import APIRouter, Depends, Request
 from pydantic import ValidationError
-from sqlalchemy import select
 
 from .. import github, tasks
 from ..db import session
 from ..github_client import GitHubError
-from ..models import GitHubSync, Project, Repository
+from ..models import GitHubSync
 from . import auth
 from .admin import redirect, render
 from .security import require_same_origin
@@ -61,17 +60,42 @@ async def test(connection_id: str):
 
 @router.get('/ui/work/github/connections/{connection_id}/repositories')
 @router.get('/ui/integrations/github/connections/{connection_id}/repositories')
-async def picker(request: Request, connection_id: str, page: int = 1, q: str = '', owner: str = ''):
+async def picker(request: Request, connection_id: str, page: int = 1, q: str = '', owner: str = '',
+                 show_ignored: bool = False):
     if request.url.path.startswith('/ui/work/github/'):
         return redirect(f'/ui/integrations/github/connections/{connection_id}/repositories?' +
-                        urlencode({'page': page, 'q': q[:120], 'owner': owner[:100]}))
+                        urlencode({'page': page, 'q': q[:120], 'owner': owner[:100], 'show_ignored': str(show_ignored).lower()}))
     try:
-        result = await github.discover(connection_id, page, q[:120], owner[:100])
-        async with session() as db:
-            projects = list(await db.scalars(select(Project).where(Project.archived.is_(False)).order_by(Project.name).limit(500)))
-            manual = list(await db.scalars(select(Repository).where(Repository.provider_id.is_(None)).order_by(Repository.name).limit(500)))
-        return render(request, 'work_github_picker.html', result=result, projects=projects, manual=manual,
-                      connection_id=connection_id, q=q[:120], owner=owner[:100])
+        result = await github.discover(connection_id, page, q[:120], owner[:100], show_ignored)
+        def page_url(number):
+            return '?' + urlencode({'page': number, 'q': q[:120], 'owner': owner[:100],
+                                    'show_ignored': str(show_ignored).lower()})
+        return render(request, 'work_github_picker.html', result=result, connection_id=connection_id,
+                      q=q[:120], owner=owner[:100], show_ignored=show_ignored, page_url=page_url)
+    except ERRORS as exc:
+        return failure(exc)
+
+
+@router.post('/ui/integrations/github/connections/{connection_id}/repositories/actions')
+async def picker_action(request: Request, connection_id: str):
+    try:
+        form = await request.form()
+        action, _, row_id = str(form.get('action', '')).partition(':')
+        ids = [row_id] if row_id else form.getlist('selected')
+        data = github.PickerAction(action=action, provider_ids=ids, page=int(str(form.get('page', '1'))))
+        results = await github.picker_action(connection_id, data)
+        labels = {'added': 'added', 'ignored': 'ignored', 'restored': 'restored',
+                  'already_added': 'already added (unchanged)', 'failed': 'could not be added'}
+        counts = {key: sum(r['status'] == key for r in results) for key in labels}
+        message = '; '.join(f'{count} {labels[key]}' for key, count in counts.items() if count) + '.'
+        if counts['added']:
+            message += ' Optional settings are blank; choose a project and enable issue import when ready.'
+        if counts['failed']:
+            message += ' Unadded rows remain available. Refresh and retry.'
+        query = urlencode({'page': data.page, 'q': str(form.get('q', ''))[:120],
+                           'owner': str(form.get('owner', ''))[:100],
+                           'show_ignored': str(form.get('show_ignored', 'false') == 'true').lower()})
+        return redirect(f'/ui/integrations/github/connections/{connection_id}/repositories?' + query, message)
     except ERRORS as exc:
         return failure(exc)
 
