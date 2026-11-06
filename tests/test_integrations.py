@@ -29,6 +29,13 @@ async def test_picker_search_and_legacy_links(browser):
     assert picker.text.index("integration=notion") < picker.text.index("kind=ssh")
     assert "integration=omada" in picker.text and "integration=keywright" in picker.text
     assert 'name="url"' not in picker.text
+    github = await browser.get("/ui/resources/new", params={"q": "github"})
+    assert "1 connection available" in github.text and "integration=github" in github.text
+    entry = await browser.get("/ui/resources/new?integration=github")
+    assert entry.status_code == 303 and entry.headers["location"] == "/ui/integrations/github"
+    assert (await browser.get(entry.headers["location"])).status_code == 200
+    legacy = await browser.get("/ui/work/github")
+    assert legacy.status_code == 303 and legacy.headers["location"] == entry.headers["location"]
     search = await browser.get("/ui/resources/new", params={"q": "WiFi"})
     assert "1 connection available" in search.text
     empty = await browser.get("/ui/resources/new", params={"q": "unavailable vendor"})

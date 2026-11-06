@@ -669,7 +669,10 @@ async def agent_action(aid: str, action: str, next: str = Form("/ui/agents")):
 async def resources_list(request: Request, sort: str = "type", group: str = "none"):
     async with session() as db:
         data = await inventory.snapshot(db)
-    return render(request, "resources.html", **inventory.resource_inventory(data, sort, group))
+        from ..github import connections
+        github_connections = await connections(db)
+    return render(request, "resources.html", github_connections=github_connections,
+                  **inventory.resource_inventory(data, sort, group))
 
 
 @router.get("/ui/resources/new", response_class=HTMLResponse, dependencies=[Depends(auth.require_admin)])
@@ -683,6 +686,8 @@ async def resource_new(request: Request, kind: str = "", adapter: str = "", inte
                   for group in (integrations.PRESETS, integrations.GENERICS)]
         return render(request, "integration_picker.html", presets=groups[0], generics=groups[1], query=q,
                       matches=sum(entry["matches"] for group in groups for entry in group))
+    if preset and preset.configuration_path:
+        return redirect(preset.configuration_path)
     if preset:
         kind, adapter = preset.kind, preset.adapter
     if kind not in ("ssh", "mcp", "llm"):
@@ -753,6 +758,8 @@ async def resource_save(
     preset = integrations.PRESET_BY_ID.get(integration)
     if integration and preset is None:
         return redirect("/ui/resources/new", "Choose an integration from the list.")
+    if preset and preset.configuration_path:
+        return redirect(preset.configuration_path)
     if preset:
         kind, adapter = preset.kind, preset.adapter
         if preset.url:

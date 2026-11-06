@@ -3,7 +3,7 @@
 {% block body %}
 <link rel="stylesheet" href="/assets/work.css">
 <div class="work-heading"><div><p class="mut">Work</p><h1>{{ selected.name if selected else 'Needs you' if view == 'needs_you' else 'All tasks' }}{% if selected and selected.kind == 'general' %} <span class="badge">General</span>{% endif %}</h1></div><a class="btn" href="#new-task">New task</a></div>
-<div class="work-nav" aria-label="Work views"><a class="btn" href="/ui/work?view=all">All tasks</a><a class="btn" href="/ui/work?view=needs_you">Needs you</a><a class="btn" href="/ui/work?board_id=brd_kw">Keywright / General</a><a class="btn" href="/ui/work/repositories">Repositories</a><a class="btn" href="/ui/work/github">GitHub</a></div>
+<div class="work-nav" aria-label="Work views"><a class="btn" href="/ui/work?view=all">All tasks</a><a class="btn" href="/ui/work?view=needs_you">Needs you</a><a class="btn" href="/ui/work?board_id=brd_kw">Keywright / General</a><a class="btn" href="/ui/work/repositories">Repositories</a></div>
 {% if selected and selected.project_id %}<nav class="work-nav" aria-label="Project"><strong>Board</strong><a class="btn" href="/ui/work/repositories?project_id={{ selected.project_id }}">Repositories &amp; environments</a></nav>{% endif %}
 <p class="mut">{{ 'Unfinished work assigned to you. Review and blocked requests appear first in list view.' if view == 'needs_you' else 'Plan work, track progress, and keep each project in view.' }}</p>
 <p id="work-updates" class="card" role="status" hidden>Work has changed. <a href="{{ request.url }}">Refresh when you’re ready</a>.</p>

@@ -23,6 +23,7 @@ class Integration:
     default_user: str = "root"
     cli_setup_instructions: str = ""
     cli_verify_command: str = ""
+    configuration_path: str = ""
 
     @property
     def search_text(self) -> str:
@@ -30,6 +31,12 @@ class Integration:
 
 
 PRESETS = (
+    Integration(
+        "github", "GitHub", "Repository discovery and issue imports into project boards.",
+        "Personal access token", "github", "native",
+        keywords="git repositories issues projects tasks boards",
+        configuration_path="/ui/integrations/github",
+    ),
     Integration(
         "notion", "Notion", "Pages, databases, and workspace search.", "Browser sign-in", "notion", "mcp",
         default_name="Notion", url="https://mcp.notion.com/mcp", auth_type="oauth",

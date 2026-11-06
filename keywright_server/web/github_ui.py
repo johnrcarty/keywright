@@ -1,4 +1,6 @@
 """Authenticated owner controls for inbound GitHub connections and synchronization."""
+from urllib.parse import urlencode
+
 from fastapi import APIRouter, Depends, Request
 from pydantic import ValidationError
 from sqlalchemy import select
@@ -23,36 +25,46 @@ def failure(exc):
 
 
 @router.get('/ui/work/github')
+@router.get('/ui/integrations/github')
 async def home(request: Request):
+    if request.url.path == '/ui/work/github':
+        return redirect('/ui/integrations/github')
     async with session() as db:
         connections = await github.connections(db)
     return render(request, 'work_github.html', connections=connections)
 
 
 @router.post('/ui/work/github/connections')
+@router.post('/ui/integrations/github/connections')
 @router.post('/ui/work/github/connections/{connection_id}')
+@router.post('/ui/integrations/github/connections/{connection_id}')
 async def save(request: Request, connection_id: str | None = None):
     try:
         form = dict(await request.form())
         form['enabled'] = form.get('enabled') == 'on'
         async with session() as db:
             await github.save_connection(db, github.ConnectionSave(**form), connection_id)
-        return redirect('/ui/work/github', 'GitHub connection saved.')
+        return redirect('/ui/integrations/github', 'GitHub connection saved.')
     except ERRORS as exc:
         return failure(exc)
 
 
 @router.post('/ui/work/github/connections/{connection_id}/test')
+@router.post('/ui/integrations/github/connections/{connection_id}/test')
 async def test(connection_id: str):
     try:
         message = await github.test_connection(connection_id)
-        return redirect('/ui/work/github', message)
+        return redirect('/ui/integrations/github', message)
     except ERRORS as exc:
         return failure(exc)
 
 
 @router.get('/ui/work/github/connections/{connection_id}/repositories')
+@router.get('/ui/integrations/github/connections/{connection_id}/repositories')
 async def picker(request: Request, connection_id: str, page: int = 1, q: str = '', owner: str = ''):
+    if request.url.path.startswith('/ui/work/github/'):
+        return redirect(f'/ui/integrations/github/connections/{connection_id}/repositories?' +
+                        urlencode({'page': page, 'q': q[:120], 'owner': owner[:100]}))
     try:
         result = await github.discover(connection_id, page, q[:120], owner[:100])
         async with session() as db:
@@ -65,6 +77,7 @@ async def picker(request: Request, connection_id: str, page: int = 1, q: str = '
 
 
 @router.post('/ui/work/github/connections/{connection_id}/select')
+@router.post('/ui/integrations/github/connections/{connection_id}/select')
 async def select_repository(request: Request, connection_id: str):
     try:
         form = dict(await request.form())

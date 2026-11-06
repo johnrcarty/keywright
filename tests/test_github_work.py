@@ -271,7 +271,7 @@ async def test_discussion_separate_paginated_and_ui_escapes_source(db, monkeypat
         page = await client.get('/ui/work/tasks/' + task_id)
         assert page.status_code == 200 and '&lt;script&gt;' in page.text and '<script>danger()' not in page.text
         assert 'name="title"' not in page.text
-        page = await client.get('/ui/work/github')
+        page = await client.get('/ui/integrations/github')
         assert 'TEST_PRIVATE_PAT' not in page.text and connection['id'] in page.text
         page = await client.get('/ui/work/repositories/' + repo_id)
         assert page.status_code == 200 and 'GitHub synchronization' in page.text

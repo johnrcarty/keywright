@@ -223,7 +223,7 @@ and publish Work refresh events after committing.
 
 ## GitHub setup and issue import
 
-Open **Work → GitHub**, add a named connection, and enter a fine-grained personal
+Open **Resources → Add resource → GitHub**, add a named connection, and enter a fine-grained personal
 access token with selected repositories and **Metadata: read** / **Issues: read**.
 Contents permission is not required. Fine-grained tokens have one resource owner;
 use separate named connections for different owners. Test the connection, then
@@ -313,3 +313,7 @@ References: [API versions](https://docs.github.com/en/rest/about-the-rest-api/ap
 [repository discovery](https://docs.github.com/en/rest/repos/repos#list-repositories-for-the-authenticated-user),
 [repository issues](https://docs.github.com/en/rest/issues/issues#list-repository-issues), and
 [REST API practices](https://docs.github.com/en/rest/using-the-rest-api/best-practices-for-using-the-rest-api).
+
+GitHub setup lives in the Integrations picker at **Resources → Add resource → GitHub**.
+Existing connections also appear on Resources. Old `/ui/work/github` bookmarks redirect
+to `/ui/integrations/github`; existing connection records and tokens are preserved.
