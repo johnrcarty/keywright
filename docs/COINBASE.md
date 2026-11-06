@@ -1,8 +1,7 @@
 # Coinbase
 
 The **Coinbase** entry in **Resources → Add resource** connects a managed SSH host
-running the official Coinbase CLI. It is available in the source checkout, ahead
-of the next release. Agents run Coinbase commands through Keywright's existing SSH
+running the official Coinbase CLI. It is included in the 0.0.2 release candidate. Agents run Coinbase commands through Keywright's existing SSH
 approval and audit flow; this preset does not expose a separate set of MCP tools.
 
 Coinbase currently allowlists clients for its remote MCP service. Keywright is not

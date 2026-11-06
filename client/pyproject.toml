@@ -1,6 +1,6 @@
 [project]
 name = "keywright"
-version = "0.0.1"
+version = "0.0.2"
 description = "Keywright client: the kw command agents use to reach brokered hosts and tools, the hazard tripwire, and the agent-machine setup."
 readme = "README.md"
 requires-python = ">=3.12"

@@ -1,4 +1,31 @@
-# Keywright v0.0.1 release checklist
+# Keywright 0.0.2 release preparation
+
+Status: candidate prepared from the work following v0.0.1. Publication is pending.
+The release emphasizes expanded integrations, with DoorDash explicitly marked Beta
+and waitlist-only. [Release notes](releases/0.0.2.md) are the source for the draft
+GitHub Release and its release-notes asset.
+
+- [x] Align server, client, router and bundled client guide at 0.0.2; raise internal
+      client dependency minimums and advance the development image tag.
+- [x] Add the DoorDash beta label and upstream account/waitlist notice in setup and docs.
+- [x] Prepare integration highlights, upgrade instructions and current limitations.
+- [x] Record [local candidate validation](releases/0.0.2-validation.md): tests,
+      wheel/source builds, clean installs and artifact hashes.
+- [ ] Pass CI for the exact reviewed commit on Python 3.12–3.14, including isolated
+      PostgreSQL/pgvector tests and both supported image architectures.
+- [ ] Review changed source, distributions and image/source materials for this candidate;
+      v0.0.1 audit records below are historical evidence, not 0.0.2 certification.
+- [ ] Merge the reviewed candidate and freeze its commit; obtain publication approval.
+- [ ] Create the v0.0.2 tag, verify image/source publication and draft installer assets,
+      rehearse Python publication through TestPyPI, and verify the exact downloaded bytes.
+- [ ] Publish the reviewed Python artifacts and GitHub Release, verify anonymous installs,
+      and update the published-version links and installation examples in README, client,
+      router, deployment and security documentation.
+
+Do not reuse or modify v0.0.1 tags or artifacts. Preparing this candidate does not
+publish packages, push a release tag, or change a deployed broker.
+
+## Historical v0.0.1 release checklist
 
 Status: v0.0.1 published on 2026-11-02 from frozen commit
 `307b3da1773127cbe8e2bd3ab7a74f07d453353e`. The repository starts with a sanitized source

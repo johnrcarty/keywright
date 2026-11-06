@@ -1,7 +1,7 @@
 ---
 name: keywright
 description: Use `kw` to run commands and move files on brokered SSH hosts, and to call brokered MCP tools, through Keywright. Every call is checked against the human's rules; some prompt the human on their phone. Read this before the first `kw` call in a session.
-keywright-version: 0.0.1
+keywright-version: 0.0.2
 ---
 
 # Keywright: reaching hosts and tools through `kw`

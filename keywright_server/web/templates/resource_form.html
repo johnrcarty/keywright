@@ -9,7 +9,8 @@
 {% if res %}<p class="small mut">Inventory: {% if inventory_asset %}<a href="/ui/inventory/assets/{{ inventory_asset.id }}">{{ inventory_asset.name }}</a>{% else %}<a href="/ui/inventory/assets/new?resource={{ res.id }}">Add this resource to inventory</a> · or link it from an existing inventory record{% endif %}</p>{% endif %}
 
 {% if preset %}
-<div class="integration-intro">{{ integration_mark(preset.icon) }}<div><h1>{{ preset.title }}</h1><p>{{ preset.instructions if not res else preset.description }}</p></div></div>
+<div class="integration-intro">{{ integration_mark(preset.icon) }}<div><h1>{{ preset.title }}{% if preset.beta %} <span class="pill">Beta</span>{% endif %}</h1><p>{{ preset.instructions if not res else preset.description }}</p></div></div>
+{% include "_integration_availability.html" %}
 {% if preset.setup_url %}<p class="help"><a href="{{ preset.setup_url }}">{{ preset.title }} setup guide</a></p>{% endif %}
 {% if preset.icon in ('pihole', 'jellyfin') %}<p class="integration-credits"><a href="/assets/brands/ATTRIBUTION.txt">Icon credits</a></p>{% endif %}
 {% if preset.auth_type == 'oauth' %}<ol class="integration-steps" aria-label="Connection setup"><li {% if not res %}aria-current="step"{% endif %}><span>1</span> Connection details</li><li {% if res %}aria-current="step"{% endif %}><span>2</span> {{ 'Connected' if oauth_status == 'connected' else 'Sign in' }}</li></ol>{% endif %}

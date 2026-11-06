@@ -17,7 +17,7 @@
 {% for entry in entries %}{% set item = entry.item %}
 <a class="integration-choice" data-integration data-search="{{ item.search_text }}" href="/ui/resources/new?{{ 'kind=' ~ item.kind if custom else 'integration=' ~ item.id }}" {% if not entry.matches %}hidden{% endif %}>
 {{ integration_mark(item.icon) }}
-<div class="integration-copy"><strong>{{ item.title }}</strong><p>{{ item.description }}</p></div>
+<div class="integration-copy"><strong>{{ item.title }}{% if item.beta %} <span class="pill">Beta</span>{% endif %}</strong><p>{{ item.description }}</p></div>
 <span class="integration-method">{{ item.badge }}</span><span class="integration-arrow">{{ icon('chevron') }}</span>
 </a>
 {% endfor %}

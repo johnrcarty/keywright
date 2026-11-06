@@ -24,6 +24,9 @@ class Integration:
     cli_setup_instructions: str = ""
     cli_verify_command: str = ""
     configuration_path: str = ""
+    beta: bool = False
+    availability_notice: str = ""
+    waitlist_url: str = ""
 
     @property
     def search_text(self) -> str:
@@ -69,11 +72,13 @@ PRESETS = (
         setup_url="https://robinhood.com/us/en/support/articles/agentic-trading-overview/",
     ),
     Integration(
-        "doordash", "DoorDash", "Restaurants, menus, carts, and orders through dd-cli.",
+        "doordash", "DoorDash", "Restaurants, menus, carts, and orders through dd-cli. Waitlist-only.",
         "CLI over SSH", "doordash", "ssh", default_name="DoorDash", default_user="doordash",
         instructions="Choose a managed host, install the CLI, and sign in with your approved DoorDash account.",
         keywords="food delivery restaurant grocery shopping menu cart order history beta token cli ssh dd-cli",
         setup_url="https://github.com/doordash-oss/doordash-cli",
+        beta=True, availability_notice="Waitlist-only. Full functionality requires an approved account.",
+        waitlist_url="https://forms.gle/gvCQZvu9C1EKA6aM6",
         cli_setup_instructions=("Install dd-cli on a supported host and sign in under the SSH account below. "
                                 "On a headless host, securely supply DD_CLI_ACCESS_TOKEN to the remote command "
                                 "environment using a token exported from a signed-in machine. "

@@ -6,4 +6,4 @@ when a rule needs a label or a draft, and every call it makes is checked against
 the human set for its token. Routing itself is plain boolean logic over the message.
 """
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"

@@ -1,8 +1,8 @@
 # Robinhood
 
 The **Robinhood** preset in **Resources → Add resource** connects to
-`https://agent.robinhood.com/mcp/trading` using browser OAuth. It is available in
-the source checkout, ahead of the next release.
+`https://agent.robinhood.com/mcp/trading` using browser OAuth. It is included in
+the 0.0.2 release candidate.
 
 ## Connect
 

@@ -8,6 +8,10 @@ scoped access, revocation and an audit trail.
 This first experimental release includes public prebuilt images for Linux x86-64 and
 ARM64, Python packages, and verified source and license materials. Keywright is Apache-2.0.
 
+**0.0.2 is in preparation:** expanded integrations, GitHub repository and issue imports,
+native task boards, and knowledge graph improvements. See the [release candidate notes](docs/releases/0.0.2.md).
+The installation instructions below use the latest published release until 0.0.2 is published.
+
 ## Install the prebuilt broker
 
 You need Docker Engine with the Compose plugin. No Git checkout, Python installation
@@ -25,7 +29,7 @@ or local image build is needed.
    ```
 
 The source copy at `deploy/compose.yaml` also works on its own; it follows
-`ghcr.io/johnrcarty/keywright:0.0.1-preview` unless `KEYWRIGHT_IMAGE` selects another tag
+`ghcr.io/johnrcarty/keywright:0.0.2-preview` unless `KEYWRIGHT_IMAGE` selects another tag
 or digest. Use the release bundle for the pinned stable installation.
 Public image downloads do not require a registry login.
 
@@ -100,16 +104,19 @@ Never point test configuration at a production database.
 
 ## Optional integrations
 
-- [DoorDash](docs/DOORDASH.md): guided `dd-cli` setup through a managed SSH host,
-  including headless authentication (source checkout, unreleased).
+- [DoorDash (Beta)](docs/DOORDASH.md): guided `dd-cli` setup through a managed SSH host,
+  including headless authentication. Waitlist-only. Full functionality requires an approved account.
+  [Join the waitlist here](https://forms.gle/gvCQZvu9C1EKA6aM6) (0.0.2 candidate).
 - [Robinhood](docs/ROBINHOOD.md): accounts, market data, and trading through browser
-  sign-in (source checkout, unreleased).
+  sign-in (0.0.2 candidate).
 - [Coinbase](docs/COINBASE.md): guided Coinbase CLI setup through a managed SSH host
-  (source checkout, unreleased).
+  (0.0.2 candidate).
 - [CoinStats](docs/FEATURES.md#oauth-for-upstream-mcp-servers-including-notion-and-coinstats):
-  crypto data and portfolios through browser sign-in (source checkout, unreleased).
+  crypto data and portfolios through browser sign-in (0.0.2 candidate).
 - [Homelab connectors](docs/CONNECTORS.md): Proxmox VE, Pi-hole v6, Home Assistant,
-  Jellyfin, Sonarr, Radarr and authentik setup and read-only tools (source checkout, unreleased).
+  Jellyfin, Sonarr, Radarr and authentik setup and read-only tools (0.0.2 candidate).
+- [GitHub and Work](docs/WORK_BOARDS.md): repository discovery, inbound issue sync, environment
+  locations, project boards, All tasks and Needs you views (0.0.2 candidate).
 - [Feature and configuration reference](docs/FEATURES.md): permissions, notifications,
   LLM gateways, OIDC, inventory, shared knowledge and result inspection.
 - [Deployment guide](deploy/README.md): base stack, optional LLM/knowledge services and

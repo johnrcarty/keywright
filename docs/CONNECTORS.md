@@ -1,8 +1,8 @@
 # Homelab connectors
 
-These connectors are available in the source checkout; they are not included in
-the published v0.0.1 artifacts. Install the server and client from the same checkout
-to try them before the next release.
+These connectors are included in the 0.0.2 release candidate; they are not included
+in the published v0.0.1 artifacts. Until 0.0.2 is published, install the server and
+client from the same candidate checkout.
 
 In **Resources → Add resource**, choose a service, enter its base address and
 credential, save, and test the connection. The broker must be able to reach the

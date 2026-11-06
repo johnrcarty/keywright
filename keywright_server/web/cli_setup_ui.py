@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy.exc import IntegrityError
 
-from .. import audit, cli_setup
+from .. import audit, cli_setup, integrations
 from ..db import session
 from ..models import Resource
 from . import auth
@@ -45,7 +45,7 @@ async def page(request: Request, rid: str):
     if not res or res.kind != "ssh" or res.config.get("integration") != "doordash" or not res.config.get("cli_setup"):
         return redirect("/ui/resources", "No managed DoorDash setup found.")
     state = cli_setup.state(res.config)
-    return render(request, "cli_setup.html", res=res, setup=state, actions=cli_setup.allowed_actions(state))
+    return render(request, "cli_setup.html", res=res, preset=integrations.PRESET_BY_ID["doordash"], setup=state, actions=cli_setup.allowed_actions(state))
 
 
 @router.post("/ui/cli-setup/{rid}/{action}")

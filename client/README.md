@@ -1,5 +1,8 @@
 # keywright
 
+The source candidate is version 0.0.2. Published installation examples below remain
+on 0.0.1 until the [0.0.2 release](https://github.com/johnrcarty/keywright/blob/main/docs/releases/0.0.2.md) is published.
+
 The client half of [Keywright](https://github.com/johnrcarty/keywright), a just-in-time credential broker for AI agents.
 
 - `kw run|put|get|capture|request|status|tool` reach brokered SSH hosts and MCP tools from any shell.

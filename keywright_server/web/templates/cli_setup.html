@@ -2,7 +2,8 @@
 {% include "_integration_style.html" %}
 <div class="integration-page integration-form">
 <a class="integration-back" href="/ui/resources/{{ res.id }}">← {{ res.name }} settings</a>
-<h1>Set up DoorDash</h1>
+<h1>Set up DoorDash <span class="pill">Beta</span></h1>
+{% include "_integration_availability.html" %}
 <p>On <strong>{{ setup.source_name }}</strong> as <strong>{{ res.config.user or 'root' }}</strong></p>
 {% set phase = setup.resume if setup.status in ('running', 'error') else setup.status %}
 {% set current_step = 2 if phase == 'new' else 4 if phase in ('signed_in', 'ready') else 3 %}

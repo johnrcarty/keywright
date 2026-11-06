@@ -1,6 +1,6 @@
 [project]
 name = "keywright-server"
-version = "0.0.1"
+version = "0.0.2"
 description = "Keywright server: just-in-time credential broker for AI agents. One MCP front door, per-request human approval, no keys in agent context."
 readme = "README.md"
 requires-python = ">=3.12"
@@ -24,7 +24,7 @@ dependencies = [
   "websockets>=12",
   "mcp>=2.2,<3",
   "pydantic>=2.7",
-  "keywright>=0.0.1,<0.1",
+  "keywright>=0.0.2,<0.1",
 ]
 
 [project.optional-dependencies]

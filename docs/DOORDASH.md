@@ -1,9 +1,12 @@
-# DoorDash CLI
+# DoorDash CLI (Beta)
 
 Choose **DoorDash** in **Resources → Add resource** to connect an SSH host running
-the official `dd-cli`. The preset is available in the source checkout, ahead of
-the next release. It runs the CLI on the enrolled SSH host and adds `doordash_shop` for shopping sessions,
+the official `dd-cli`. The beta integration is included in the 0.0.2 release candidate. It runs the CLI on the enrolled SSH host and adds `doordash_shop` for shopping sessions,
 reviewed command guidance and priced checkout approvals.
+
+> Waitlist-only. Full functionality requires an approved account. Join the waitlist here: https://forms.gle/gvCQZvu9C1EKA6aM6
+
+Availability notice from the [DoorDash CLI repository](https://github.com/doordash-oss/doordash-cli). Installing the CLI or configuring Keywright does not grant DoorDash account approval.
 
 ## Guided setup on an existing host
 
