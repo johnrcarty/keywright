@@ -79,7 +79,8 @@ async def test_adding_ignored_row_restores_it_and_ignore_does_not_change_added_r
     repo = await db.scalar(select(Repository))
     previous = (repo.version, repo.archived, repo.import_enabled, repo.project_id, repo.sync_connection_id)
     result = await gh.picker_action(cid, gh.PickerAction(action='ignore', provider_ids=[provider_id]))
-    assert result[0]['status'] == 'ignored'
+    assert result[0]['status'] == 'already_added'
+    assert await db.scalar(select(func.count()).select_from(GitHubIgnoredRepository)) == 0
     await db.refresh(repo)
     assert (repo.version, repo.archived, repo.import_enabled, repo.project_id, repo.sync_connection_id) == previous
     assert (await gh.discover(cid, show_ignored=True))['repositories'][0]['registered_id'] == repo.id

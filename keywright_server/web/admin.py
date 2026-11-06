@@ -11,6 +11,7 @@ import secrets
 import shlex
 from datetime import timedelta
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
 
 from fastapi import APIRouter, Depends, Form, Request, WebSocket, WebSocketDisconnect
@@ -671,8 +672,13 @@ async def resources_list(request: Request, sort: str = "type", group: str = "non
         data = await inventory.snapshot(db)
         from ..github import connections
         github_connections = await connections(db)
-    return render(request, "resources.html", github_connections=github_connections,
-                  **inventory.resource_inventory(data, sort, group))
+    # Presentation rows only: native connections share list sorting/filtering without
+    # becoming broker Resources or exposing their credentials in resource config.
+    data["resources"] = [*data["resources"], *(
+        SimpleNamespace(id=c["id"], name=c["name"], kind="other", config={}, github_connection=c)
+        for c in github_connections
+    )]
+    return render(request, "resources.html", **inventory.resource_inventory(data, sort, group))
 
 
 @router.get("/ui/resources/new", response_class=HTMLResponse, dependencies=[Depends(auth.require_admin)])

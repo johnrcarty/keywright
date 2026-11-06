@@ -253,6 +253,8 @@ async def picker_action(connection_id, data: PickerAction):
         await tasks.lock(db)
         if not await db.get(GitHubConnection, connection_id):
             raise tasks.TaskError('not_found', 'GitHub connection not found.')
+        registered = set(await db.scalars(select(Repository.provider_id).where(
+            Repository.provider_host == 'github.com', Repository.provider_id.in_(ids))))
         results = []
         for provider_id in ids:
             row = await db.get(GitHubIgnoredRepository, ('github.com', provider_id))
@@ -260,6 +262,8 @@ async def picker_action(connection_id, data: PickerAction):
                 if row:
                     await db.delete(row)
                 status = 'restored'
+            elif provider_id in registered:
+                status = 'already_added'
             else:
                 if row is None:
                     db.add(GitHubIgnoredRepository(provider_id=provider_id))

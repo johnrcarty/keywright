@@ -238,10 +238,12 @@ Adding an already registered repository preserves its existing configuration.
 
 Ignore persistently hides a repository from the picker, including across renames,
 token replacements and other connections. Show ignored exposes hidden rows with
-Restore actions. Ignoring an added repository does not archive it or affect imports,
-tasks or locations. Adding an ignored repository also restores its picker visibility.
+Restore actions. Already-added repositories show Manage instead of Ignore, and
+bulk Ignore skips them without changing imports, tasks or locations. Adding an ignored repository also restores its picker visibility.
 Bulk add reports partial failures; retries do not duplicate registered repositories.
-Configured GitHub connections in Resources have a direct **Browse repositories** link.
+Configured GitHub connections appear in the main Resources list under **All / Other**,
+with the same sorting and search. Click a connection to browse repositories; its
+actions menu includes Configure GitHub. Disabled connections open configuration.
 
 Tokens use the existing Fernet sealing pattern in dedicated connection records.
 They are never returned to browser responses or agent tools. Replace a token by

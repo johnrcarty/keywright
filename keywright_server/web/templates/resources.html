@@ -6,15 +6,14 @@
 <a class="btn p" href="/ui/resources/new">+ Add resource</a>
 </div>
 <p class="page-intro collection-intro">Manage the systems and endpoints your agents can reach.</p>
-{% if github_connections %}<section aria-label="GitHub connections"><h2>GitHub</h2><div class="resource-list">{% for connection in github_connections %}<article class="resource-card"><a class="resource-link" href="/ui/integrations/github#{{ connection.id }}"><span class="resource-icon">{{ icon('github') }}</span><div class="resource-copy"><h2>{{ connection.name }}</h2><div class="resource-endpoint">GitHub · {{ connection.status if connection.enabled else 'Disabled' }}</div></div><span class="resource-chevron">{{ icon('chevron') }}</span></a><div class="resource-labels">{% if connection.enabled %}<a class="btn sm" href="/ui/integrations/github/connections/{{ connection.id }}/repositories">Browse repositories</a>{% endif %}<a class="btn sm" href="/ui/integrations/github#{{ connection.id }}">Configure GitHub</a></div></article>{% endfor %}</div></section>{% endif %}
 {% if rows %}
-<form method="get" class="resource-organize row">
-<label for="resource-sort">Sort</label><select id="resource-sort" name="sort">{% for key,label in [('type','Type'),('name','Name'),('ip','IP address')] %}<option value="{{ key }}" {{ 'selected' if sort==key }}>{{ label }}</option>{% endfor %}</select>
-<label for="resource-group">Group</label><select id="resource-group" name="group">{% for key,label in [('none','None'),('host','Inventory host'),('network','Network')] %}<option value="{{ key }}" {{ 'selected' if group==key }}>{{ label }}</option>{% endfor %}</select><button class="btn sm">Apply</button>
+<form method="get" class="resource-organize">
+<label for="resource-sort">Sort<select id="resource-sort" name="sort">{% for key,label in [('type','Type'),('name','Name'),('ip','IP address')] %}<option value="{{ key }}" {{ 'selected' if sort==key }}>{{ label }}</option>{% endfor %}</select></label>
+<label for="resource-group">Group<select id="resource-group" name="group">{% for key,label in [('none','None'),('host','Inventory host'),('network','Network')] %}<option value="{{ key }}" {{ 'selected' if group==key }}>{{ label }}</option>{% endfor %}</select></label><button class="btn sm">Apply</button>
 </form>
 <div id="resource-filters" hidden>
 <div class="resource-tabs" role="group" aria-label="Filter by resource type">
-{% for kind, label in [('all', 'All'), ('ssh', 'SSH'), ('mcp', 'MCP'), ('llm', 'LLM')] %}<button type="button" data-kind="{{ kind }}" aria-pressed="{{ 'true' if kind == 'all' else 'false' }}">{{ label }}</button>{% endfor %}
+{% for kind, label in [('all', 'All'), ('ssh', 'SSH'), ('mcp', 'MCP'), ('llm', 'LLM'), ('other', 'Other')] %}<button type="button" data-kind="{{ kind }}" aria-pressed="{{ 'true' if kind == 'all' else 'false' }}">{{ label }}</button>{% endfor %}
 </div>
 <div class="resource-search">{{ icon('search') }}<input type="search" id="resource-search" placeholder="Search resources…" aria-label="Search resources" autocomplete="off"></div>
 </div>
@@ -22,6 +21,15 @@
 <div class="resource-list">
 {% for r in rows %}
 {% if group!='none' and loop.changed(resource_groups[r.id]) %}<div class="resource-group-heading" data-group-heading="{{ resource_groups[r.id] }}">{{ resource_groups[r.id] }}</div>{% endif %}
+{% if r.kind == 'other' %}
+{% set connection = r.github_connection %}
+<article class="resource-card" data-group="{{ resource_groups[r.id] }}" data-resource-kind="other" data-search="{{ resource_groups[r.id] }} {{ connection.name }} github other {{ connection.status if connection.enabled else 'disabled' }}">
+<a class="resource-link" href="{{ '/ui/integrations/github/connections/' ~ connection.id ~ '/repositories' if connection.enabled else '/ui/integrations/github#' ~ connection.id }}" aria-label="{{ 'Browse repositories for ' if connection.enabled else 'Configure GitHub for ' }}{{ connection.name }}">
+<span class="resource-icon">{{ icon('github') }}</span><div class="resource-copy"><h2>{{ connection.name }}</h2><div class="resource-endpoint">GitHub · {{ connection.status if connection.enabled else 'Disabled' }}</div></div>
+</a>
+<details class="resource-actions action-menu"><summary aria-label="Actions for {{ connection.name }}">{{ icon('more') }}</summary><div class="action-menu-items">{% if connection.enabled %}<a href="/ui/integrations/github/connections/{{ connection.id }}/repositories">Browse repositories</a>{% endif %}<a href="/ui/integrations/github#{{ connection.id }}">Configure GitHub</a></div></details>
+</article>
+{% else %}
 <article class="resource-card" data-group="{{ resource_groups[r.id] }}" data-resource-kind="{{ r.kind }}" data-search="{{ resource_groups[r.id] }} {{ resource_assets[r.id].name if resource_assets.get(r.id) else '' }} {{ r.name }} {{ r.description }} {{ r.kind }} {{ r.default_mode }} {% if r.kind == 'ssh' %}{{ r.config.user }} {{ r.config.host }} {{ r.config.get('port', 22) }}{% else %}{{ r.config.url }}{% endif %}">
 <a class="resource-link" href="/ui/resources/{{ r.id }}">
 <span class="resource-icon {{ r.kind }}">{{ icon(r.kind) }}</span>
@@ -32,7 +40,8 @@
 {% if r.description %}<p class="resource-description">{{ r.description }}</p>{% endif %}
 <details class="resource-actions action-menu"><summary aria-label="Actions for {{ r.name }}">{{ icon('more') }}</summary><div class="action-menu-items"><a href="/ui/resources/{{ r.id }}">Edit resource</a><a href="{{ '/ui/inventory/assets/' ~ resource_assets[r.id].id if resource_assets.get(r.id) else '/ui/inventory/assets/new?resource=' ~ r.id }}">{{ 'View inventory' if resource_assets.get(r.id) else 'Add to inventory' }}</a>{% if r.kind in ('mcp', 'llm') %}<a href="/ui/access?resource={{ r.id }}">Edit access</a>{% endif %}<form method="post" action="/ui/resources/{{ r.id }}/probe"><button type="submit">Test connection</button></form></div></details>
 </article>
-{% else %}{% if not github_connections %}<div class="collection-empty card">{{ icon('mcp') }}<h2>No resources yet</h2><p class="mut">Choose an integration or set up a custom connection.</p><a class="btn p" href="/ui/resources/new">+ Add resource</a></div>{% endif %}{% endfor %}
+{% endif %}
+{% else %}<div class="collection-empty card">{{ icon('mcp') }}<h2>No resources yet</h2><p class="mut">Choose an integration or set up a custom connection.</p><a class="btn p" href="/ui/resources/new">+ Add resource</a></div>{% endfor %}
 </div>
 <div id="resource-empty" class="collection-empty card" hidden><h2>No matching resources</h2><p class="mut">Try a different name, endpoint, or resource type.</p><button type="button" class="btn" id="resource-reset">Clear filters</button></div>
 {% if rows %}<p class="resource-count mut small" id="resource-count" role="status">Showing {{ rows|length }} resource{{ '' if rows|length == 1 else 's' }}</p>{% endif %}
