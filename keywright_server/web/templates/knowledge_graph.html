@@ -1,0 +1,48 @@
+{% extends "base.html" %}{% block title %}Knowledge graph · Keywright{% endblock %}
+{% block body %}
+<style>
+.kg-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.kg-heading h1{margin-bottom:4px}.kg-controls{display:flex;flex-wrap:wrap;align-items:end;gap:12px;margin:18px 0}
+.kg-controls label{margin:0;min-width:120px;flex:1}.kg-controls input,.kg-controls select{margin-top:6px}
+.kg-controls input[type=search]{width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:var(--r);background:var(--bg);color:var(--fg);font:inherit}
+.kg-controls .kg-search{flex:2;min-width:180px}.kg-workspace{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:14px}
+.kg-stage{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;min-width:0}
+#knowledge-canvas{width:100%;height:620px;display:block;touch-action:none;cursor:grab}
+#knowledge-canvas:focus{outline:2px solid var(--acc);outline-offset:-3px}
+.kg-camera{position:absolute;top:12px;left:12px;display:flex;gap:6px}.kg-camera button{min-width:36px}
+.kg-legend{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0;font-size:12px;color:var(--mut)}
+.kg-legend span{display:inline-flex;gap:6px;align-items:center}.kg-key{width:9px;height:9px;border-radius:50%}
+.kg-details{min-width:0;max-height:720px;overflow:auto}.kg-details h2{margin-top:0;overflow-wrap:anywhere}
+.kg-details p,.kg-details li{overflow-wrap:anywhere}.kg-details ul{padding-left:18px}.kg-details li{margin:8px 0}
+.kg-details pre{white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.5 ui-monospace,monospace;max-height:300px;overflow:auto}
+.kg-details .btn{margin:4px 4px 4px 0}.kg-list{max-height:190px;overflow:auto;padding:0;list-style:none}
+.kg-list button{display:block;text-align:left;border:0;background:none;color:var(--acc);padding:6px;cursor:pointer;width:100%;overflow-wrap:anywhere}
+.kg-empty{position:absolute;inset:100px 24px auto;text-align:center;pointer-events:none}.kg-empty p{max-width:420px;margin:10px auto}
+.kg-warning{border-left:3px solid var(--warn);padding:10px 14px;margin:10px 0}
+@media(max-width:850px){.kg-workspace{grid-template-columns:1fr}.kg-details{max-height:none}#knowledge-canvas{height:460px}.kg-controls label{min-width:130px}.kg-controls input[type=search]{font-size:16px}}
+</style>
+<div class="kg-heading"><div><h1>Knowledge graph</h1><p class="page-intro">Follow the links between reviewed notes, decisions and memory.</p></div><a class="btn" href="/ui/knowledge{% if collection %}?collection={{ collection }}{% endif %}">Back to knowledge</a></div>
+<div class="kg-controls">
+<label>Collection<select id="kg-collection"><option value="">All collections</option>{% for c in collections %}<option value="{{ c.id }}" {{ 'selected' if c.id == collection }}>{{ c.name }}</option>{% endfor %}</select></label>
+<label class="kg-search">Find a document<input id="kg-search" type="search" placeholder="Title or path…" autocomplete="off"></label>
+<label>View<select id="kg-view"><option value="global" {{ 'selected' if not document }}>Global graph</option><option value="local" {{ 'selected' if document }}>Selected document</option></select></label>
+<label>Link depth<select id="kg-depth">{% for n in [1,2,3] %}<option value="{{ n }}" {{ 'selected' if n == depth }}>{{ n }} hop{{ 's' if n > 1 }}</option>{% endfor %}</select></label>
+</div>
+<div class="kg-legend"><span><i class="kg-key" style="background:#3b82f6"></i>Documentation</span><span><i class="kg-key" style="background:#a855f7"></i>Decision</span><span><i class="kg-key" style="background:#14b8a6"></i>Memory</span><span><i class="kg-key" style="background:#f59e0b"></i>Operational</span><span>— Explicit reference</span></div>
+<p id="kg-status" class="small mut" role="status" aria-live="polite">Loading published knowledge…</p>
+<div id="kg-warning" class="kg-warning" hidden></div>
+<div class="kg-workspace">
+<div class="kg-stage">
+<canvas id="knowledge-canvas" tabindex="0" aria-label="Knowledge graph. Drag to pan, scroll or use plus and minus to zoom. Use the document list to select a note."></canvas>
+<div class="kg-camera"><button type="button" class="btn sm" id="kg-in" aria-label="Zoom in">+</button><button type="button" class="btn sm" id="kg-out" aria-label="Zoom out">−</button><button type="button" class="btn sm" id="kg-fit">Fit</button></div>
+<div class="kg-empty" id="kg-empty" hidden><h2>No published documents</h2><p>Publish a note to start. Connect notes with <code>[[wikilinks]]</code>, Markdown links, or plain collection paths.</p></div>
+</div>
+<aside class="card kg-details" aria-label="Document and relationships">
+<div id="kg-selection"><h2>Explore your knowledge</h2><p class="mut">Select a node to see its references, backlinks and source. Links connect notes within each collection.</p></div>
+<details open><summary>Documents in this view</summary><ul class="kg-list" id="kg-documents"></ul></details>
+</aside>
+</div>
+<details class="card" style="margin-top:16px"><summary>Index links in existing documents</summary><p>New publications update the graph automatically. Rebuild links for older documents, newly supported reference formats, or after restoring a backup. Plain collection paths in note text and source metadata are included. This reads approved Markdown without changing its content or approval history.</p><form method="post" action="/ui/knowledge/graph/rebuild"><input type="hidden" name="collection" id="kg-rebuild-collection" value="{{ collection }}"><button class="btn">Rebuild document links</button></form></details>
+<p class="small mut">Only current, published, unexpired documents appear. A reference is not proof of dependency or authority. Semantic suggestions and extracted entities are not part of this graph.</p>
+{% endblock %}
+{% block scripts %}<script>{% include "_knowledge_graph.js" %}</script>{% endblock %}

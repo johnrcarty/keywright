@@ -23,7 +23,8 @@ The image and corresponding source materials are public. Registry login is not r
 
 ## Image versions and updates
 
-- `0.0.1-preview` follows successful builds from the current development series on `main`.
+- `0.0.2-preview` is the candidate development tag, produced by successful builds after
+  the 0.0.2 preparation changes land on `main`. The latest published stable release is 0.0.1.
 - `sha-<full commit>` identifies the source revision. Pin the registry digest to select exact image bytes.
 - A matching `v0.0.1` Git tag publishes image tag `0.0.1` after tests and both native image checks pass.
   The `0.0.1` tag is published. The workflow does not publish a `latest` alias.
@@ -117,7 +118,7 @@ The core and knowledge checks below passed on a clean Debian 13 AMD64 VM using c
 records the image, test methods and limits. Treat this checklist as a fresh-install procedure
 for subsequent releases; optional HTTPS and external notification checks were outside that run.
 
-- [ ] Pull the published image and start it with an empty data volume; `/healthz` reports 0.0.1.
+- [ ] Pull the published image and start it with an empty data volume; `/healthz` reports the exact version under review.
 - [ ] Complete administrator setup through the SSH tunnel and log in again.
 - [ ] Add one disposable SSH target and verify its host-key fingerprint.
 - [ ] Enroll a test agent, approve one exact command, and verify its audit record.

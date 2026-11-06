@@ -1,12 +1,12 @@
 """Admin knowledge publishing and proposal review; agent access stays behind MCP policy."""
 import difflib
 
-from fastapi import APIRouter, Depends, Request
-from fastapi.responses import PlainTextResponse
+from fastapi import APIRouter, Depends, Query, Request
+from fastapi.responses import JSONResponse, PlainTextResponse
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
-from .. import audit, knowledge_index
+from .. import audit, events, knowledge_graph, knowledge_index
 from .. import knowledge as k
 from ..db import session
 from ..models import Resource, now
@@ -15,6 +15,67 @@ from .admin import redirect, render
 from .security import require_same_origin
 
 router = APIRouter(dependencies=[Depends(require_same_origin), Depends(auth.require_admin)])
+
+
+@router.get("/ui/knowledge/graph")
+async def graph_page(request: Request, collection: str = "", document: str = "",
+                     depth: int = Query(1, ge=1, le=3)):
+    async with session() as db:
+        collections = list(await db.scalars(select(Resource).where(
+            Resource.kind == "mcp", Resource.config["adapter"].as_string() == "knowledge").order_by(Resource.name)))
+        if collection and collection not in {res.id for res in collections}:
+            return redirect("/ui/knowledge", "Collection not found.")
+    return render(request, "knowledge_graph.html", collections=collections, collection=collection,
+                  document=document, depth=depth)
+
+
+@router.get("/ui/knowledge/graph/data")
+async def graph_data(collection: str = "", document: str = "", depth: int = Query(1, ge=1, le=3),
+                     limit: int = Query(500, ge=1, le=500)):
+    try:
+        async with session() as db:
+            result = await knowledge_graph.snapshot(db, collection or None, document_id=document or None,
+                                                    depth=depth, limit=limit)
+            await audit.record(db, tool="knowledge.graph", decision="read",
+                               detail={"collection": collection or "all", "document": document, "depth": depth})
+        return JSONResponse(result)
+    except k.KnowledgeError as exc:
+        return JSONResponse({"error": str(exc)}, status_code=404)
+
+
+@router.get("/ui/knowledge/graph/preview/{did}")
+async def graph_preview(did: str):
+    async with session() as db:
+        doc = await db.get(k.Document, did)
+        if not doc:
+            return JSONResponse({"error": "Document not found."}, status_code=404)
+        try:
+            data = await k.get_document(db, doc.resource_id, did)
+        except k.KnowledgeError as exc:
+            return JSONResponse({"error": str(exc)}, status_code=404)
+        await audit.record(db, tool="knowledge.get", decision="read",
+                           detail={"document": did, "revision": data["revision"], "view": "graph"})
+        data["preview_truncated"] = len(data["markdown"]) > 12000
+        data["markdown"] = data["markdown"][:12000]
+    return JSONResponse(data)
+
+
+@router.post("/ui/knowledge/graph/rebuild")
+async def graph_rebuild(request: Request):
+    form = await request.form()
+    collection = str(form.get("collection", ""))
+    try:
+        async with session() as db:
+            await k.lock_writes(db)
+            result = await knowledge_graph.rebuild(db, collection or None)
+            await audit.record(db, tool="knowledge.graph.rebuild", decision="indexed",
+                               detail={"collection": collection or "all", **result})
+    except k.KnowledgeError as exc:
+        return redirect("/ui/knowledge/graph", str(exc))
+    from urllib.parse import urlencode
+
+    return redirect("/ui/knowledge/graph?" + urlencode({"collection": collection}),
+                    f"Indexed {result['links']} links from {result['documents']} published documents.")
 
 
 @router.get("/ui/knowledge")
@@ -98,7 +159,7 @@ async def document(request: Request, did: str, download: bool = False):
 
 
 @router.get("/ui/knowledge/proposals/{revision_id}")
-async def proposal(request: Request, revision_id: str):
+async def proposal(request: Request, revision_id: str, next: str = ""):
     async with session() as db:
         rev = await db.get(k.Revision, revision_id)
         if not rev:
@@ -113,7 +174,8 @@ async def proposal(request: Request, revision_id: str):
             return redirect("/ui/knowledge", str(exc))
         diff = "".join(difflib.unified_diff(previous.splitlines(True), body.splitlines(True),
                                           fromfile="Current published Markdown", tofile="Proposed Markdown"))
-    return render(request, "knowledge_proposal.html", revision=rev, doc=doc, collection=res, body=body, diff=diff)
+    return render(request, "knowledge_proposal.html", revision=rev, doc=doc, collection=res, body=body, diff=diff,
+                  next="/ui" if next == "/ui" else "")
 
 
 @router.post("/ui/knowledge/proposals/{revision_id}")
@@ -130,8 +192,11 @@ async def review(request: Request, revision_id: str):
             await audit.record(db, tool="knowledge.review", decision=rev.status,
                                detail={"revision": rev.id, "collection": rid, "sha256": rev.sha256})
     except k.KnowledgeError as exc:
-        return redirect("/ui/knowledge/proposals/" + revision_id, str(exc))
-    return redirect("/ui/knowledge?collection=" + rid, "Proposal " + rev.status + ".")
+        return redirect("/ui/knowledge/proposals/" + revision_id +
+                        ("?next=/ui" if form.get("next") == "/ui" else ""), str(exc))
+    events.publish("knowledge.reviewed", id=rev.id, status=rev.status)
+    return redirect("/ui" if form.get("next") == "/ui" else "/ui/knowledge?collection=" + rid,
+                    "Proposal " + rev.status + ".")
 
 
 @router.post("/ui/knowledge/{rid}/archive")

@@ -18,12 +18,16 @@ class LogNotifier(Notifier):
     description = "No push channel. Pending requests show on the dashboard."
     fields: ClassVar[list] = []
 
+    async def send_task(self, event_id: str, url: str) -> None:
+        log.info("WORK ASSIGNMENT %s: %s", event_id, url)
+
     async def probe(self) -> ProbeResult:
         return ProbeResult(ok=True, message="Nothing to configure.")
 
     async def send(self, req: AccessRequest, agent: Agent, links: dict[str, str], buttons: list[str]) -> None:
         title, body = request_summary(req, agent)
-        log.warning("ACCESS REQUEST %s\n%s\n%s\ndecide: %s", req.id, title, body, links.get("once", "").rsplit("/", 1)[0])
+        link = links.get("once") or links.get("shopping20") or ""
+        log.warning("ACCESS REQUEST %s\n%s\n%s\ndecide: %s", req.id, title, body, link.rsplit("/", 1)[0])
 
     async def send_nudge(self, nudge: Nudge, agent: Agent, url: str) -> None:
         title, body = nudge_summary(nudge, agent)

@@ -1,0 +1,28 @@
+Connector artwork
+=================
+
+Pi-hole Vortex logo
+Copyright (c) 2017 Pi-hole. MIT License.
+Original, unmodified SVG from https://github.com/pi-hole/graphics
+Full license: PI-HOLE-LICENSE.txt (in this directory).
+Brand guidelines: https://pi-hole.net/trademark-rules-and-brand-guidelines/
+
+Jellyfin icon (color on light / color on dark)
+Credit: Jellyfin Project and the jellyfin-ux contributors.
+Licensed under Creative Commons Attribution-ShareAlike 4.0 International:
+https://creativecommons.org/licenses/by-sa/4.0/
+Original, unmodified SVGs from https://github.com/jellyfin/jellyfin-ux
+Full license: JELLYFIN-LICENSE.txt (in this directory).
+Brand guidelines: https://jellyfin.org/docs/general/contributing/branding/
+
+The SVG artwork retains its upstream license; it is not relicensed under
+Keywright's Apache-2.0 license. Any adapted Jellyfin artwork must retain the
+required attribution and applicable ShareAlike terms. SVG source is distributed
+alongside these notices. Exact source commits, URLs and hashes: sources.json.
+
+These marks identify the third-party services supported by the connectors.
+They do not represent Keywright or imply endorsement by the respective projects.
+Trademark rights remain with their owners.
+
+Proxmox, Home Assistant, Sonarr and Radarr use original, neutral Keywright
+category drawings (server, home, television and film), not those projects' logos.

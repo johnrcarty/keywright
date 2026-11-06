@@ -1,0 +1,39 @@
+{% extends "base.html" %}{% block title %}Set up DoorDash · Keywright{% endblock %}{% block body %}
+{% include "_integration_style.html" %}
+<div class="integration-page integration-form">
+<a class="integration-back" href="/ui/resources/{{ res.id }}">← {{ res.name }} settings</a>
+<h1>Set up DoorDash <span class="pill">Beta</span></h1>
+{% include "_integration_availability.html" %}
+<p>On <strong>{{ setup.source_name }}</strong> as <strong>{{ res.config.user or 'root' }}</strong></p>
+{% set phase = setup.resume if setup.status in ('running', 'error') else setup.status %}
+{% set current_step = 2 if phase == 'new' else 4 if phase in ('signed_in', 'ready') else 3 %}
+<ol class="integration-steps" aria-label="Setup steps">{% for number, label in [(1,'Choose host'),(2,'Install'),(3,'Sign in'),(4,'Verify')] %}<li {% if number == current_step %}aria-current="step"{% endif %}><span>{{ number }}</span> {{ label }}</li>{% endfor %}</ol>
+<div class="card" role="status" aria-live="polite">
+{% if setup.status == 'new' %}
+<h2>Install on this host</h2>
+<p>Keywright will use the existing SSH connection to {{ res.config.host }}. It installs DoorDash CLI 0.2.6 in this account’s home directory and checks the official download checksum.</p>
+<p class="help">This account and other users with administrative access to the host can access the DoorDash sign-in. No sudo or system-wide installation is needed. Guided installation supports glibc Linux on x86_64 with Python 3.9 or newer.</p>
+{% elif setup.status == 'running' %}
+<h2>{{ {'install':'Installing DoorDash CLI…', 'signin':'Starting sign-in…', 'finish':'Completing sign-in…', 'token':'Saving sign-in…', 'verify':'Verifying DoorDash access…'}.get(setup.action, 'Working…') }}</h2>
+<p>You can leave this page and return. Progress is saved here.</p>
+<p class="help">This page refreshes while setup runs. Please wait before starting another step.</p>
+{% else %}<p>{{ setup.message }}</p>{% endif %}
+{% if setup.status == 'ready' %}<a class="btn p" href="/ui/resources/{{ res.id }}">Open connection</a><p class="help">Agent commands still follow this connection’s access rules. Headless DoorDash tokens last about 72 hours; return here to sign in again when needed.</p>{% endif %}
+</div>
+{% if 'install' in actions %}<form method="post" action="/ui/cli-setup/{{ res.id }}/install"><button class="btn p">Install DoorDash CLI</button></form>{% endif %}
+{% if setup.status == 'signin' and setup.signin_url %}
+<div class="card"><h2>Finish DoorDash sign-in</h2>
+<p><a class="btn p" href="{{ setup.signin_url }}" target="_blank" rel="noopener noreferrer">Open DoorDash sign-in</a></p>
+<p>Sign in using your approved beta account. The final page may say “localhost refused to connect.” That is expected: copy the full address from your browser’s address bar and paste it here.</p>
+<form method="post" action="/ui/cli-setup/{{ res.id }}/finish">
+<label for="return-address">Return address or sign-in code</label><input id="return-address" name="value" type="password" required maxlength="16384" autocomplete="off" autocapitalize="none" spellcheck="false">
+<p class="help">Finish within 10 minutes. The sign-in token is saved privately on the selected host.</p>
+<button class="btn p">Complete sign-in</button></form></div>
+{% endif %}
+{% if 'signin' in actions %}<form method="post" action="/ui/cli-setup/{{ res.id }}/signin" style="margin:16px 0"><button class="btn {{ 'p' if setup.status == 'installed' else '' }}">{{ 'Sign in to DoorDash' if setup.status == 'installed' else 'Start a new sign-in' }}</button></form>{% endif %}
+{% if 'token' in actions %}<details class="card"><summary>Use an exported access token instead</summary><p>If you already exported a token with <code>dd-cli export-token</code>, paste it here.</p><form method="post" action="/ui/cli-setup/{{ res.id }}/token"><label for="access-token">DoorDash access token</label><input id="access-token" type="password" name="value" required maxlength="16384" autocomplete="off" autocapitalize="none" spellcheck="false"><p class="help">Sent over SSH and stored only on the selected host. It is not added to Keywright’s database or audit log.</p><button class="btn">Save token on host</button></form></details>{% endif %}
+{% if 'verify' in actions %}<form method="post" action="/ui/cli-setup/{{ res.id }}/verify"><button class="btn {{ 'p' if setup.status != 'ready' else '' }}">Verify DoorDash access</button><p class="help">Checks order-history access without displaying orders or placing a purchase.</p></form>{% endif %}
+<p class="help" style="margin-top:24px">Need a different host? <a href="/ui/resources/new?integration=doordash">Create another DoorDash connection</a>.</p>
+</div>
+{% if setup.status == 'running' %}<script>setTimeout(function(){window.location.reload();}, 2500);</script>{% endif %}
+{% endblock %}

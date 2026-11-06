@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Attach GitHub repository{% endblock %}
+{% block body %}
+<link rel="stylesheet" href="/assets/work.css">
+<p><a href="/ui/integrations/github/connections/{{ connection_id }}/repositories">GitHub repositories</a></p>
+<h1>Attach {{ selection.owner }}/{{ selection.name }}</h1>
+<p>Choose a manually registered repository. Its name, description, project, and environment locations are retained. Issue import stays off until you configure it.</p>
+<form method="get" class="card work-filters">
+<input type="hidden" name="owner" value="{{ selection.owner }}"><input type="hidden" name="name" value="{{ selection.name }}"><input type="hidden" name="provider_id" value="{{ selection.provider_id }}">
+<label>Find a manual repository<input name="q" value="{{ q }}" maxlength="120"></label><button class="btn">Search</button>
+</form>
+{% if available.repositories %}
+<form method="post" action="/ui/integrations/github/connections/{{ connection_id }}/select" class="card">
+<input type="hidden" name="owner" value="{{ selection.owner }}"><input type="hidden" name="name" value="{{ selection.name }}"><input type="hidden" name="provider_id" value="{{ selection.provider_id }}">
+<label>Existing repository<select name="local_repository_id" required><option value="">Choose repository</option>{% for repo in available.repositories %}<option value="{{ repo.id }}">{{ repo.name }} · {{ repo.id }}</option>{% endfor %}</select></label>
+<button class="btn p">Attach repository</button>
+</form>
+{% else %}<p>No matching manual repositories. Change the search or use Add in the picker to register a new repository.</p>{% endif %}
+<nav class="work-nav">{% if offset > 0 %}<a class="btn" href="{{ page_url([0, offset - 50]|max) }}">Previous</a>{% endif %}{% if available.next_offset is not none %}<a class="btn" href="{{ page_url(available.next_offset) }}">Next</a>{% endif %}</nav>
+{% endblock %}

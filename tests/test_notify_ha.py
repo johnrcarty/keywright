@@ -221,3 +221,24 @@ async def test_clearing_a_nudge_retracts_it_from_the_phone(ha, _data_dir):
     await ha.clear_nudge(Nudge(id="ndg_1", agent_id="agt_1", message="x", created_at=now()))
     payload = json.loads(route.calls.last.request.read().decode())
     assert payload == {"message": "clear_notification", "data": {"tag": "ndg_1"}}
+
+
+@respx.mock
+async def test_shopping_notification_opens_broker_without_allow_once(ha, _data_dir, monkeypatch):
+    import json
+
+    from keywright_server import approvals
+
+    monkeypatch.setattr(approvals, 'public_url', lambda: 'https://broker.test/keywright')
+    route = respx.post(f'{BASE}/api/services/notify/mobile_app_phone').respond(200, json=[])
+    agent = Agent(id='agt_shop', name='shopper', token_hash='x')
+    req = AccessRequest(id='req_shop', agent_id=agent.id, session_id='s1', patterns=[], reason='Browse',
+                        detail={'shopping_session': True}, created_at=now())
+    scopes = approvals.offered_scopes(req)
+    assert set(scopes) == {'shopping20', 'deny'}
+    links = approvals.decision_links(req.id, scopes)
+    assert 'once' not in links
+    await ha.send(req, agent, links, list(scopes))
+    data = json.loads(route.calls.last.request.read())['data']
+    assert data['url'] == data['clickAction'] == 'https://broker.test/keywright/ui/requests/req_shop'
+    assert {approvals.parse_notification_action(a['action'])[1] for a in data['actions']} == set(scopes)

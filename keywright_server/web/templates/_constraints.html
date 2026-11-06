@@ -1,4 +1,7 @@
 {% if constraints.host %}<div>Host: <b>{{ constraints.host }}</b>{% if constraints.user %} · as <code>{{ constraints.user }}</code>{% endif %}</div>{% endif %}
+{% if constraints.shopping_session %}<p><b>Shop for 20 minutes</b> on this connection, for this agent and session. Browse menus, inspect orders and cards, and prepare carts. Each purchase requires a separate approval of the priced order.</p>{% endif %}
+{% if constraints.checkout and not checkout_shown %}{% with checkout=constraints.checkout %}{% include "_checkout.html" %}{% endwith %}{% endif %}
+{% if constraints.shopping and not constraints.shopping_session %}<div class="help">Shopping access · browsing and cart preparation only</div>{% endif %}
 {% if constraints.server %}<div>Server: <b>{{ constraints.server }}</b>{% if constraints.tool %} · <code>{{ constraints.tool }}</code>{% endif %}</div>{% endif %}
 {% if constraints.command %}<pre>$ {{ constraints.command }}</pre>{% endif %}
 {% if constraints.to_path %}<div>Output {{ 'appended to' if constraints.append else 'written to' }} <b>{{ constraints.to_host }}</b> <code>{{ constraints.to_path }}</code>{% if constraints.to_user %} as <code>{{ constraints.to_user }}</code>{% endif %} · not returned to the agent</div>{% endif %}

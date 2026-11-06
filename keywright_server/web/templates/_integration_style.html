@@ -17,6 +17,8 @@
 .integration-mark{display:flex;align-items:center;justify-content:center;flex:0 0 48px;width:48px;height:48px;border-radius:12px;background:var(--panel-raised);color:var(--acc)}
 .integration-mark .ui-icon{width:27px;height:27px}.integration-mark.notion{background:#fafafa;color:#191919;border:1px solid #c9c9c9;font:700 35px/1 Georgia,serif;border-radius:10px}
 .integration-mark.omada{background:#e1f5ef;color:#087b68}.integration-mark.shield{background:#e5ecff;color:#315f99}
+.integration-mark picture{display:flex}.integration-logo{display:block;width:32px;height:32px;object-fit:contain}
+.integration-credits{font-size:12px;margin:12px 0 0}.integration-credits a{color:var(--mut)}
 .integration-copy{flex:1;min-width:0}.integration-copy strong{display:block;font-size:16px;font-weight:600;line-height:1.3}.integration-copy p{margin:5px 0 0;color:var(--mut);font-size:13px}
 .integration-method{color:var(--mut);font-size:12px;white-space:nowrap}.integration-arrow{display:flex;color:var(--mut)}.integration-arrow .ui-icon{width:17px;height:17px}
 .integration-custom .integration-mark{width:40px;height:40px;flex-basis:40px;border-radius:9px}.integration-custom .integration-choice{min-height:80px;padding-top:15px;padding-bottom:15px}
@@ -24,6 +26,8 @@
 .integration-intro{display:flex;align-items:center;gap:16px;margin-bottom:24px}.integration-intro h1{margin:0 0 5px;font-size:25px}.integration-intro p{margin:0;color:var(--mut)}
 .integration-steps{display:flex;gap:20px;list-style:none;padding:0;margin:0 0 24px;color:var(--mut);font-size:13px}.integration-steps li{display:flex;align-items:center;gap:7px}.integration-steps span{border:1px solid var(--line);border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center}.integration-steps [aria-current=step]{color:var(--fg)}.integration-steps [aria-current=step] span{background:var(--button-bg);border-color:var(--button-bg);color:var(--button-fg)}
 .integration-form>.card{padding:22px;border-radius:12px}.integration-form label{margin-top:15px}.integration-form .grid label{margin-top:0}.integration-form input[type=text],.integration-form input[type=password],.integration-form input[type=url],.integration-form select{min-height:42px;border-radius:6px}
+.integration-steps{flex-wrap:wrap}.integration-form select{max-width:100%}
+.integration-form .btn{min-height:44px}
 .integration-advanced{margin-top:22px;border-top:1px solid var(--line);padding-top:16px}.integration-advanced summary{cursor:pointer;font-weight:550;min-height:32px}.integration-actions{margin-top:22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}.integration-actions .btn{min-height:44px;padding:9px 18px;border-radius:7px}.integration-actions p{margin:0;color:var(--mut);font-size:12px}
 [data-integration][hidden],.integration-group[hidden],.integration-empty[hidden]{display:none}
 @media(max-width:600px){.integration-heading h1{font-size:25px}.integration-heading p{font-size:14px}.integration-choice{display:grid;grid-template-columns:48px minmax(0,1fr) 17px;padding:17px 14px;gap:7px 12px}.integration-mark{grid-row:1/3}.integration-copy{grid-column:2;grid-row:1}.integration-method{grid-column:2;grid-row:2;font-size:12px;white-space:normal}.integration-arrow{grid-column:3;grid-row:1/3}.integration-custom .integration-choice{grid-template-columns:40px minmax(0,1fr) 17px}.integration-form>.card{padding:17px}.integration-intro{align-items:flex-start}.integration-intro h1{font-size:23px}.integration-steps{gap:14px}.integration-actions .btn{width:100%}}

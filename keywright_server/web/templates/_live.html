@@ -4,7 +4,7 @@
 <span class="pill pending" data-count="nudges">{{ nudges|length }}</span></h2>
 <div id="nudge-list">{% for n in nudges %}{% include "_nudge_card.html" %}{% endfor %}</div>
 
-<h2>Pending requests <span class="pill" data-count="pending">{{ pending|length }}</span>
+<h2>Pending requests <span class="pill" data-count="pending">{{ pending|length + proposals|length }}</span>
 <span class="live-state" id="live-state" hidden></span></h2>
-<div id="pending-list">{% for req in pending %}{% include "_request_card.html" %}{% endfor %}</div>
-<div class="card mut" id="pending-empty"{% if pending %} hidden{% endif %}>Nothing waiting.</div>
+<div id="pending-list">{% for req in pending %}{% include "_request_card.html" %}{% endfor %}{% for proposal in proposals %}{% include "_knowledge_card.html" %}{% endfor %}</div>
+<div class="card mut" id="pending-empty"{% if pending or proposals %} hidden{% endif %}>Nothing waiting.</div>

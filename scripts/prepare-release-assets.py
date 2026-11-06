@@ -3,6 +3,7 @@ import argparse
 import hashlib
 import shutil
 import tarfile
+import tomllib
 from pathlib import Path
 
 
@@ -37,15 +38,12 @@ def main():
                  'application-image.txt': f'keywright-image-{arch}.txt'}
         for source, target in names.items():
             shutil.copyfile(root / source, args.output / target)
-    (args.output / 'RELEASE-NOTES.txt').write_text(
-        'Draft Keywright release — review before publication.\n\n'
-        'The installation bundle pins the multi-platform application image.\n'
-        'Per-architecture source archives, notices and inventories accompany it.\n'
-        'Source images are already available at the digest references in these assets,\n'
-        'under the same registry access rules as the application images.\n\n'
-        'Before publishing: finish release notes, verify SECURITY.md reporting is active,\n'
-        'review support/known limitations, validate final privacy checks and ensure that\n'
-        'historical unaudited previews are excluded from public distribution.\n')
+    repository = Path(__file__).resolve().parents[1]
+    version = tomllib.loads((repository / 'pyproject.toml').read_text())['project']['version']
+    notes = repository / 'docs' / 'releases' / (version + '.md')
+    if not notes.is_file():
+        raise ValueError(f'Missing reviewed release notes for {version}')
+    (args.output / 'RELEASE-NOTES.txt').write_text(notes.read_text())
     files = sorted(args.output.iterdir())
     (args.output / 'SHA256SUMS').write_text(''.join(
         f'{hashlib.sha256(p.read_bytes()).hexdigest()}  {p.name}\n' for p in files))

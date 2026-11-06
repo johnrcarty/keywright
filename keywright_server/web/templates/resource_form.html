@@ -1,5 +1,6 @@
 {% extends "base.html" %}{% from "_icons.html" import icon %}{% block title %}{{ 'Edit' if res else 'Add' }} {{ preset.title if preset else kind }}{% endblock %}{% block body %}
 {% include "_integration_style.html" %}
+{% from "_integration_mark.html" import integration_mark %}
 <div class="integration-page integration-form">
 {% if not res %}<a class="integration-back" href="/ui/resources/new">{{ icon('chevron') }} All integrations</a>{% endif %}
 {% if res %}
@@ -8,9 +9,24 @@
 {% if res %}<p class="small mut">Inventory: {% if inventory_asset %}<a href="/ui/inventory/assets/{{ inventory_asset.id }}">{{ inventory_asset.name }}</a>{% else %}<a href="/ui/inventory/assets/new?resource={{ res.id }}">Add this resource to inventory</a> · or link it from an existing inventory record{% endif %}</p>{% endif %}
 
 {% if preset %}
-<div class="integration-intro"><span class="integration-mark {{ preset.icon }}">{% if preset.icon == 'notion' %}N{% else %}{{ icon(preset.icon) }}{% endif %}</span><div><h1>{{ preset.title }}</h1><p>{{ preset.instructions if not res else preset.description }}</p></div></div>
+<div class="integration-intro">{{ integration_mark(preset.icon) }}<div><h1>{{ preset.title }}{% if preset.beta %} <span class="pill">Beta</span>{% endif %}</h1><p>{{ preset.instructions if not res else preset.description }}</p></div></div>
+{% include "_integration_availability.html" %}
+{% if preset.setup_url %}<p class="help"><a href="{{ preset.setup_url }}">{{ preset.title }} setup guide</a></p>{% endif %}
+{% if preset.icon in ('pihole', 'jellyfin') %}<p class="integration-credits"><a href="/assets/brands/ATTRIBUTION.txt">Icon credits</a></p>{% endif %}
 {% if preset.auth_type == 'oauth' %}<ol class="integration-steps" aria-label="Connection setup"><li {% if not res %}aria-current="step"{% endif %}><span>1</span> Connection details</li><li {% if res %}aria-current="step"{% endif %}><span>2</span> {{ 'Connected' if oauth_status == 'connected' else 'Sign in' }}</li></ol>{% endif %}
 {% else %}<h1>{{ 'Edit' if res else 'Add' }} {{ {'ssh': 'SSH host', 'mcp': 'MCP server', 'llm': 'LLM gateway'}[kind] }}</h1>{% endif %}
+{% set guided_cli = preset and preset.id == 'doordash' and not res %}
+{% if guided_cli %}
+<div class="card"><h2>Use a host Keywright already knows</h2><p>Choose a host, then let Keywright install the CLI and guide you through sign-in.</p>
+{% if ssh_hosts %}<form method="post" action="/ui/cli-setup/doordash">
+<label for="cli-name">Connection name</label><input type="text" id="cli-name" name="name" value="DoorDash" required maxlength="64" pattern="[A-Za-z0-9_.-]+">
+<label for="cli-host">Existing SSH host</label><select id="cli-host" name="host_id" required><option value="">Choose a host…</option>{% for host in ssh_hosts %}<option value="{{ host.id }}">{{ host.name }} — {{ host.config.user or 'root' }}@{{ host.config.host }}</option>{% endfor %}</select>
+<p class="help">Reuses this host’s SSH account and key. DoorDash gets its own connection with Ask for approval access. Installation starts after you review the selected host.</p>
+<button class="btn p">Continue with this host</button></form>
+{% else %}<p>No enrolled SSH hosts are available. <a href="/ui/resources/new?kind=ssh">Add an SSH host</a>, or configure a connection manually below.</p>{% endif %}</div>
+<details class="card"><summary>Set up a host manually</summary>
+{% endif %}
+{% if res and res.config.get('cli_setup') %}<p><a class="btn p" href="/ui/cli-setup/{{ res.id }}">{{ 'Manage DoorDash sign-in' if res.config.cli_setup.status == 'ready' else 'Continue DoorDash setup' }}</a></p>{% endif %}
 <div class="card"><form method="post" action="/ui/resources">
 <input type="hidden" name="rid" value="{{ res.id if res else '' }}"><input type="hidden" name="kind" value="{{ kind }}">
 <input type="hidden" name="integration" value="{{ preset.id if preset else '' }}">
@@ -22,10 +38,21 @@
 </div>
 <label>Description <span class="mut">(optional)</span></label><input type="text" name="description" value="{{ res.description if res else '' }}">
 {% if kind == 'ssh' %}
+{% if res and res.config.get('cli_setup') %}
+<p>Uses {{ res.config.cli_setup.source_name }} as {{ res.config.user }}. <a href="/ui/cli-setup/{{ res.id }}">Manage installation and sign-in</a>.</p>
+<input type="hidden" name="host" value="{{ res.config.host }}"><input type="hidden" name="port" value="{{ res.config.port or 22 }}"><input type="hidden" name="user" value="{{ res.config.user }}">
+{% else %}
+{% if preset and preset.cli_verify_command %}
+<p class="help">{{ preset.cli_setup_instructions }}
+The CLI and its credential store must work in a non-interactive SSH session. Keywright stores the SSH key;
+the {{ preset.title }} credential stays on that host. Commands use this resource's access rules and approvals.</p>
+<p class="help">After connecting, verify {{ preset.title }} access with <code>kw run {{ res.name if res else preset.default_name }} -r "Verify {{ preset.title }} access" -- {{ preset.cli_verify_command }}</code>.
+Test connection checks SSH connectivity only.</p>
+{% endif %}
 <div class="grid host-fields">
 <div><label>Host</label><input type="text" name="host" value="{{ res.config.host if res else '' }}" required></div>
 <div><label>Port</label><input type="number" name="port" value="{{ res.config.port if res else 22 }}"></div>
-<div><label>User</label><input type="text" name="user" value="{{ res.config.user if res else 'root' }}"></div>
+<div><label>User</label><input type="text" name="user" value="{{ res.config.user if res else preset.default_user if preset else 'root' }}"></div>
 </div>
 {% if res %}
 <label>Private key path on the Keywright host</label><input type="text" name="key_path" value="{{ res.config.key_path if res else '' }}" placeholder="{{ keys_dir }}/&lt;name&gt;">
@@ -37,6 +64,7 @@
 {% endif %}
 {% if res and res.config.host_key %}<label>Pinned host key</label><code>{{ res.config.host_key }}</code>
 <div class="row" style="margin-top:6px"><label class="inline"><input type="checkbox" name="forget_host_key" value="1"> forget host key (re-pin on next connect)</label></div>{% else %}<div class="help" style="margin-top:8px">Host key not pinned yet: the first successful connection or probe pins it.</div>{% endif %}
+{% endif %}
 {% elif kind == 'llm' %}
 {% set limits = (res.config.limits if res else {}) or {} %}{% set budget = (res.config.agent_budget if res else {}) or {} %}
 <label>LiteLLM URL <span class="mut">(reachable from this Keywright only; never published to agents)</span></label>
@@ -64,6 +92,20 @@
 {% else %}
 {% if adapter == 'keywright' %}
 <p class="help">Built-in tools for inventory, hosting and network topology, discovery observations, subnets and IP allocations. Agents use the same approval gate and access rules as other resources. No URL or credentials are needed.</p>
+{% elif connector %}
+<p class="help">This connector provides read-only API tools. Calls use the access rules and approvals configured below.</p>
+{% if res %}<p class="help">{{ connector.instructions }}</p>{% endif %}
+<label>Server base address</label><input type="url" name="url" value="{{ res.config.url if res else '' }}" placeholder="{{ connector.example_url }}" required>
+<div class="help">Use HTTPS when available. HTTP sends the credential without transport encryption.</div>
+{% if adapter == 'proxmox' %}
+<label>API token ID</label><input type="text" name="token_id" value="{{ res.config.get('token_id', '') if res else '' }}" placeholder="keywright@pve!inventory" required>
+{% endif %}
+<label>{{ connector.secret_label }}</label><input type="password" name="api_secret" autocomplete="new-password" placeholder="{{ 'Leave blank to keep the stored credential' if res else '' }}" {% if not res %}required{% endif %}>
+<div class="help">Stored on Keywright. Agents never receive this credential.</div>
+<details class="integration-advanced"><summary>TLS settings</summary>
+<label>TLS certificate verification</label><select name="verify_tls"><option value="1" {{ 'selected' if not res or res.config.get('verify_tls', True) }}>Verify certificate (recommended)</option><option value="0" {{ 'selected' if res and not res.config.get('verify_tls', True) }}>Skip certificate verification</option></select>
+<label>Custom CA bundle path <span class="mut">(optional, on the Keywright server)</span></label><input type="text" name="ca_bundle" value="{{ res.config.get('ca_bundle', '') if res else '' }}">
+</details>
 {% elif adapter == 'omada' %}
 <p class="help">In Omada Global View, open <b>Settings → Platform Integration → Open API</b> and create an app in <b>Client</b> mode with access to the sites you want. This connector reads sites, devices and clients.</p>
 <label>Interface Access Address</label><input type="url" name="url" value="{{ res.config.url if res else '' }}" placeholder="https://omada.example:8043" required>
@@ -99,7 +141,7 @@
 <label>Client secret (optional; leave blank to keep stored secret)</label><input type="password" name="oauth_client_secret" autocomplete="new-password">
 <label>Scopes (optional, space separated)</label><input name="oauth_scope" value="{{ oauth.get('scope', '') }}">
 <div class="help">Leave blank to use the MCP server's advertised scopes.</div>
-<label>Additional OAuth origins (optional, comma separated)</label><input name="oauth_origins" value="{{ oauth.get('origins', []) | join(', ') }}" placeholder="https://login.example.com">
+<label>Additional OAuth origins (optional, comma separated)</label><input name="oauth_origins" value="{{ oauth.get('origins', preset.oauth_origins if preset else []) | join(', ') }}" placeholder="https://login.example.com">
 <div class="help">The MCP server's origin is trusted by default. Add an origin only when your provider uses a separate authorization server.</div>
 </details>
 <label>Headers (one per line, <code>Name: value</code>; stored secrets show as ***)</label>
@@ -157,7 +199,7 @@
 <form method="post" action="/ui/resources/{{ res.id }}/suggest-bundles" class="row" style="margin-top:8px"><button class="btn">Suggest bundles from the tool list</button>
 <span class="small mut">groups upstream tools by verb (get/list → read-only, call/run → control, remove/restart → destructive, set/create → config-write); adds only names you don't have</span></form>
 {% endif %}
-{% if res and kind == 'ssh' %}
+{% if res and kind == 'ssh' and not res.config.get('cli_setup') %}
 <h2>Key &amp; enrolment</h2>
 {% if not (key and key.exists) %}
 <form method="post" action="/ui/resources/{{ res.id }}/keygen" class="row"><button class="btn p">Generate key on this Keywright</button>
@@ -194,5 +236,6 @@
 <form method="post" action="/ui/resources/{{ res.id }}/delete" onsubmit="return confirm('Delete this resource?')"><button class="btn bad">Delete</button></form>
 </div>{% endif %}
 </div>
+{% if guided_cli %}</details>{% endif %}
 </div>
 {% endblock %}

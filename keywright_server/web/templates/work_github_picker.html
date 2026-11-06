@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Repositories · GitHub{% endblock %}
+{% block body %}
+<link rel="stylesheet" href="/assets/work.css">
+<div class="work-heading"><h1>GitHub repositories</h1><a class="btn" href="/ui/integrations/github">GitHub settings</a></div>
+<nav class="work-nav"><a class="btn" href="/ui/resources">Configured integrations</a><a class="btn" href="/ui/work/repositories">Added repositories</a></nav>
+<p>Add uses the repository name. Choose a project, locations, and issue import settings later. Ignore hides a repository from this picker until you restore it.</p>
+<form method="get" class="card work-filters">
+<input type="hidden" name="page" value="{{ result.page }}">
+<label>Search this page<input type="text" name="q" value="{{ q }}" maxlength="120" placeholder="Repository name"></label>
+<label>Owner<input type="text" name="owner" value="{{ owner }}" maxlength="100"></label>
+<label><input type="checkbox" name="show_ignored" value="true" {{ 'checked' if show_ignored }}> Show ignored</label><button class="btn">Filter</button>
+</form>
+<form method="post" action="/ui/integrations/github/connections/{{ connection_id }}/repositories/actions" id="github-repo-actions">
+<input type="hidden" name="page" value="{{ result.page }}"><input type="hidden" name="q" value="{{ q }}"><input type="hidden" name="owner" value="{{ owner }}"><input type="hidden" name="show_ignored" value="{{ 'true' if show_ignored else 'false' }}">
+<div class="gh-bulk work-nav"><span id="github-selection-count" role="status" aria-live="polite">Select rows for bulk actions</span><button class="btn p" type="submit" name="action" value="add" data-bulk>Add selected</button><button class="btn" type="submit" name="action" value="ignore" data-bulk>Ignore selected</button>{% if show_ignored %}<button class="btn" type="submit" name="action" value="restore" data-bulk>Restore selected</button>{% endif %}</div>
+<table class="gh-repo-table">
+<caption class="mut">Page {{ result.page }} · {{ result.repositories|length }} shown{% if result.ignored_on_page %} · {{ result.ignored_on_page }} ignored{% endif %}. Selection applies to this page.</caption>
+<thead><tr><th class="gh-check"><label><input type="checkbox" id="github-select-all" aria-label="Select all available repositories on this page"></label></th><th scope="col">Repository</th><th scope="col" class="gh-details">Visibility / branch</th><th scope="col" class="gh-actions">Actions</th></tr></thead>
+<tbody>{% for repo in result.repositories %}<tr data-repository="{{ repo.id }}">
+<td class="gh-check"><label><input type="checkbox" name="selected" value="{{ repo.id }}" aria-label="Select {{ repo.full_name }}"></label></td>
+<td class="gh-name"><a href="{{ repo.web_url }}" target="_blank" rel="noopener noreferrer"><strong>{{ repo.name }}</strong></a><span class="mut">{{ repo.owner }}{% if repo.registered_id %} · Added{% endif %}{% if repo.ignored %} · Ignored{% endif %}{{ ' · Archived' if repo.archived }}{{ ' · Disabled' if repo.disabled }}</span><span class="gh-mobile-meta mut">{{ repo.visibility }} · {{ repo.default_branch }}</span></td>
+<td class="gh-details"><span>{{ repo.visibility }}</span><span class="mut">{{ repo.default_branch }}</span></td>
+<td class="gh-actions"><div>{% if repo.registered_id %}<a class="btn sm" href="/ui/work/repositories/{{ repo.registered_id }}">Manage</a>{% else %}<button class="btn sm" type="submit" name="action" value="add:{{ repo.id }}" aria-label="Add {{ repo.full_name }}">Add</button>{% endif %}{% if repo.ignored %}<button class="btn sm" type="submit" name="action" value="restore:{{ repo.id }}" aria-label="Restore {{ repo.full_name }}">Restore</button>{% elif not repo.registered_id %}<button class="btn sm" type="submit" name="action" value="ignore:{{ repo.id }}" aria-label="Ignore {{ repo.full_name }}">Ignore</button>{% endif %}{% if not repo.registered_id %}<a class="btn sm" href="/ui/integrations/github/connections/{{ connection_id }}/attach?owner={{ repo.owner|urlencode }}&amp;name={{ repo.name|urlencode }}&amp;provider_id={{ repo.id|urlencode }}">Attach existing</a>{% endif %}</div></td>
+</tr>{% else %}<tr><td colspan="4">No repositories to show on this page. Try Show ignored, change filters, or browse the next page.</td></tr>{% endfor %}</tbody>
+</table>
+</form>
+<nav class="work-nav">{% if result.page > 1 %}<a class="btn" href="{{ page_url(result.page-1) }}">Previous</a>{% endif %}{% if result.next_page %}<a class="btn" href="{{ page_url(result.next_page) }}">Next</a>{% endif %}</nav>
+<p class="mut">GitHub returns up to 100 repositories per page. Search and bulk selection apply to the current page. Ignored repositories stay hidden across visits and token changes; existing tasks and imports are unaffected.</p>
+<script src="/assets/github-picker.js" defer></script>
+{% endblock %}

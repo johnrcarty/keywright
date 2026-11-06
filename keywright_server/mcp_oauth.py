@@ -226,10 +226,14 @@ async def begin(config: dict, browser: str, admin: str) -> str:
             endpoint = discovered["metadata"].get("registration_endpoint")
             if not endpoint:
                 raise ConnectionError("This provider requires a pre-registered OAuth client ID.")
+            supported_grants = discovered["metadata"].get("grant_types_supported")
+            grant_types = ["authorization_code"]
+            if supported_grants is None or "refresh_token" in supported_grants:
+                grant_types.append("refresh_token")
             async with httpx.AsyncClient(timeout=15, follow_redirects=False) as client:
                 response = await client.post(checked_url(endpoint, config), json={
                     "client_name": "Keywright", "redirect_uris": [callback_url()],
-                    "grant_types": ["authorization_code", "refresh_token"], "response_types": ["code"],
+                    "grant_types": grant_types, "response_types": ["code"],
                     "token_endpoint_auth_method": "none",
                 })
                 response.raise_for_status()

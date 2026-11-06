@@ -1,6 +1,10 @@
 {% extends "base.html" %}{% block title %}Request {{ req.id }}{% endblock %}{% block body %}
-<h1>Request <span class="mono">{{ req.id }}</span> <span class="pill {{ req.status }}">{{ req.status }}</span></h1>
+<h1>{% if req.detail.checkout %}Review DoorDash order{% elif req.detail.shopping_session %}Shopping access{% else %}Request <span class="mono">{{ req.id }}</span>{% endif %} <span class="pill {{ req.status }}">{{ req.status }}</span></h1>
 <div class="card">
+{% if req.status == 'pending' and req.expires_at %}<p><b>Awaiting {{ 'checkout' if req.detail.checkout else 'shopping' if req.detail.shopping_session else 'access' }} approval</b> · <span data-until="{{ req.expires_at.isoformat() }}">expires {{ req.expires_at.isoformat() }}</span></p>{% endif %}
+{% if req.detail.checkout %}{% with checkout=req.detail.checkout %}{% include "_checkout.html" %}{% endwith %}{% set checkout_shown=True %}{% endif %}
+{% if req.detail.shopping_session %}<p><b>{{ req.agent.name }}</b> asks to browse and prepare a DoorDash cart for 20 minutes in this session. Each purchase needs a separate approval of the priced order.</p>{% endif %}
+{% if req.detail.checkout or req.detail.shopping_session %}<details><summary>Request details and permissions</summary>{% endif %}
 <table class="detail-table" role="table"><tbody role="rowgroup">
 <tr role="row"><th scope="row" role="rowheader">Agent</th><td role="cell">{{ req.agent.name }}</td></tr>
 <tr role="row"><th scope="row" role="rowheader">Session</th><td role="cell" class="mono">{{ req.session_id or '— (no session id: “This session” is not available for this request)' }}</td></tr>
@@ -14,6 +18,7 @@
 {% if req.decided_at %}<tr role="row"><th scope="row" role="rowheader">Decided</th><td role="cell">{{ req.decided_at }} · {{ decision_label(req) }} via {{ req.decided_via }}{% if req.deny_reason %} · “{{ req.deny_reason }}”{% endif %}</td></tr>{% endif %}
 {% if req.decision_options %}<tr role="row"><th scope="row" role="rowheader">Access scope</th><td role="cell">{{ 'Exact operation' if req.decision_options.extent == 'exact' else 'Listed permission patterns' }}{% if req.decision_options.ttl_s %} · {{ req.decision_options.ttl_s // 60 }} minutes{% endif %}</td></tr>{% endif %}
 </tbody></table>
+{% if req.detail.checkout or req.detail.shopping_session %}</details>{% endif %}
 {% if req.status == 'pending' %}<div style="margin-top:12px">{% with next='/ui/requests/' ~ req.id, in_detail=True %}{% include "_decide.html" %}{% endwith %}</div>{% endif %}
 </div>
 {% if grants %}<div class="row toolbar"><form method="post" action="/ui/requests/{{ req.id }}/revoke"><input type="hidden" name="next" value="/ui/requests/{{ req.id }}"><button class="btn">Revoke this approval</button></form><span class="small mut">Other permission sources may still allow access. Running operations continue.</span></div>{% endif %}
@@ -25,3 +30,4 @@
 {% if grants %}<h2>Grants from this request</h2><div class="card"><table class="data-table" role="table"><thead role="rowgroup"><tr role="row"><th scope="col" role="columnheader">Pattern</th><th scope="col" role="columnheader">Scope</th><th scope="col" role="columnheader">Expires</th><th scope="col" role="columnheader">Uses</th><th scope="col" role="columnheader">Revoked</th></tr></thead><tbody role="rowgroup">
 {% for g in grants %}<tr role="row"><td role="cell" data-label="Pattern" class="wide"><div class="cell-value"><code>{{ g.pattern }}</code></div></td><td role="cell" data-label="Scope"><div class="cell-value">{{ g.scope }}</div></td><td role="cell" data-label="Expires"><div class="cell-value">{{ g.expires_at or '—' }}</div></td><td role="cell" data-label="Uses"><div class="cell-value">{{ g.uses_remaining if g.uses_remaining is not none else '∞' }}</div></td><td role="cell" data-label="Revoked"><div class="cell-value">{{ g.revoked_at or '' }}</div></td></tr>{% endfor %}</tbody></table></div>{% endif %}
 {% endblock %}
+{% block scripts %}{% include "_expiry_script.html" %}{% endblock %}

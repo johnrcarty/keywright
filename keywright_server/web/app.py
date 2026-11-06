@@ -4,6 +4,7 @@ import asyncio
 import contextlib
 import logging
 from collections.abc import AsyncIterator
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
@@ -12,8 +13,9 @@ from mcp.server.auth.provider import AccessToken
 from mcp.server.streamable_http_manager import StreamableHTTPSessionManager
 from mcp.server.transport_security import TransportSecuritySettings
 from starlette.routing import Route
+from starlette.staticfiles import StaticFiles
 
-from .. import __version__, approvals, llm_proxy, mail, nudges, tool_access
+from .. import __version__, approvals, cli_setup, llm_proxy, mail, nudges, tool_access
 from ..config import settings
 from ..db import init_db, session
 from ..mcp_server import build_server, resolve_agent
@@ -21,6 +23,7 @@ from ..notify.manager import manager
 from ..settings_store import warm
 from . import (
     admin,
+    cli_setup_ui,
     discovery_ui,
     friction_ui,
     inventory_ui,
@@ -118,6 +121,10 @@ def create_app() -> FastAPI:
         janitor = asyncio.create_task(_janitor(), name="janitor")
         watch = asyncio.create_task(_tool_watch(), name="tool-watch")
         mail_worker = asyncio.create_task(mail.worker(), name="mail-inbox")
+        from .. import task_notifications
+        task_worker = asyncio.create_task(task_notifications.worker(), name="task-notifications")
+        from .. import github
+        github_worker = asyncio.create_task(github.worker(), name="github-sync")
         async with sm.run():
             log.info("Keywright listening; MCP at /mcp, admin at /ui")
             try:
@@ -126,6 +133,13 @@ def create_app() -> FastAPI:
                 janitor.cancel()
                 watch.cancel()
                 mail_worker.cancel()
+                task_worker.cancel()
+                github_worker.cancel()
+                with contextlib.suppress(asyncio.CancelledError):
+                    await github_worker
+                with contextlib.suppress(asyncio.CancelledError):
+                    await task_worker
+                await cli_setup.shutdown()
                 with contextlib.suppress(asyncio.CancelledError):
                     await mail_worker
                 await manager.stop()
@@ -133,7 +147,15 @@ def create_app() -> FastAPI:
     app = FastAPI(title="Keywright", version=__version__, lifespan=lifespan, docs_url=None, redoc_url=None)
     oidc.configure(app)
     app.add_middleware(BrowserSecurityHeaders)
+    app.mount("/assets", StaticFiles(directory=Path(__file__).parent / "assets"), name="assets")
     app.include_router(admin.router)
+    from . import work_ui
+    app.include_router(work_ui.router)
+    from . import repositories_ui
+    app.include_router(repositories_ui.router)
+    from . import github_ui
+    app.include_router(github_ui.router)
+    app.include_router(cli_setup_ui.router)
     app.include_router(oidc.router)
     app.include_router(mcp_oauth_ui.router)
     app.include_router(inventory_ui.router)

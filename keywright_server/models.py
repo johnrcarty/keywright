@@ -1,10 +1,22 @@
 from __future__ import annotations
 
 import secrets
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from typing import Any, ClassVar
 
-from sqlalchemy import JSON, DateTime, ForeignKey, Index, Integer, String, Text, TypeDecorator
+from sqlalchemy import (
+    JSON,
+    CheckConstraint,
+    Date,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Text,
+    TypeDecorator,
+    text,
+)
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -66,6 +78,23 @@ class KnowledgeRevision(Base):
     created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=now)
     reviewed_at: Mapped[datetime | None] = mapped_column(UTCDateTime, nullable=True)
     expires_at: Mapped[datetime | None] = mapped_column(UTCDateTime, nullable=True)
+
+    link_version: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
+
+class KnowledgeLink(Base):
+    __tablename__ = "knowledge_links"
+    __table_args__ = (Index("knowledge_link_source_revision", "source_document_id", "source_revision_id"),)
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: new_id("link"))
+    source_document_id: Mapped[str] = mapped_column(ForeignKey("knowledge_documents.id", ondelete="CASCADE"))
+    source_revision_id: Mapped[str] = mapped_column(ForeignKey("knowledge_revisions.id", ondelete="CASCADE"))
+    target_document_id: Mapped[str | None] = mapped_column(
+        ForeignKey("knowledge_documents.id", ondelete="SET NULL"), nullable=True, index=True)
+    target_ref: Mapped[str] = mapped_column(String)
+    syntax: Mapped[str] = mapped_column(String)
+    relation: Mapped[str] = mapped_column(String, default="references")
+    origin: Mapped[str] = mapped_column(String, default="explicit")
+    line_number: Mapped[int] = mapped_column(Integer)
 
 
 class KnowledgeChunk(Base):
@@ -247,6 +276,17 @@ class Grant(Base):
         if self.scope == "session":
             return bool(self.session_id) and self.session_id == session_id
         return True
+
+
+class ShoppingCart(Base):
+    """Provider-observed linkage and durable submit reservation. A timeout never clears it."""
+    __tablename__ = "shopping_carts"
+    resource_id: Mapped[str] = mapped_column(ForeignKey("resources.id", ondelete="CASCADE"), primary_key=True)
+    cart_id: Mapped[str] = mapped_column(String, primary_key=True)
+    link: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
+    submit_state: Mapped[str | None] = mapped_column(String, nullable=True)
+    submitted_at: Mapped[datetime | None] = mapped_column(UTCDateTime, nullable=True)
+    request_ids: Mapped[list[Any] | None] = mapped_column(JSON, nullable=True)
 
 
 class LlmKey(Base):
@@ -440,3 +480,238 @@ class DiscoveryLink(Base):
     interface_id: Mapped[str | None] = mapped_column(ForeignKey("inventory_interfaces.id"), nullable=True)
     reviewed_data: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
     reviewed_at: Mapped[datetime] = mapped_column(UTCDateTime, default=now)
+
+
+# Work records coordinate people and agents; they confer no infrastructure access.
+class Project(Base):
+    __tablename__ = "work_projects"
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: new_id("prj"))
+    key: Mapped[str] = mapped_column(String, unique=True)
+    name: Mapped[str] = mapped_column(String)
+    description: Mapped[str] = mapped_column(Text, default="")
+    archived: Mapped[bool] = mapped_column(default=False)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=now)
+
+
+class Board(Base):
+    __tablename__ = "work_boards"
+    __table_args__ = (CheckConstraint(
+        "(kind = 'general' AND key = 'kw' AND project_id IS NULL) OR "
+        "(kind = 'project' AND key <> 'kw' AND project_id IS NOT NULL)", name="work_board_kind"),)
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: new_id("brd"))
+    key: Mapped[str] = mapped_column(String, unique=True)
+    name: Mapped[str] = mapped_column(String)
+    kind: Mapped[str] = mapped_column(String)
+    project_id: Mapped[str | None] = mapped_column(ForeignKey("work_projects.id"), unique=True, nullable=True)
+
+
+class BoardAgentAccess(Base):
+    __tablename__ = "work_board_agent_access"
+    board_id: Mapped[str] = mapped_column(ForeignKey("work_boards.id"), primary_key=True)
+    agent_id: Mapped[str] = mapped_column(ForeignKey("agents.id", ondelete="CASCADE"), primary_key=True)
+    read: Mapped[bool] = mapped_column(default=False)
+    write: Mapped[bool] = mapped_column(default=False)
+    claim: Mapped[bool] = mapped_column(default=False)
+    request_human_action: Mapped[bool] = mapped_column(default=False)
+
+
+class Task(Base):
+    __tablename__ = "work_tasks"
+    __table_args__ = (
+        CheckConstraint("status IN ('backlog','ready','in_progress','blocked','review','done')", name="work_task_status"),
+        CheckConstraint("priority BETWEEN 0 AND 3", name="work_task_priority"),
+        CheckConstraint("version > 0", name="work_task_version"),
+        CheckConstraint("(assignee_kind = 'agent' AND assignee_agent_id IS NOT NULL) OR "
+                        "(assignee_kind IN ('owner','unassigned') AND assignee_agent_id IS NULL)",
+                        name="work_task_assignee"),
+        Index("work_task_board_order", "board_id", "status", "position"),
+        Index("work_task_owner_queue", "assignee_kind", "archived", "status"),
+    )
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: new_id("tsk"))
+    board_id: Mapped[str] = mapped_column(ForeignKey("work_boards.id"))
+    title: Mapped[str] = mapped_column(String)
+    description: Mapped[str] = mapped_column(Text, default="")
+    notes: Mapped[str] = mapped_column(Text, default="")
+    acceptance: Mapped[str] = mapped_column(Text, default="")
+    status: Mapped[str] = mapped_column(String, default="backlog")
+    priority: Mapped[int] = mapped_column(Integer, default=2)
+    due_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    labels: Mapped[list[Any]] = mapped_column(JSON, default=list)
+    assignee_kind: Mapped[str] = mapped_column(String, default="unassigned")
+    assignee_agent_id: Mapped[str | None] = mapped_column(ForeignKey("agents.id"), nullable=True)
+    creator: Mapped[str] = mapped_column(String)
+    position: Mapped[int] = mapped_column(Integer, default=1024)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    archived: Mapped[bool] = mapped_column(default=False)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=now)
+    updated_at: Mapped[datetime] = mapped_column(UTCDateTime, default=now)
+
+
+class TaskActivity(Base):
+    __tablename__ = "work_task_activity"
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: new_id("act"))
+    task_id: Mapped[str] = mapped_column(ForeignKey("work_tasks.id"), index=True)
+    actor: Mapped[str] = mapped_column(String)
+    kind: Mapped[str] = mapped_column(String)
+    data: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=now)
+
+
+class TaskComment(Base):
+    __tablename__ = "work_task_comments"
+    __table_args__ = (Index("work_comment_retry", "task_id", "actor", "idempotency_key", unique=True),)
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: new_id("cmt"))
+    task_id: Mapped[str] = mapped_column(ForeignKey("work_tasks.id"), index=True)
+    actor: Mapped[str] = mapped_column(String)
+    body: Mapped[str] = mapped_column(Text)
+    idempotency_key: Mapped[str] = mapped_column(String)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=now)
+
+
+class TaskNotification(Base):
+    __tablename__ = "work_task_notifications"
+    __table_args__ = (Index("work_notification_event", "activity_id", "recipient", unique=True),)
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: new_id("ntf"))
+    task_id: Mapped[str] = mapped_column(ForeignKey("work_tasks.id"), index=True)
+    activity_id: Mapped[str] = mapped_column(ForeignKey("work_task_activity.id"))
+    recipient: Mapped[str] = mapped_column(String, default="owner")
+    read_at: Mapped[datetime | None] = mapped_column(UTCDateTime, nullable=True)
+    delivered_at: Mapped[datetime | None] = mapped_column(UTCDateTime, nullable=True)
+    attempts: Mapped[int] = mapped_column(Integer, default=0)
+    next_attempt_at: Mapped[datetime] = mapped_column(UTCDateTime, default=now)
+    error: Mapped[str] = mapped_column(String, default="")
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=now)
+
+
+class Repository(Base):
+    __tablename__ = "work_repositories"
+    __table_args__ = (Index("uq_work_repository_provider", "provider_host", "provider_id", unique=True),)
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: new_id("repo"))
+    project_id: Mapped[str | None] = mapped_column(ForeignKey("work_projects.id"), nullable=True, index=True)
+    name: Mapped[str] = mapped_column(String)
+    description: Mapped[str] = mapped_column(Text, default="")
+    web_url: Mapped[str] = mapped_column(String, default="")
+    sync_connection_id: Mapped[str | None] = mapped_column(ForeignKey("work_github_connections.id"), nullable=True)
+    source_metadata: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+    import_enabled: Mapped[bool] = mapped_column(default=False)
+    include_closed: Mapped[bool] = mapped_column(default=False)
+    poll_seconds: Mapped[int] = mapped_column(Integer, default=300)
+    last_refreshed_at: Mapped[datetime | None] = mapped_column(UTCDateTime, nullable=True)
+    # Provider identity is assigned only by discovery, never guessed from a URL.
+    provider_host: Mapped[str | None] = mapped_column(String, nullable=True)
+    provider_id: Mapped[str | None] = mapped_column(String, nullable=True)
+    archived: Mapped[bool] = mapped_column(default=False)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=now)
+
+
+class RepositoryLocation(Base):
+    __tablename__ = "work_repository_locations"
+    __table_args__ = (
+        CheckConstraint("environment IN ('dev','test','prod')", name="work_location_environment"),
+        CheckConstraint("directory_kind IN ('checkout','deployment_directory')", name="work_location_kind"),
+        CheckConstraint("asset_ref IS NOT NULL OR resource_ref IS NOT NULL", name="work_location_host"),
+        Index("uq_work_location_primary", "repository_id", "environment", unique=True,
+              sqlite_where=text('is_primary = 1'),
+              postgresql_where=text('is_primary = true')),
+    )
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: new_id("loc"))
+    repository_id: Mapped[str] = mapped_column(ForeignKey("work_repositories.id"), index=True)
+    environment: Mapped[str] = mapped_column(String)
+    name: Mapped[str] = mapped_column(String)
+    asset_id: Mapped[str | None] = mapped_column(ForeignKey("inventory_assets.id", ondelete="SET NULL"), nullable=True)
+    resource_id: Mapped[str | None] = mapped_column(ForeignKey("resources.id", ondelete="SET NULL"), nullable=True)
+    # Retain original identities after deletion; never relink automatically by display name.
+    asset_ref: Mapped[str | None] = mapped_column(String, nullable=True)
+    resource_ref: Mapped[str | None] = mapped_column(String, nullable=True)
+    directory: Mapped[str] = mapped_column(String)
+    directory_kind: Mapped[str] = mapped_column(String, default="checkout")
+    expected_ref: Mapped[str] = mapped_column(String, default="")
+    subdirectory: Mapped[str] = mapped_column(String, default="")
+    application_url: Mapped[str] = mapped_column(String, default="")
+    notes: Mapped[str] = mapped_column(Text, default="")
+    is_primary: Mapped[bool] = mapped_column(default=False)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    verification_status: Mapped[str] = mapped_column(String, default="unverified")
+    verified_at: Mapped[datetime | None] = mapped_column(UTCDateTime, nullable=True)
+    verification_message: Mapped[str] = mapped_column(String, default="")
+    verification_fingerprint: Mapped[str] = mapped_column(String, default="")
+    observed: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+
+class GitHubConnection(Base):
+    __tablename__ = "work_github_connections"
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: new_id("ghc"))
+    name: Mapped[str] = mapped_column(String)
+    sealed_data: Mapped[str] = mapped_column(Text)
+    enabled: Mapped[bool] = mapped_column(default=True)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    status: Mapped[str] = mapped_column(String, default="untested")
+    error: Mapped[str] = mapped_column(String, default="")
+    retry_at: Mapped[datetime | None] = mapped_column(UTCDateTime, nullable=True)
+    tested_at: Mapped[datetime | None] = mapped_column(UTCDateTime, nullable=True)
+
+
+class GitHubCache(Base):
+    __tablename__ = "work_github_cache"
+    signature: Mapped[str] = mapped_column(String, primary_key=True)
+    connection_id: Mapped[str] = mapped_column(ForeignKey("work_github_connections.id", ondelete="CASCADE"), index=True)
+    etag: Mapped[str] = mapped_column(String, default="")
+    modified: Mapped[str] = mapped_column(String, default="")
+    payload: Mapped[Any] = mapped_column(JSON)
+    next_request_at: Mapped[datetime | None] = mapped_column(UTCDateTime, nullable=True)
+    next_url: Mapped[str] = mapped_column(String, default="")
+    touched_at: Mapped[datetime] = mapped_column(UTCDateTime, default=now)
+
+
+class GitHubSync(Base):
+    """One recoverable job/checkpoint per repository; no unbounded job history."""
+    __tablename__ = "work_github_sync"
+    repository_id: Mapped[str] = mapped_column(ForeignKey("work_repositories.id"), primary_key=True)
+    status: Mapped[str] = mapped_column(String, default="queued")
+    run_id: Mapped[str] = mapped_column(String, default="")
+    started_at: Mapped[datetime | None] = mapped_column(UTCDateTime, nullable=True)
+    last_success: Mapped[datetime | None] = mapped_column(UTCDateTime, nullable=True)
+    watermark: Mapped[datetime | None] = mapped_column(UTCDateTime, nullable=True)
+    last_full: Mapped[datetime | None] = mapped_column(UTCDateTime, nullable=True)
+    next_attempt: Mapped[datetime] = mapped_column(UTCDateTime, default=now)
+    force_full: Mapped[bool] = mapped_column(default=False)
+    imported: Mapped[int] = mapped_column(Integer, default=0)
+    updated: Mapped[int] = mapped_column(Integer, default=0)
+    failures: Mapped[int] = mapped_column(Integer, default=0)
+    error: Mapped[str] = mapped_column(String, default="")
+    source_available: Mapped[bool] = mapped_column(default=True)
+
+
+class ExternalIssue(Base):
+    __tablename__ = "work_external_issues"
+    __table_args__ = (Index("uq_work_issue_provider", "provider_host", "provider_id", unique=True),)
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: new_id("issue"))
+    provider_host: Mapped[str] = mapped_column(String, default="github.com")
+    provider_id: Mapped[str] = mapped_column(String)
+    repository_id: Mapped[str] = mapped_column(ForeignKey("work_repositories.id"), index=True)
+    task_id: Mapped[str | None] = mapped_column(ForeignKey("work_tasks.id"), nullable=True, unique=True)
+    number: Mapped[int] = mapped_column(Integer)
+    source_updated_at: Mapped[datetime] = mapped_column(UTCDateTime)
+    snapshot: Mapped[dict[str, Any]] = mapped_column(JSON)
+    refreshed_at: Mapped[datetime] = mapped_column(UTCDateTime, default=now)
+
+
+class GitHubDiscussionPage(Base):
+    __tablename__ = "work_github_discussion_pages"
+    __table_args__ = (Index("uq_work_discussion_page", "issue_id", "page", unique=True),)
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: new_id("discussion"))
+    issue_id: Mapped[str] = mapped_column(ForeignKey("work_external_issues.id"), index=True)
+    page: Mapped[int] = mapped_column(Integer)
+    comments: Mapped[list] = mapped_column(JSON, default=list)
+    has_next: Mapped[bool] = mapped_column(default=False)
+    refreshed_at: Mapped[datetime] = mapped_column(UTCDateTime, default=now)
+
+
+class GitHubIgnoredRepository(Base):
+    """Owner's picker preferences survive token replacement, renames and rediscovery."""
+    __tablename__ = "work_github_ignored_repositories"
+    provider_host: Mapped[str] = mapped_column(String, primary_key=True, default="github.com")
+    provider_id: Mapped[str] = mapped_column(String, primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=now)

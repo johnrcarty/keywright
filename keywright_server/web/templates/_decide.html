@@ -2,7 +2,14 @@
 <form method="post" action="/ui/requests/{{ req.id }}/decide" class="decision-actions">
 <input type="hidden" name="next" value="{{ next or '/ui' }}">
 {% if not in_detail %}{% include "_hazards.html" %}{% endif %}
-{% if hazard_blocks(hazard_level(req.detail)) %}
+{% if req.detail.shopping_session or req.detail.checkout %}
+<input type="hidden" name="extent" value="exact">
+{% if req.detail.shopping_session %}<button class="btn ok" name="scope" value="shopping20">Shop for 20 minutes</button>
+{% else %}<button class="btn ok" name="scope" value="once">Place this order once</button>{% endif %}
+<button class="btn bad" name="scope" value="deny">Deny</button>
+<p class="help">{{ 'Browsing and cart changes for this agent session; purchases need their own approval.' if req.detail.shopping_session else 'Approval expires within five minutes. Changed quotes require another review.' }}</p>
+</form>
+{% elif hazard_blocks(hazard_level(req.detail)) %}
 <input type="hidden" name="extent" value="exact">
 <button class="btn ok" name="scope" value="once">Allow once (exact operation)</button>
 <div class="decision-deny"><input type="text" name="deny_reason" placeholder="Deny reason (optional)" aria-label="Deny reason (optional)">

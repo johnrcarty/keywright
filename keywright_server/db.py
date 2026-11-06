@@ -47,11 +47,15 @@ async def init_db() -> None:
     settings.ensure_dirs()
     async with engine().begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        from .tasks import seed
+        await seed(conn)
         await conn.run_sync(_upgrade_knowledge_columns)
+        await conn.run_sync(_upgrade_knowledge_graph_columns)
         from .knowledge_index import init_local
         await conn.run_sync(init_local)
         await conn.run_sync(_upgrade_access_columns)
         await conn.run_sync(_upgrade_discovery_columns)
+        await conn.run_sync(_upgrade_repository_columns)
         await conn.run_sync(_relocate_key_paths)
         await conn.execute(text("SELECT 1"))
     if settings.db_url.startswith("sqlite") and settings.db_path.exists():
@@ -63,6 +67,13 @@ def _upgrade_knowledge_columns(conn) -> None:
     columns = {c["name"] for c in inspect(conn).get_columns("knowledge_chunks")}
     if "section_path" not in columns:
         conn.execute(text("ALTER TABLE knowledge_chunks ADD COLUMN section_path JSON"))
+
+
+def _upgrade_knowledge_graph_columns(conn) -> None:
+    """Track derived link coverage without modifying publication or source identity."""
+    columns = {c["name"] for c in inspect(conn).get_columns("knowledge_revisions")}
+    if "link_version" not in columns:
+        conn.execute(text("ALTER TABLE knowledge_revisions ADD COLUMN link_version INTEGER"))
 
 
 def _upgrade_access_columns(conn) -> None:
@@ -115,5 +126,21 @@ async def reset_for_tests(url: str) -> None:
     _sessionmaker = async_sessionmaker(_engine, expire_on_commit=False)
     async with _engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        from .tasks import seed
+        await seed(conn)
         from .knowledge_index import init_local
         await conn.run_sync(init_local)
+
+
+def _upgrade_repository_columns(conn) -> None:
+    columns = {c['name'] for c in inspect(conn).get_columns('work_repositories')}
+    for name, definition in {
+        'sync_connection_id': 'VARCHAR REFERENCES work_github_connections(id)',
+        'source_metadata': "JSON NOT NULL DEFAULT '{}'",
+        'import_enabled': 'BOOLEAN NOT NULL DEFAULT FALSE',
+        'include_closed': 'BOOLEAN NOT NULL DEFAULT FALSE',
+        'poll_seconds': 'INTEGER NOT NULL DEFAULT 300',
+        'last_refreshed_at': 'TIMESTAMP',
+    }.items():
+        if name not in columns:
+            conn.execute(text(f'ALTER TABLE work_repositories ADD COLUMN {name} {definition}'))

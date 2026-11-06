@@ -32,6 +32,8 @@ ERROR_EXIT = {
     "unauthorized": EXIT_TRANSPORT, "invalid_arguments": EXIT_USAGE,
     "ssh_failed": EXIT_FAILED, "put_failed": EXIT_FAILED, "get_failed": EXIT_FAILED, "capture_failed": EXIT_FAILED,
     "upstream_failed": EXIT_FAILED, "internal": EXIT_FAILED,
+    "forbidden": EXIT_DENIED, "invalid_assignee": EXIT_USAGE, "invalid_transition": EXIT_USAGE,
+    "stale_version": EXIT_FAILED, "conflict": EXIT_FAILED,
 }
 # Approvals arrive on a phone; 300 s produced timeouts in normal use (F3 in the 2026-09-20 field
 # report). KW_WAIT sets the default per machine or per profile without repeating --wait everywhere.
@@ -66,6 +68,24 @@ def build_parser() -> argparse.ArgumentParser:
 
     sp = sub.add_parser("resources", help="brokered resources and your standing on each")
     sp.add_argument("--json", action="store_true")
+
+    sp = sub.add_parser("work", help="native work boards and repository context")
+    sp.add_argument("action", choices=("boards", "list", "get", "create", "update", "comment", "repositories", "repository", "locations", "context", "discussion"))
+    sp.add_argument("task_id", nargs="?")
+    sp.add_argument("--data", default="{}", help="JSON fields or filters; updates require expected_version")
+    sp.add_argument("--json", action="store_true")
+
+    sp = sub.add_parser("shop", help="DoorDash shopping session, cached guide, status or reviewed checkout")
+    sp.add_argument("host")
+    sp.add_argument("action", choices=("guide", "start", "status", "checkout"))
+    sp.add_argument("--cart-uuid")
+    sp.add_argument("--card-id")
+    sp.add_argument("--tip-cents", type=int)
+    sp.add_argument("--scheduled-time")
+    sp.add_argument("--priority", action="store_true")
+    sp.add_argument("--no-apply-credits", action="store_true")
+    sp.add_argument("--intent", help="DoorDash workflow purpose; exclude private account/delivery information")
+    gated(sp)
 
     sp = sub.add_parser("run", help="run a command on a brokered host: kw run <host> [opts] -- <cmd...>")
     sp.add_argument("host")
@@ -133,6 +153,17 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--raw", action="store_true", help="print the raw result JSON")
     gated(sp)
 
+    sp = sub.add_parser("issue", help="preview or submit a public Keywright bug report or connector request")
+    sp.add_argument("kind", choices=("bug", "connector"))
+    sp.add_argument("--title", required=True)
+    report = sp.add_mutually_exclusive_group(required=True)
+    report.add_argument("--body", help="report text; include reproduction steps or requested connector operations")
+    report.add_argument("--body-file", help="UTF-8 report file, or - for stdin")
+    action = sp.add_mutually_exclusive_group()
+    action.add_argument("--submit", action="store_true", help="publish using your existing GitHub CLI login")
+    action.add_argument("--dry-run", action="store_true", help="preview only (the default); no network access")
+    sp.add_argument("--json", action="store_true")
+
     sp = sub.add_parser("hazards", help="flag destructive shell commands (also the Claude Code PreToolUse hook)")
     sp.add_argument("command", nargs="?")
     sp.add_argument("--hook", action="store_true")
@@ -188,7 +219,11 @@ class Gate:
     def call(self, tool: str, arguments: dict[str, Any], read_timeout: float = 60.0):
         from .transport import call
 
-        return call(self.profile, self.session, tool, arguments, read_timeout=read_timeout)
+        started = time.monotonic()
+        result = call(self.profile, self.session, tool, arguments, read_timeout=read_timeout)
+        if tool in ("ssh_run", "doordash_shop") and isinstance(getattr(result, "structured_content", None), dict):
+            result.structured_content.setdefault("timing", {})["client_exchange_ms"] = int((time.monotonic() - started) * 1000)
+        return result
 
     def gated(self, tool: str, arguments: dict[str, Any], remote_timeout: int = 60) -> tuple[dict[str, Any], int]:
         """(payload, exit code). Exit 0 means the payload is a success result."""
@@ -520,7 +555,56 @@ def cmd_resources(args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
-CORE_TOOLS = {"access_list_resources", "access_request", "access_status", "request_attention",
+def cmd_work(args: argparse.Namespace) -> int:
+    from .transport import AuthError, TransportError, payload
+
+    try:
+        fields = json.loads(args.data)
+        if not isinstance(fields, dict):
+            raise TypeError
+    except (ValueError, TypeError):
+        return _usage("--data must be a JSON object")
+    if args.action in ("get", "update", "comment", "discussion"):
+        if not args.task_id:
+            return _usage("this work action requires a task ID")
+        fields["task_id"] = args.task_id
+    elif args.action in ("repository", "locations", "context"):
+        if not args.task_id:
+            return _usage("this work action requires a repository ID")
+        fields["repository_id"] = args.task_id
+    elif args.task_id:
+        return _usage("this work action does not take a task ID")
+    names = {"boards": "work_list_boards", "list": "work_list_tasks", "get": "work_get_task",
+             "create": "work_create_task", "update": "work_update_task", "comment": "work_comment_task",
+             "repositories": "work_list_repositories", "repository": "work_get_repository",
+             "locations": "work_list_locations", "context": "work_get_location_context",
+             "discussion": "work_get_github_discussion"}
+    gate = Gate(args)
+    try:
+        result = gate.call(names[args.action], fields)
+    except (AuthError, TransportError):
+        return _fail("Work call failed; inspect current state before retrying a mutation.", EXIT_TRANSPORT)[1]
+    data = payload(result)
+    code = ERROR_EXIT.get(data.get("error"), EXIT_FAILED) if result.is_error else EXIT_OK
+    if not args.json:
+        sys.stdout.write(json.dumps(data, indent=2) + "\n")
+    return emit(data, code, args.json)
+
+
+def cmd_shop(args: argparse.Namespace) -> int:
+    gate = Gate(args)
+    arguments = {key: getattr(args, key) for key in ("host", "action", "cart_uuid", "card_id", "tip_cents",
+                 "scheduled_time", "priority", "no_apply_credits", "intent", "reason")
+                 if getattr(args, key) is not None}
+    data, code = gate.gated("doordash_shop", arguments, remote_timeout=180)
+    if code == EXIT_OK and "exit_code" in data and data["exit_code"] != 0:
+        code = EXIT_REMOTE
+    if not gate.as_json:
+        sys.stdout.write(json.dumps(data, indent=2) + "\n")
+    return emit(data, code, gate.as_json)
+
+
+CORE_TOOLS = {"access_list_resources", "access_request", "access_status", "request_attention", "doordash_shop",
               "ssh_run", "ssh_put", "ssh_get", "ssh_capture"}
 
 
@@ -714,9 +798,17 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_setup(args)
     if rest and args.cmd not in ("run", "capture"):
         return _usage("`--` is only meaningful for run and capture")
+    if args.cmd == "issue":
+        from .issues import run
+
+        return run(args)
     try:
+        if args.cmd == "work":
+            return cmd_work(args)
         if args.cmd == "run":
             return cmd_run(args, rest)
+        if args.cmd == "shop":
+            return cmd_shop(args)
         if args.cmd == "put":
             return cmd_put(args)
         if args.cmd == "get":

@@ -220,7 +220,15 @@ is an optional, separate search index, not a migration of broker state or LiteLL
    files or follow symlinks. Reimport from the document page after changing the source repository.
 3. Grant selected agents the collection's `read-only` bundle. Grant `contribute` separately
    if they may propose memory. Existing deny rules, grants, revocation and audit apply.
-4. Review agent proposals in Knowledge. The UI shows the current-to-proposed Markdown diff,
+   For shared guidance, open **Access for every agent**, keep **Agent → Every agent**, and
+   allow the read-only tools. This covers existing and future enrolled agents with ordinary
+   global rules. Allow `knowledge_propose` separately when everyone may submit reviewable notes.
+   No existing collection is automatically shared, and proposals remain private to admin review
+   until published. Agent-specific deny rules still win. See [CLI feedback](CLI_FEEDBACK.md).
+4. Pending agent proposals appear live under **Dashboard → Pending requests**, alongside
+   access approvals, and count toward the pending total. **Review & approve** opens the
+   proposal directly and returns to the dashboard after approval or rejection. Proposals
+   also remain available in Knowledge. The UI shows the current-to-proposed Markdown diff,
    attribution, rationale and claimed source. Approval publishes; rejection never indexes the
    proposal. Stale proposals must be submitted again against the current revision.
 
@@ -231,7 +239,70 @@ The MCP tools are exported using Keywright's existing naming convention:
 | `KeywrightKnowledge__knowledge_search` | Search reviewed chunks; return source, revision, hash, line range and citation |
 | `KeywrightKnowledge__knowledge_get` | Read a current published document by `document_id` |
 | `KeywrightKnowledge__knowledge_list` | List this collection's reviewed documents with pagination |
+| `KeywrightKnowledge__knowledge_neighbors` | Explore explicit references and backlinks between current published documents in this collection |
 | `KeywrightKnowledge__knowledge_propose` | Submit Markdown for human review; cannot publish or change access |
+
+#### Knowledge graph
+
+Open **Knowledge → Knowledge graph**, or **Links & backlinks** on a document. The admin
+global view groups all collections; local views expand one to three hops. Select a node or
+use the document list to see references, backlinks, unresolved destinations, source line
+numbers and a Markdown preview. Drag to pan or move nodes; use the wheel or buttons to zoom.
+Colors identify documentation, decisions, memory and operational notes. Solid arrows are
+explicit references. The canvas is self-contained; no remote scripts or graph database are needed.
+
+Approved publication indexes `[[wikilinks]]`, display aliases, heading/block fragments,
+inline Markdown links and reference-style Markdown links. Whitespace-delimited, qualified
+collection paths such as `feedback/example/preparation.md` are also recognized in prose
+and in a revision's source metadata, including a trailing `@revision` citation. These paths
+start at the collection root; explicit `./` and `../` paths are relative to the note.
+Source-metadata references are labeled as such instead of presenting a Markdown line number.
+Host paths, URLs and `git:` sources are not treated as collection paths. Code fences, indented/inline code,
+HTML comments and leading YAML front matter are ignored. This is a focused parser, not a
+complete CommonMark renderer or Obsidian importer: nested labels, HTML anchors and aliases
+defined in YAML are not supported. External URLs, images, non-Markdown attachments,
+query-bearing URLs and paths that escape the collection are ignored, never fetched.
+
+Markdown paths resolve relative to the source document; `/` starts at the collection root.
+Wiki paths resolve from the collection root except explicit `./` and `../` paths. A short
+wiki name first matches a root document, then a unique basename elsewhere in that collection;
+ambiguous names remain unresolved. `.md` may be omitted. Resolution never crosses collections,
+even in the admin global view. Publishing a missing target resolves its incoming references.
+
+The derived `knowledge_links` table records source document/revision, destination text,
+line number, and `references` / `explicit` relationship. Publication updates outgoing edges
+in the same audited transaction. Graph reads recheck current publication and expiry: pending,
+rejected, archived, expired and foreign-collection targets expose no IDs or metadata. Links
+do not change source Markdown, revision identity, approval history or permissions.
+
+Startup adds the table and a nullable link-index version marker. For older publications,
+use **Index links in existing documents → Rebuild document links**; the graph reports missing
+coverage. Link-index version 2 adds plain paths and source-metadata references; rebuild
+existing documents to include them without changing approved content. An indexed graph with
+no references explains that shared topics alone do not create links. Rebuilds verify canonical Markdown hashes and roll back on missing/corrupt source.
+No embedding provider is called. New collections include `knowledge_neighbors` in their
+read-only bundle; older collections' bundles and access rules are not silently expanded.
+
+```json
+{"document_id":"doc_example","depth":2,"direction":"both","limit":50}
+```
+
+The MCP tool accepts direction `both`, `incoming` or `outgoing`, depth 1–3, and a node limit
+of 1–100 including the starting document. Results include nodes, directed edges, unresolved
+references, provenance, hop distances, coverage and an explicit truncation flag. Browser
+views cap at 500 documents and 5,000 links (plus 5,000 unresolved references); use a collection
+or local view when truncated. Publication permits up to 1,000 internal links per document.
+
+Semantic suggestions, typed entities and automatic graph expansion during retrieval remain
+follow-on work. Agents can explicitly call `knowledge_neighbors` after search and read
+connected documents through existing collection permissions. A reference is not proof of
+dependency, causation or authority. More indexing does not invent additional relationships.
+
+Link syntax and local-graph interaction follow the patterns described in
+[Obsidian's internal links](https://help.obsidian.md/links) and
+[graph view](https://help.obsidian.md/plugins/graph), with Keywright's collection and review boundaries.
+
+#### Search and indexing
 
 Search accepts `query`, `limit` (1–30, default 10), optional `path_prefix`, and optional
 `diagnostics` (default false). A prefix such as `projects/example/` restricts both text and vector
@@ -435,12 +506,20 @@ review form is rejected if its source or inventory has changed. Unlinking an obs
 inventory, interfaces, and addresses. Imports and selected changes commit atomically with an audit
 record and never grant agent access or configure the source device. Background polling is not enabled; the Network map can refresh while its browser tab is visible.
 
-### OAuth for upstream MCP servers (including Notion)
+### OAuth for upstream MCP servers (including Notion and CoinStats)
 
-**Resources → Add resource** opens a searchable integration catalog. Notion, TP-Link Omada,
+**Resources → Add resource** opens a searchable integration catalog. Notion, CoinStats, Robinhood, TP-Link Omada,
 and Keywright inventory have guided setup and connection defaults. Generic SSH hosts, MCP servers,
 and LLM gateways are listed under **Custom connections**. The catalog lives in
 `keywright_server/integrations.py`; presets reuse the existing adapters and OAuth implementation.
+The [Coinbase preset](COINBASE.md) guides CLI setup on a managed SSH host and uses
+the existing SSH command approval flow. Coinbase's remote MCP currently requires
+client allowlisting; Keywright is not on its published supported-client list.
+The [DoorDash preset](DOORDASH.md) also uses managed SSH, with `dd-cli` login or a
+host-managed access token for headless use. Its guided setup can reuse an enrolled SSH
+host, install a checksum-verified CLI, and walk the owner through browser sign-in or
+token entry and an authenticated verification. Both CLI presets keep provider credentials
+on the remote host and default to **Ask for approval**.
 
 HTTP MCP resources support browser-based OAuth as well as static headers. OAuth is generic:
 Keywright discovers the server's authorization provider, registers a client automatically when
@@ -456,10 +535,26 @@ To connect Notion, including a Free-plan workspace:
 4. Use **Test connection**, then review the discovered tools and access bundles. Agents use the
    same Keywright MCP endpoint or CLI as before; each operation still passes the approval gate.
 
+To connect **CoinStats**, choose it from **Add resource** and select **Continue to CoinStats**.
+The preset supplies `https://mcp.coinstats.app/mcp` and the additional OAuth origins
+`https://api.coin-stats.com` and `https://coinstats.app`. Sign in and approve access in your
+browser, then use **Test connection**. No API key is needed; the `coinstats` scope is discovered
+from the provider. This preset is available in the source checkout, ahead of the next release.
+Agents discover the current tools with `kw tool CoinStats --list`, covering market data,
+portfolios, wallets, exchanges and news. Keep the default **Ask for approval** access mode;
+the upstream catalog also documents portfolio mutations, including deletion. Available tools
+and permissions depend on CoinStats. See its [connection guide](https://coinstats.app/api-docs/mcp/connecting)
+and [tool catalog](https://coinstats.app/api-docs/mcp/tools).
+
+The [Robinhood preset](ROBINHOOD.md) uses the same browser sign-in flow, with its
+trading MCP endpoint and additional OAuth origins preconfigured. Complete Robinhood's
+agent onboarding before testing account access. New resources default to **Ask for approval**.
+
 The fixed callback is `<KW_PUBLIC_URL>/ui/mcp-oauth/callback`. Advanced OAuth settings accept
 explicit scopes, pre-registered client credentials, and additional trusted HTTPS origins when the
 authorization provider runs separately from the MCP server. Discovery sends no configured headers
-and does not follow redirects. Unknown OAuth origins are rejected until the administrator adds them.
+and does not follow redirects. Presets can supply known provider origins; other origins are
+rejected until the administrator adds them.
 OAuth requires protected-resource metadata, authorization-server or OIDC discovery, and S256 PKCE.
 This flow does not implement device-code grants or automatic client-ID metadata document hosting.
 

@@ -53,6 +53,7 @@ textarea{min-height:90px;font-family:ui-monospace,monospace;font-size:13px}
 .tile-open>summary::-webkit-details-marker{display:none}
 .tile-open>summary:hover{background:rgba(127,127,127,.05)}
 .tile-head{display:flex;flex-wrap:wrap;gap:6px 8px;align-items:baseline}
+.tile-summary{padding:10px 12px;overflow-wrap:anywhere}
 .tile-head>b{min-width:0;overflow-wrap:anywhere}
 .tile-dot{width:8px;height:8px;border-radius:50%;background:var(--warn);flex:0 0 auto;align-self:center}
 .req-tile.flagged .tile-dot{background:var(--bad)}
@@ -157,8 +158,9 @@ input,select,textarea{min-width:0;max-width:100%}input[type=checkbox]{flex-shrin
 <a href="/ui/grants" class="{{ 'active' if request.url.path.startswith('/ui/grants') }}">Grants</a>
 <a href="/ui/policies" class="{{ 'active' if request.url.path.startswith('/ui/policies') }}">Rules</a>
 <a href="/ui/access" class="{{ 'active' if request.url.path.startswith('/ui/access') }}">Access</a>
-<a href="/ui/resources" class="{{ 'active' if (request.url.path.startswith('/ui/resources') or request.url.path.startswith('/ui/inventory')) }}">Resources</a>
+<a href="/ui/resources" class="{{ 'active' if (request.url.path.startswith('/ui/resources') or request.url.path.startswith('/ui/inventory') or request.url.path.startswith('/ui/integrations')) }}">Resources</a>
 <a href="/ui/agents" class="{{ 'active' if request.url.path.startswith('/ui/agents') }}">Agents</a>
+<a href="/ui/work" class="{{ 'active' if request.url.path.startswith('/ui/work') }}">Work</a>
 <a href="/ui/knowledge" class="{{ 'active' if request.url.path.startswith('/ui/knowledge') }}">Knowledge</a>
 <a href="/ui/mail" class="{{ 'active' if request.url.path.startswith('/ui/mail') }}">Mail</a>
 <a href="/ui/usage" class="{{ 'active' if request.url.path.startswith('/ui/usage') }}">Usage</a>
@@ -169,13 +171,14 @@ input,select,textarea{min-width:0;max-width:100%}input[type=checkbox]{flex-shrin
 </nav></header>
 <nav class="mobile-nav" aria-label="Mobile navigation">
 <a href="/ui" class="{{ 'active' if request.url.path == '/ui' }}">{{ icon('dashboard') }}Dashboard</a>
-<a href="/ui/resources" class="{{ 'active' if (request.url.path.startswith('/ui/resources') or request.url.path.startswith('/ui/inventory')) }}">{{ icon('ssh') }}Resources</a>
+<a href="/ui/resources" class="{{ 'active' if (request.url.path.startswith('/ui/resources') or request.url.path.startswith('/ui/inventory') or request.url.path.startswith('/ui/integrations')) }}">{{ icon('ssh') }}Resources</a>
 <a href="/ui/requests" class="{{ 'active' if request.url.path.startswith('/ui/requests') }}">{{ icon('requests') }}Requests</a>
 <a href="/ui/audit" class="{{ 'active' if request.url.path.startswith('/ui/audit') }}">{{ icon('activity') }}Activity</a>
 <details class="mobile-more{{ ' current' if request.url.path.startswith('/ui/grants') or request.url.path.startswith('/ui/policies') or request.url.path.startswith('/ui/access') or request.url.path.startswith('/ui/agents') or request.url.path.startswith('/ui/settings') or request.url.path.startswith('/ui/usage') or request.url.path.startswith('/ui/mail') or request.url.path.startswith('/ui/knowledge') }}">
 <summary>{{ icon('more') }}More</summary>
 <div class="mobile-more-menu">
 <a href="/ui/knowledge" class="{{ 'active' if request.url.path.startswith('/ui/knowledge') }}">Knowledge</a>
+<a href="/ui/work" class="{{ 'active' if request.url.path.startswith('/ui/work') }}">Work</a>
 <a href="/ui/mail" class="{{ 'active' if request.url.path.startswith('/ui/mail') }}">Mail</a>
 <a href="/ui/usage" class="{{ 'active' if request.url.path.startswith('/ui/usage') }}">Usage</a>
 <a href="/ui/grants" class="{{ 'active' if request.url.path.startswith('/ui/grants') }}">Grants</a>

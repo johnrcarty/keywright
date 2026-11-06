@@ -1,5 +1,8 @@
 # keywright
 
+The source candidate is version 0.0.2. Published installation examples below remain
+on 0.0.1 until the [0.0.2 release](https://github.com/johnrcarty/keywright/blob/main/docs/releases/0.0.2.md) is published.
+
 The client half of [Keywright](https://github.com/johnrcarty/keywright), a just-in-time credential broker for AI agents.
 
 - `kw run|put|get|capture|request|status|tool` reach brokered SSH hosts and MCP tools from any shell.
@@ -52,6 +55,40 @@ that do not supply it retain the fallback. Compare `kw session` inside and outsi
 to check attribution. Process fallback is per process, not necessarily per conversation.
 Switching from process to thread identity requires fresh session-scoped approvals.
 
+## Bug reports and connector requests
+
+Available in the source checkout, ahead of the next published package. `kw issue`
+works without a configured or reachable broker. Preview a public report first:
+
+```bash
+kw issue bug --title "Describe the failure" --body-file report.txt
+kw issue connector --title "Add a service connector" --body-file request.txt --json
+```
+
+For bugs, include reproduction steps, expected/actual behavior and relevant versions.
+For connectors, include upstream API/MCP/CLI documentation, authentication details
+(without credentials), versions and the operations you want. Search existing
+[issues](https://github.com/johnrcarty/keywright/issues) before submitting.
+
+To publish, install [GitHub CLI](https://cli.github.com/), sign in with
+`gh auth login --hostname github.com`, and repeat the command with `--submit`.
+It creates an issue in `johnrcarty/keywright` using that login. `--body-file -` reads
+stdin; `--body` accepts inline text. `--dry-run` explicitly selects the default
+preview behavior. `--json` gives machine-readable results. Publishing uses
+[`gh issue create`](https://cli.github.com/manual/gh_issue_create).
+
+Only your supplied title, body and client version are included. The command does
+not collect logs, config files, broker credentials or conversation history, and
+does not automatically sanitize your text. Review the preview for private data.
+Security vulnerabilities belong in the repository's private security reporting
+process, not a public bug report. Agents should publish only when authorized to
+file a public report.
+
+Exit codes: 0 previewed/submitted, 2 invalid input, 6 submission failed or outcome
+unknown. Submission is never retried automatically; after a timeout or uncertain
+failure, check GitHub before retrying to avoid duplicate issues. Broker-side MCP
+does not acquire a GitHub credential; shell-capable agents use this client command.
+
 ## License
 
 Keywright is licensed under [Apache-2.0](LICENSE). Copyright 2026 Keywright
@@ -59,3 +96,39 @@ contributors. See [NOTICE](NOTICE) and [third-party notices](THIRD_PARTY_NOTICES
 Commercial use and proprietary extensions are permitted under the license's terms.
 Unless explicitly stated otherwise, contributions intentionally submitted for
 inclusion in Keywright are provided under Apache-2.0.
+
+### DoorDash shopping
+
+Use `kw shop DoorDash guide` for the reviewed CLI contract, then `kw shop DoorDash start`
+for a 20-minute browsing/cart session. `kw shop DoorDash status` reports the remaining time.
+Checkout uses `kw shop DoorDash checkout --cart-uuid ID --card-id ID --tip-cents CENTS`: a live
+priced approval, rechecked before submission. See [DoorDash setup and ordering](../docs/DOORDASH.md).
+
+### Native work boards
+
+`kw work boards` lists authorized project boards and General; `kw work list`
+combines authorized tasks across them. Use `--data` for JSON filters or mutation
+fields and `--json` for machine-readable output. Read a task with `kw work get ID`;
+updates require its `expected_version`, and comments require an `idempotency_key`.
+Agents need explicit board access configured in **Work → Board access**.
+
+```sh
+kw work create --data '{"title":"Review the checklist","assignee":"owner"}' --json
+kw work list --data '{"status":"ready","limit":20}' --json
+kw work update tsk_EXAMPLE --data '{"expected_version":1,"notes":"Plan the checks"}' --json
+kw work comment tsk_EXAMPLE --data '{"body":"Checked examples","idempotency_key":"check-1"}' --json
+```
+
+This initial interface supports planning and comments. Claims, execution, and
+structured handoffs follow in a later slice. Assignment launches nothing and
+grants no host access. See [Native work boards](../docs/WORK_BOARDS.md).
+
+Repository context: `kw work repositories`, `kw work repository <repo_id>`,
+`kw work locations <repo_id>`, and `kw work context <repo_id> --data '{"environment":"dev"}'`.
+These reads require project-board access; host details also require existing broker
+permission. Context never falls back from dev to prod.
+
+GitHub tasks: use `kw work list --data '{"source":"github"}'`, or filter by
+`repository_id`. `kw work get <task_id>` separates source fields from local notes.
+`kw work discussion <task_id> --data '{"page":1}'` reads a cached source discussion
+page. GitHub configuration, tokens, import selection, and discussion refresh are owner controls.

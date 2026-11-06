@@ -1,0 +1,12 @@
+{% from "_icons.html" import icon %}
+{% macro integration_mark(name) -%}
+<span class="integration-mark {{ name }}" aria-hidden="true">
+{%- if name == 'notion' -%}N
+{%- elif name == 'pihole' -%}
+<img class="integration-logo" src="/assets/brands/pihole.svg" width="32" height="32" alt="">
+{%- elif name == 'jellyfin' -%}
+<picture><source media="(prefers-color-scheme: light)" srcset="/assets/brands/jellyfin-light.svg"><img class="integration-logo" src="/assets/brands/jellyfin-dark.svg" width="32" height="32" alt=""></picture>
+{%- else -%}{{ icon(name) }}
+{%- endif -%}
+</span>
+{%- endmacro %}

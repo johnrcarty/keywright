@@ -2,7 +2,7 @@
 name: keywright
 services:
   keywright:
-    image: ${KEYWRIGHT_IMAGE:-ghcr.io/johnrcarty/keywright:0.0.1-preview}
+    image: ${KEYWRIGHT_IMAGE:-ghcr.io/johnrcarty/keywright:0.0.2-preview}
     ports:
       - "${KW_BIND_ADDRESS:-127.0.0.1}:${KW_HTTP_PORT:-8700}:8700"
     environment:

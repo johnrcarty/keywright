@@ -11,6 +11,7 @@ import secrets
 import shlex
 from datetime import timedelta
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
 
 from fastapi import APIRouter, Depends, Form, Request, WebSocket, WebSocketDisconnect
@@ -29,9 +30,11 @@ from .. import (
     audit,
     bundles,
     events,
+    homelab,
     integrations,
     inventory,
     inventory_mcp,
+    knowledge,
     llm,
     mcp_oauth,
     mcp_proxy,
@@ -155,12 +158,31 @@ async def logout(request: Request):
 
 
 # ---- dashboard & requests -----------------------------------------------------------------------
+def _proposal_query():
+    return (select(knowledge.Revision, knowledge.Document, Resource, Agent.name.label("agent_name"))
+            .select_from(knowledge.Revision)
+            .join(knowledge.Document, knowledge.Document.id == knowledge.Revision.document_id)
+            .join(Resource, Resource.id == knowledge.Document.resource_id)
+            .outerjoin(Agent, Agent.id == knowledge.Revision.proposed_by)
+            .where(knowledge.Revision.status == "pending", Resource.kind == "mcp",
+                   Resource.config["adapter"].as_string() == "knowledge"))
+
+
+async def _pending_proposals(db, revision_id: str | None = None) -> list[dict[str, Any]]:
+    query = _proposal_query().order_by(desc(knowledge.Revision.created_at))
+    if revision_id is not None:
+        query = query.where(knowledge.Revision.id == revision_id)
+    return [{"revision": rev, "document": doc, "collection": res, "agent_name": agent_name}
+            for rev, doc, res, agent_name in (await db.execute(query)).all()]
+
+
 async def _waiting(db) -> dict[str, Any]:
     """What is waiting on the human right now: the live region of the dashboard."""
     pending = (await db.execute(
         select(AccessRequest).where(AccessRequest.status == "pending").order_by(desc(AccessRequest.created_at))
     )).scalars().all()
-    return {"pending": list(pending), "nudges": await nudges.open_nudges(db)}
+    return {"pending": list(pending), "proposals": await _pending_proposals(db),
+            "nudges": await nudges.open_nudges(db)}
 
 
 async def _counts(db) -> dict[str, int]:
@@ -170,6 +192,7 @@ async def _counts(db) -> dict[str, int]:
     # janitor has not swept yet is still a tile on the page, so it is still a number on the tile.
     pending = await db.scalar(select(func.count()).select_from(AccessRequest).where(
         AccessRequest.status == "pending"))
+    proposals = await db.scalar(select(func.count()).select_from(_proposal_query().subquery()))
     waiting = await db.scalar(select(func.count()).select_from(Nudge).where(Nudge.cleared_at.is_(None)))
     grants = (await db.execute(select(Grant).where(
         Grant.revoked_at.is_(None),
@@ -178,7 +201,7 @@ async def _counts(db) -> dict[str, int]:
     ))).scalars().all()
     # Grants from one approval are one lease to a human, exactly as the access overview groups them.
     leases = {(g.agent_id, g.request_id or g.id) for g in grants if g.is_active(at, g.session_id)}
-    return {"pending": pending or 0, "nudges": waiting or 0, "leases": len(leases)}
+    return {"pending": (pending or 0) + (proposals or 0), "nudges": waiting or 0, "leases": len(leases)}
 
 
 @router.get("/ui", response_class=HTMLResponse, dependencies=[Depends(auth.require_admin)])
@@ -217,6 +240,11 @@ async def _live_payload(db, event: dict[str, Any]) -> dict[str, Any] | None:
     if kind == "resync":
         return {**event, **await _live_state(db)}
     counts = await _counts(db)
+    if kind == "knowledge.proposed":
+        proposals = await _pending_proposals(db, event["id"])
+        if not proposals:
+            return None  # already reviewed or removed before this event was rendered
+        return {**event, "counts": counts, "html": _render("_knowledge_card.html", proposal=proposals[0])}
     if kind == "request.created":
         req = await db.get(AccessRequest, event["id"])
         if req is None or req.status != "pending":
@@ -600,6 +628,13 @@ async def agent_create(name: str = Form(...), note: str = Form("")):
 @router.post("/ui/agents/{aid}/{action}", dependencies=[Depends(auth.require_admin)])
 async def agent_action(aid: str, action: str, next: str = Form("/ui/agents")):
     async with session() as db:
+        if action == "delete":
+            from ..models import Task
+            from ..tasks import lock
+
+            await lock(db)
+            if await db.scalar(select(Task.id).where(Task.assignee_agent_id == aid).limit(1)):
+                return redirect(next, "Reassign this agent's tasks before deleting it, or disable it to retain its work history.")
         a = await db.get(Agent, aid)
         if a is None:
             return redirect("/ui/agents", "No such agent.")
@@ -635,6 +670,14 @@ async def agent_action(aid: str, action: str, next: str = Form("/ui/agents")):
 async def resources_list(request: Request, sort: str = "type", group: str = "none"):
     async with session() as db:
         data = await inventory.snapshot(db)
+        from ..github import connections
+        github_connections = await connections(db)
+    # Presentation rows only: native connections share list sorting/filtering without
+    # becoming broker Resources or exposing their credentials in resource config.
+    data["resources"] = [*data["resources"], *(
+        SimpleNamespace(id=c["id"], name=c["name"], kind="other", config={}, github_connection=c)
+        for c in github_connections
+    )]
     return render(request, "resources.html", **inventory.resource_inventory(data, sort, group))
 
 
@@ -649,15 +692,21 @@ async def resource_new(request: Request, kind: str = "", adapter: str = "", inte
                   for group in (integrations.PRESETS, integrations.GENERICS)]
         return render(request, "integration_picker.html", presets=groups[0], generics=groups[1], query=q,
                       matches=sum(entry["matches"] for group in groups for entry in group))
+    if preset and preset.configuration_path:
+        return redirect(preset.configuration_path)
     if preset:
         kind, adapter = preset.kind, preset.adapter
     if kind not in ("ssh", "mcp", "llm"):
         return redirect("/ui/resources/new", "Choose a connection type from the list.")
+    async with session() as db:
+        ssh_hosts = list(await db.scalars(select(Resource).where(Resource.kind == "ssh").order_by(Resource.name)))
+        ssh_hosts = [r for r in ssh_hosts if r.config.get("host") and r.config.get("key_path")]
     return render(request, "resource_form.html", res=None, kind=kind, keys_dir=settings.keys_dir,
-                  preset=preset,
+                  preset=preset, ssh_hosts=ssh_hosts,
                   oauth_callback=settings.public_url.rstrip("/") + mcp_oauth.CALLBACK_PATH,
                   inventory_bundles=inventory_mcp.DEFAULT_BUNDLES,
-                  adapter=adapter if kind == "mcp" and adapter in ("omada", "keywright") else "")
+                  connector=homelab.CONNECTORS.get(adapter),
+                  adapter=adapter if kind == "mcp" and adapter in ("omada", "keywright", *homelab.CONNECTORS) else "")
 
 
 @router.get("/ui/resources/{rid}", response_class=HTMLResponse, dependencies=[Depends(auth.require_admin)])
@@ -676,6 +725,7 @@ async def resource_edit(request: Request, rid: str):
                   oauth_callback=settings.public_url.rstrip("/") + mcp_oauth.CALLBACK_PATH,
                   oauth_status=await mcp_oauth.status(res.config) if res.config.get("auth_type") == "oauth" else None,
                   adapter=res.config.get("adapter", ""),
+                  connector=homelab.CONNECTORS.get(res.config.get("adapter")),
                   key=key_info(res) if res.kind == "ssh" else None,
                   leases=await llm_leases(res) if res.kind == "llm" else None)
 
@@ -706,6 +756,7 @@ async def resource_save(
     agent_budget_duration: str = Form("1d"),
     adapter: str = Form(""), omada_id: str = Form(""), client_id: str = Form(""),
     client_secret: str = Form(""), verify_tls: str = Form("1"), ca_bundle: str = Form(""),
+    api_secret: str = Form(""), token_id: str = Form(""),
     auth_type: str = Form("headers"), oauth_client_id: str = Form(""), oauth_client_secret: str = Form(""),
     oauth_scope: str = Form(""), oauth_auth_method: str = Form("none"), oauth_origins: str = Form(""),
     integration: str = Form(""), setup_action: str = Form(""),
@@ -713,10 +764,14 @@ async def resource_save(
     preset = integrations.PRESET_BY_ID.get(integration)
     if integration and preset is None:
         return redirect("/ui/resources/new", "Choose an integration from the list.")
+    if preset and preset.configuration_path:
+        return redirect(preset.configuration_path)
     if preset:
         kind, adapter = preset.kind, preset.adapter
         if preset.url:
             url, auth_type = preset.url, preset.auth_type
+        if not oauth_origins.strip():
+            oauth_origins = ",".join(preset.oauth_origins)
     if setup_action and (setup_action != "connect" or not preset or preset.auth_type != "oauth"):
         return redirect("/ui/resources/new", "Invalid integration setup action.")
     name = name.strip()
@@ -748,9 +803,14 @@ async def resource_save(
             cfg["integration"] = preset.id
         if res.id and (kind != res.kind or adapter != cfg.get("adapter", "")):
             return redirect("/ui/resources", "Create a new resource to change its connection type.")
-        if adapter not in ("", "omada", "keywright") or (adapter and kind != "mcp"):
+        if adapter not in ("", "omada", "keywright", *homelab.CONNECTORS) or (adapter and kind != "mcp"):
             return redirect("/ui/resources", "Invalid connection type.")
         if kind == "ssh":
+            if (cfg.get("cli_setup") and
+                    (host.strip() != cfg.get("host") or int(port or 22) != int(cfg.get("port") or 22)
+                        or user.strip() != cfg.get("user") or private_key.strip() or forget_host_key
+                        or (key_path.strip() and key_path.strip() != cfg.get("key_path")))):
+                return redirect(f"/ui/resources/{res.id}", "Create a new CLI setup to use a different SSH connection.")
             if private_key.strip():
                 settings.ensure_dirs()
                 p = settings.keys_dir / name
@@ -829,6 +889,19 @@ async def resource_save(
                 except ValueError as e:
                     return redirect(f"/ui/resources/{res.id}" if res.id else
                                     "/ui/resources/new?kind=mcp&adapter=omada", f"Not saved: {e}")
+            if adapter in homelab.CONNECTORS:
+                if verify_tls not in ("0", "1"):
+                    return redirect("/ui/resources", "Invalid TLS verification setting.")
+                cfg.update({"adapter": adapter, "url": url.strip().rstrip("/"),
+                            "token_id": token_id.strip(),
+                            "api_secret": cfg.get("api_secret", "") if api_secret in ("", "***") else api_secret,
+                            "verify_tls": verify_tls == "1", "ca_bundle": ca_bundle.strip()})
+                cfg.pop("headers", None)
+                try:
+                    homelab.validate_config(cfg)
+                except ValueError as e:
+                    return redirect(f"/ui/resources/{res.id}" if res.id else
+                                    f"/ui/resources/new?integration={adapter}", f"Not saved: {e}")
             mcp_proxy.forget(name)
         res.name, res.default_mode, res.description, res.config = name, default_mode, description, cfg
         await db.commit()

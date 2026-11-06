@@ -3,7 +3,7 @@
 <p class="page-intro">Requests that need you and agents with active approvals.</p>
 </div>
 <div class="grid stats">
-<div class="card"><div class="mut small">Pending requests</div><div class="stat" data-count="pending">{{ pending|length }}</div></div>
+<div class="card"><div class="mut small">Pending requests</div><div class="stat" data-count="pending">{{ pending|length + proposals|length }}</div></div>
 <div class="card"><div class="mut small">Temporary approvals</div><div class="stat" data-count="leases">{{ lease_count }}</div></div>
 <div class="card"><div class="mut small">Targets / agents</div><div class="stat">{{ target_count }} / {{ agent_count }}</div></div>
 <div class="card"><div class="mut small">Notifier</div><div><b>{{ notifier.driver_id }}</b>
@@ -161,6 +161,8 @@
     if (event.type === 'resync') return resync(event);
     if (event.type === 'request.created') add('pending-list', 'req-' + event.id, event.html);
     else if (event.type === 'request.decided') resolved(event);
+    else if (event.type === 'knowledge.proposed') add('pending-list', 'proposal-' + event.id, event.html);
+    else if (event.type === 'knowledge.reviewed') drop('proposal-' + event.id);
     else if (event.type === 'nudge.created') add('nudge-list', 'nudge-' + event.id, event.html);
     else if (event.type === 'nudge.cleared') drop('nudge-' + event.id);
     settle(event.counts);
@@ -168,7 +170,7 @@
 
   // ---- the socket -------------------------------------------------------------------------
   var state = document.getElementById('live-state');
-  var backoff = 1000, socket = null, retrying = false, everOpened = false;
+  var backoff = 1000, socket = null, retrying = false;
 
   function show(text, cls) {
     if (!state) return;
@@ -202,8 +204,7 @@
     socket.onopen = function () {
       backoff = 1000;
       show('live', 'on');
-      if (everOpened) refresh();  // catch up on anything decided while we were away
-      everOpened = true;
+      refresh();  // also catch proposals created between the initial page load and subscription
     };
     socket.onmessage = function (e) {
       try { apply(JSON.parse(e.data)); } catch (err) { /* a message we do not understand is not fatal */ }

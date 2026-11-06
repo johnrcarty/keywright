@@ -65,7 +65,7 @@ class BrowserSecurityHeaders:
                 headers["X-Frame-Options"] = "DENY"
                 headers["Referrer-Policy"] = "same-origin"
                 headers["Content-Security-Policy"] = "frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
-                if scope["path"].startswith(("/ui", "/d/", "/enroll/")):
+                if scope["path"].startswith(("/ui", "/d/", "/enroll/", "/api/work")):
                     headers["Cache-Control"] = "no-store"
                 if scope.get("scheme") == "https":
                     message["headers"] = [
