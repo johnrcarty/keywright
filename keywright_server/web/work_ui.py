@@ -9,7 +9,7 @@ from sqlalchemy import select, update
 
 from .. import audit, settings_store, tasks
 from ..db import session
-from ..models import Agent, Board, BoardAgentAccess, TaskNotification, now
+from ..models import Agent, Board, BoardAgentAccess, Repository, TaskNotification, now
 from . import auth
 from .admin import redirect, render
 from .security import require_same_origin
@@ -57,6 +57,7 @@ async def home(request: Request):
             result = await tasks.list_tasks(db, filters)
             boards = await tasks.list_boards(db, include_archived=filters.include_archived, offset=board_offset)
             selected = await db.get(Board, filters.board_id) if filters.board_id else None
+            repositories = list(await db.scalars(select(Repository).order_by(Repository.name).limit(500)))
             agents = list(await db.scalars(select(Agent).order_by(Agent.name).limit(100)))
             grants = list(await db.scalars(select(BoardAgentAccess).where(BoardAgentAccess.board_id == selected.id))) if selected else []
             owner = (await settings_store.get(db, "work_owner", {})).get("name", "Me")
@@ -68,7 +69,7 @@ async def home(request: Request):
     def page_url(offset):
         return "/ui/work?" + urlencode({**query, "offset": offset})
     return render(request, "work.html", result=result, boards=boards, selected=selected, agents=agents,
-                  grants={g.agent_id: g for g in grants}, owner=owner, unread=unread, filters=filters,
+                  grants={g.agent_id: g for g in grants}, repositories=repositories, owner=owner, unread=unread, filters=filters,
                   statuses=tasks.STATUSES, priorities=tasks.PRIORITIES, view=view,
                   mode="list" if mode == "list" else "board", page_url=page_url, board_offset=board_offset,
                   selected_project=next((b for b in boards["boards"] if selected and b["id"] == selected.id), None))

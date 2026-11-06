@@ -55,6 +55,7 @@ async def init_db() -> None:
         await conn.run_sync(init_local)
         await conn.run_sync(_upgrade_access_columns)
         await conn.run_sync(_upgrade_discovery_columns)
+        await conn.run_sync(_upgrade_repository_columns)
         await conn.run_sync(_relocate_key_paths)
         await conn.execute(text("SELECT 1"))
     if settings.db_url.startswith("sqlite") and settings.db_path.exists():
@@ -129,3 +130,17 @@ async def reset_for_tests(url: str) -> None:
         await seed(conn)
         from .knowledge_index import init_local
         await conn.run_sync(init_local)
+
+
+def _upgrade_repository_columns(conn) -> None:
+    columns = {c['name'] for c in inspect(conn).get_columns('work_repositories')}
+    for name, definition in {
+        'sync_connection_id': 'VARCHAR REFERENCES work_github_connections(id)',
+        'source_metadata': "JSON NOT NULL DEFAULT '{}'",
+        'import_enabled': 'BOOLEAN NOT NULL DEFAULT FALSE',
+        'include_closed': 'BOOLEAN NOT NULL DEFAULT FALSE',
+        'poll_seconds': 'INTEGER NOT NULL DEFAULT 300',
+        'last_refreshed_at': 'TIMESTAMP',
+    }.items():
+        if name not in columns:
+            conn.execute(text(f'ALTER TABLE work_repositories ADD COLUMN {name} {definition}'))

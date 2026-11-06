@@ -4,7 +4,19 @@ import secrets
 from datetime import UTC, date, datetime
 from typing import Any, ClassVar
 
-from sqlalchemy import JSON, CheckConstraint, Date, DateTime, ForeignKey, Index, Integer, String, Text, TypeDecorator
+from sqlalchemy import (
+    JSON,
+    CheckConstraint,
+    Date,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Text,
+    TypeDecorator,
+    text,
+)
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -570,3 +582,128 @@ class TaskNotification(Base):
     next_attempt_at: Mapped[datetime] = mapped_column(UTCDateTime, default=now)
     error: Mapped[str] = mapped_column(String, default="")
     created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=now)
+
+
+class Repository(Base):
+    __tablename__ = "work_repositories"
+    __table_args__ = (Index("uq_work_repository_provider", "provider_host", "provider_id", unique=True),)
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: new_id("repo"))
+    project_id: Mapped[str | None] = mapped_column(ForeignKey("work_projects.id"), nullable=True, index=True)
+    name: Mapped[str] = mapped_column(String)
+    description: Mapped[str] = mapped_column(Text, default="")
+    web_url: Mapped[str] = mapped_column(String, default="")
+    sync_connection_id: Mapped[str | None] = mapped_column(ForeignKey("work_github_connections.id"), nullable=True)
+    source_metadata: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+    import_enabled: Mapped[bool] = mapped_column(default=False)
+    include_closed: Mapped[bool] = mapped_column(default=False)
+    poll_seconds: Mapped[int] = mapped_column(Integer, default=300)
+    last_refreshed_at: Mapped[datetime | None] = mapped_column(UTCDateTime, nullable=True)
+    # Provider identity is assigned only by discovery, never guessed from a URL.
+    provider_host: Mapped[str | None] = mapped_column(String, nullable=True)
+    provider_id: Mapped[str | None] = mapped_column(String, nullable=True)
+    archived: Mapped[bool] = mapped_column(default=False)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    created_at: Mapped[datetime] = mapped_column(UTCDateTime, default=now)
+
+
+class RepositoryLocation(Base):
+    __tablename__ = "work_repository_locations"
+    __table_args__ = (
+        CheckConstraint("environment IN ('dev','test','prod')", name="work_location_environment"),
+        CheckConstraint("directory_kind IN ('checkout','deployment_directory')", name="work_location_kind"),
+        CheckConstraint("asset_ref IS NOT NULL OR resource_ref IS NOT NULL", name="work_location_host"),
+        Index("uq_work_location_primary", "repository_id", "environment", unique=True,
+              sqlite_where=text('is_primary = 1'),
+              postgresql_where=text('is_primary = true')),
+    )
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: new_id("loc"))
+    repository_id: Mapped[str] = mapped_column(ForeignKey("work_repositories.id"), index=True)
+    environment: Mapped[str] = mapped_column(String)
+    name: Mapped[str] = mapped_column(String)
+    asset_id: Mapped[str | None] = mapped_column(ForeignKey("inventory_assets.id", ondelete="SET NULL"), nullable=True)
+    resource_id: Mapped[str | None] = mapped_column(ForeignKey("resources.id", ondelete="SET NULL"), nullable=True)
+    # Retain original identities after deletion; never relink automatically by display name.
+    asset_ref: Mapped[str | None] = mapped_column(String, nullable=True)
+    resource_ref: Mapped[str | None] = mapped_column(String, nullable=True)
+    directory: Mapped[str] = mapped_column(String)
+    directory_kind: Mapped[str] = mapped_column(String, default="checkout")
+    expected_ref: Mapped[str] = mapped_column(String, default="")
+    subdirectory: Mapped[str] = mapped_column(String, default="")
+    application_url: Mapped[str] = mapped_column(String, default="")
+    notes: Mapped[str] = mapped_column(Text, default="")
+    is_primary: Mapped[bool] = mapped_column(default=False)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    verification_status: Mapped[str] = mapped_column(String, default="unverified")
+    verified_at: Mapped[datetime | None] = mapped_column(UTCDateTime, nullable=True)
+    verification_message: Mapped[str] = mapped_column(String, default="")
+    verification_fingerprint: Mapped[str] = mapped_column(String, default="")
+    observed: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
+
+
+class GitHubConnection(Base):
+    __tablename__ = "work_github_connections"
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: new_id("ghc"))
+    name: Mapped[str] = mapped_column(String)
+    sealed_data: Mapped[str] = mapped_column(Text)
+    enabled: Mapped[bool] = mapped_column(default=True)
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    status: Mapped[str] = mapped_column(String, default="untested")
+    error: Mapped[str] = mapped_column(String, default="")
+    retry_at: Mapped[datetime | None] = mapped_column(UTCDateTime, nullable=True)
+    tested_at: Mapped[datetime | None] = mapped_column(UTCDateTime, nullable=True)
+
+
+class GitHubCache(Base):
+    __tablename__ = "work_github_cache"
+    signature: Mapped[str] = mapped_column(String, primary_key=True)
+    connection_id: Mapped[str] = mapped_column(ForeignKey("work_github_connections.id", ondelete="CASCADE"), index=True)
+    etag: Mapped[str] = mapped_column(String, default="")
+    modified: Mapped[str] = mapped_column(String, default="")
+    payload: Mapped[Any] = mapped_column(JSON)
+    next_request_at: Mapped[datetime | None] = mapped_column(UTCDateTime, nullable=True)
+    next_url: Mapped[str] = mapped_column(String, default="")
+    touched_at: Mapped[datetime] = mapped_column(UTCDateTime, default=now)
+
+
+class GitHubSync(Base):
+    """One recoverable job/checkpoint per repository; no unbounded job history."""
+    __tablename__ = "work_github_sync"
+    repository_id: Mapped[str] = mapped_column(ForeignKey("work_repositories.id"), primary_key=True)
+    status: Mapped[str] = mapped_column(String, default="queued")
+    run_id: Mapped[str] = mapped_column(String, default="")
+    started_at: Mapped[datetime | None] = mapped_column(UTCDateTime, nullable=True)
+    last_success: Mapped[datetime | None] = mapped_column(UTCDateTime, nullable=True)
+    watermark: Mapped[datetime | None] = mapped_column(UTCDateTime, nullable=True)
+    last_full: Mapped[datetime | None] = mapped_column(UTCDateTime, nullable=True)
+    next_attempt: Mapped[datetime] = mapped_column(UTCDateTime, default=now)
+    force_full: Mapped[bool] = mapped_column(default=False)
+    imported: Mapped[int] = mapped_column(Integer, default=0)
+    updated: Mapped[int] = mapped_column(Integer, default=0)
+    failures: Mapped[int] = mapped_column(Integer, default=0)
+    error: Mapped[str] = mapped_column(String, default="")
+    source_available: Mapped[bool] = mapped_column(default=True)
+
+
+class ExternalIssue(Base):
+    __tablename__ = "work_external_issues"
+    __table_args__ = (Index("uq_work_issue_provider", "provider_host", "provider_id", unique=True),)
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: new_id("issue"))
+    provider_host: Mapped[str] = mapped_column(String, default="github.com")
+    provider_id: Mapped[str] = mapped_column(String)
+    repository_id: Mapped[str] = mapped_column(ForeignKey("work_repositories.id"), index=True)
+    task_id: Mapped[str | None] = mapped_column(ForeignKey("work_tasks.id"), nullable=True, unique=True)
+    number: Mapped[int] = mapped_column(Integer)
+    source_updated_at: Mapped[datetime] = mapped_column(UTCDateTime)
+    snapshot: Mapped[dict[str, Any]] = mapped_column(JSON)
+    refreshed_at: Mapped[datetime] = mapped_column(UTCDateTime, default=now)
+
+
+class GitHubDiscussionPage(Base):
+    __tablename__ = "work_github_discussion_pages"
+    __table_args__ = (Index("uq_work_discussion_page", "issue_id", "page", unique=True),)
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: new_id("discussion"))
+    issue_id: Mapped[str] = mapped_column(ForeignKey("work_external_issues.id"), index=True)
+    page: Mapped[int] = mapped_column(Integer)
+    comments: Mapped[list] = mapped_column(JSON, default=list)
+    has_next: Mapped[bool] = mapped_column(default=False)
+    refreshed_at: Mapped[datetime] = mapped_column(UTCDateTime, default=now)

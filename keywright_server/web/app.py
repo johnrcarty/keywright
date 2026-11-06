@@ -123,6 +123,8 @@ def create_app() -> FastAPI:
         mail_worker = asyncio.create_task(mail.worker(), name="mail-inbox")
         from .. import task_notifications
         task_worker = asyncio.create_task(task_notifications.worker(), name="task-notifications")
+        from .. import github
+        github_worker = asyncio.create_task(github.worker(), name="github-sync")
         async with sm.run():
             log.info("Keywright listening; MCP at /mcp, admin at /ui")
             try:
@@ -132,6 +134,9 @@ def create_app() -> FastAPI:
                 watch.cancel()
                 mail_worker.cancel()
                 task_worker.cancel()
+                github_worker.cancel()
+                with contextlib.suppress(asyncio.CancelledError):
+                    await github_worker
                 with contextlib.suppress(asyncio.CancelledError):
                     await task_worker
                 await cli_setup.shutdown()
@@ -146,6 +151,10 @@ def create_app() -> FastAPI:
     app.include_router(admin.router)
     from . import work_ui
     app.include_router(work_ui.router)
+    from . import repositories_ui
+    app.include_router(repositories_ui.router)
+    from . import github_ui
+    app.include_router(github_ui.router)
     app.include_router(cli_setup_ui.router)
     app.include_router(oidc.router)
     app.include_router(mcp_oauth_ui.router)

@@ -42,3 +42,32 @@ def test_work_cli_denied_without_board_grant(live_server, monkeypatch, capsys):
 @pytest.mark.parametrize("args", [["get"], ["create", "--data", "[]"], ["list", "unexpected"]])
 def test_work_cli_rejects_invalid_arguments(args, capsys):
     assert cli.main(["work", *args]) == 2
+
+
+@pytest.fixture
+async def repository_context(db, agent):
+    from keywright_server import repositories
+    from keywright_server.models import Resource
+    project = await tasks.create_project(db, tasks.ProjectCreate(key='context', name='Context'))
+    await tasks.set_access(db, project['board_id'], agent.id, {'read': True})
+    repo = await repositories.save_repository(db, repositories.RepositorySave(name='App', project_id=project['project_id']))
+    host = Resource(name='ContextHost', kind='ssh', default_mode='open', config={})
+    db.add(host)
+    await db.commit()
+    await repositories.save_location(db, repo['id'], repositories.LocationSave(
+        name='Dev', environment='dev', resource_id=host.id, directory='/srv/app'))
+    return repo
+
+
+def test_repository_cli_uses_authenticated_mcp(live_server, repository_context, monkeypatch, capsys):
+    monkeypatch.setenv('KW_URL', live_server)
+    monkeypatch.setenv('KW_TOKEN', 'gk_testtoken')
+    repo = repository_context
+    assert cli.main(['work', 'repositories', '--json']) == 0
+    assert json.loads(capsys.readouterr().out)['repositories'][0]['id'] == repo['id']
+    assert cli.main(['work', 'repository', repo['id'], '--json']) == 0
+    assert json.loads(capsys.readouterr().out)['name'] == 'App'
+    assert cli.main(['work', 'locations', repo['id'], '--json']) == 0
+    assert json.loads(capsys.readouterr().out)['locations'][0]['directory'] == '/srv/app'
+    assert cli.main(['work', 'context', repo['id'], '--data', '{"environment":"dev"}', '--json']) == 0
+    assert json.loads(capsys.readouterr().out)['environment'] == 'dev'

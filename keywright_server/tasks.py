@@ -14,7 +14,11 @@ from .models import (
     Agent,
     Board,
     BoardAgentAccess,
+    ExternalIssue,
+    GitHubConnection,
+    GitHubSync,
     Project,
+    Repository,
     Task,
     TaskActivity,
     TaskComment,
@@ -80,6 +84,8 @@ class TaskPatch(Input):
 
 
 class TaskFilter(Input):
+    repository_id: str | None = None
+    source: Literal["local", "github"] | None = None
     board_id: str | None = None
     project_id: str | None = None
     assignee: str | None = None
@@ -263,10 +269,11 @@ async def create_task(db, data: TaskCreate, agent=None):
     await db.flush()
     await activity(db, task, agent, "created", notify=task.assignee_kind == "owner")
     await commit(db, "task", task_id=task.id)
-    return serialize(task, board, details=True)
+    return serialize(task, board, details=True, source=await db.scalar(
+        select(ExternalIssue).where(ExternalIssue.task_id == task.id)))
 
 
-def serialize(task, board, details=False):
+def serialize(task, board, details=False, source=None):
     result = {"id": task.id, "board_id": board.id, "board_name": board.name, "board_kind": board.kind,
               "project_id": board.project_id, "title": task.title, "status": task.status,
               "priority": task.priority, "due_date": task.due_date.isoformat() if task.due_date else None,
@@ -274,6 +281,15 @@ def serialize(task, board, details=False):
               if task.assignee_kind == "agent" else task.assignee_kind,
               "version": task.version, "position": task.position, "archived": task.archived,
               "created_at": task.created_at.isoformat(), "updated_at": task.updated_at.isoformat()}
+    result["source"] = None
+    if source:
+        snapshot = source.snapshot
+        result["source"] = {"provider": "github", "repository_id": source.repository_id,
+                            "number": source.number, "url": snapshot["url"], "state": snapshot["state"],
+                            "state_reason": snapshot.get("state_reason", ""),
+                            "refreshed_at": source.refreshed_at.isoformat()}
+        if details:
+            result["source"].update(snapshot)
     if details:
         result.update(description=task.description, notes=task.notes, acceptance=task.acceptance, creator=task.creator)
     return result
@@ -281,7 +297,8 @@ def serialize(task, board, details=False):
 
 async def list_tasks(db, filters: TaskFilter, agent=None):
     await active_agent(db, agent)
-    stmt = select(Task, Board).join(Board, Task.board_id == Board.id).outerjoin(Project, Board.project_id == Project.id)
+    stmt = select(Task, Board, ExternalIssue).join(Board, Task.board_id == Board.id).outerjoin(
+        Project, Board.project_id == Project.id).outerjoin(ExternalIssue, ExternalIssue.task_id == Task.id)
     if agent:
         stmt = stmt.join(BoardAgentAccess, BoardAgentAccess.board_id == Board.id).where(
             BoardAgentAccess.agent_id == agent.id, BoardAgentAccess.read.is_(True))
@@ -307,6 +324,12 @@ async def list_tasks(db, filters: TaskFilter, agent=None):
             stmt = stmt.where(Task.assignee_agent_id == filters.assignee[6:])
         else:
             stmt = stmt.where(Task.assignee_kind == filters.assignee)
+    if filters.repository_id:
+        stmt = stmt.where(ExternalIssue.repository_id == filters.repository_id)
+    if filters.source == "github":
+        stmt = stmt.where(ExternalIssue.id.is_not(None))
+    elif filters.source == "local":
+        stmt = stmt.where(ExternalIssue.id.is_(None))
     if filters.q:
         stmt = stmt.where(Task.title.contains(filters.q, autoescape=True))
     count = await db.scalar(select(func.count()).select_from(stmt.subquery()))
@@ -316,7 +339,7 @@ async def list_tasks(db, filters: TaskFilter, agent=None):
     if filters.needs_you:
         ordering.insert(0, case((Task.status == "review", 0), (Task.status == "blocked", 1), else_=2))
     rows = (await db.execute(stmt.order_by(*ordering).offset(filters.offset).limit(filters.limit))).all()
-    return {"tasks": [serialize(t, b) for t, b in rows], "total": count,
+    return {"tasks": [serialize(t, b, source=source) for t, b, source in rows], "total": count,
             "next_offset": filters.offset + filters.limit if filters.offset + filters.limit < count else None}
 
 
@@ -326,7 +349,18 @@ async def get_task(db, task_id, agent=None, offset=0, limit=50):
     if not task:
         raise TaskError("not_found", "Task not found.")
     board = await board_access(db, task.board_id, agent)
-    data = serialize(task, board, details=True)
+    source = await db.scalar(select(ExternalIssue).where(ExternalIssue.task_id == task.id))
+    data = serialize(task, board, details=True, source=source)
+    if source:
+        sync = await db.get(GitHubSync, source.repository_id)
+        repository = await db.get(Repository, source.repository_id)
+        connection = await db.get(GitHubConnection, repository.sync_connection_id) if repository.sync_connection_id else None
+        project = await db.get(Project, repository.project_id) if repository.project_id else None
+        paused = not (repository.import_enabled and not repository.archived and project and not project.archived
+                      and connection and connection.enabled)
+        data["source"].update(sync_status="paused" if paused else sync.status if sync else "unavailable",
+                              sync_error="Automatic refresh is paused." if paused else sync.error if sync else "Source is unavailable.",
+                              available=sync.source_available if sync else False)
     for model, key in ((TaskActivity, "activity"), (TaskComment, "comments")):
         rows = list(await db.scalars(select(model).where(model.task_id == task_id)
                                     .order_by(model.created_at.desc(), model.id).offset(offset).limit(limit + 1)))
@@ -348,6 +382,9 @@ async def update_task(db, task_id, data: TaskPatch, agent=None):
     values = data.model_dump(exclude_unset=True, exclude={"expected_version", "before_id"})
     if any(v is None for k, v in values.items() if k != "due_date"):
         raise TaskError("invalid_arguments", "Only due date may be cleared with null.")
+    if ("title" in values or "description" in values) and await db.scalar(
+            select(ExternalIssue.id).where(ExternalIssue.task_id == task.id)):
+        raise TaskError("source_owned", "GitHub owns this title and description. Edit local notes instead.")
     validate_fields(values)
     if agent:
         if task.assignee_kind == "agent" and task.assignee_agent_id != agent.id:
@@ -392,7 +429,8 @@ async def update_task(db, task_id, data: TaskPatch, agent=None):
         changes["assignee"] = {"from": previous_assignee, "to": current_assignee}
     await activity(db, task, agent, "updated", changes, notify=notify)
     await commit(db, "task", task_id=task.id)
-    return serialize(task, board, details=True)
+    return serialize(task, board, details=True, source=await db.scalar(
+        select(ExternalIssue).where(ExternalIssue.task_id == task.id)))
 
 
 async def comment(db, task_id, body, idempotency_key, agent=None):
@@ -441,4 +479,5 @@ async def move_task(db, task_id, board_id, expected_version):
     await db.refresh(task)
     await activity(db, task, None, "moved", {"from_board_id": old_board, "to_board_id": board_id})
     await commit(db, "task", task_id=task_id)
-    return serialize(task, destination, details=True)
+    return serialize(task, destination, details=True, source=await db.scalar(
+        select(ExternalIssue).where(ExternalIssue.task_id == task.id)))

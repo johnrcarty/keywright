@@ -119,3 +119,13 @@ kw work comment tsk_EXAMPLE --data '{"body":"Checked examples","idempotency_key"
 This initial interface supports planning and comments. Claims, execution, and
 structured handoffs follow in a later slice. Assignment launches nothing and
 grants no host access. See [Native work boards](../docs/WORK_BOARDS.md).
+
+Repository context: `kw work repositories`, `kw work repository <repo_id>`,
+`kw work locations <repo_id>`, and `kw work context <repo_id> --data '{"environment":"dev"}'`.
+These reads require project-board access; host details also require existing broker
+permission. Context never falls back from dev to prod.
+
+GitHub tasks: use `kw work list --data '{"source":"github"}'`, or filter by
+`repository_id`. `kw work get <task_id>` separates source fields from local notes.
+`kw work discussion <task_id> --data '{"page":1}'` reads a cached source discussion
+page. GitHub configuration, tokens, import selection, and discussion refresh are owner controls.

@@ -69,8 +69,8 @@ def build_parser() -> argparse.ArgumentParser:
     sp = sub.add_parser("resources", help="brokered resources and your standing on each")
     sp.add_argument("--json", action="store_true")
 
-    sp = sub.add_parser("work", help="native task boards: boards, list, get, create, update, comment")
-    sp.add_argument("action", choices=("boards", "list", "get", "create", "update", "comment"))
+    sp = sub.add_parser("work", help="native work boards and repository context")
+    sp.add_argument("action", choices=("boards", "list", "get", "create", "update", "comment", "repositories", "repository", "locations", "context", "discussion"))
     sp.add_argument("task_id", nargs="?")
     sp.add_argument("--data", default="{}", help="JSON fields or filters; updates require expected_version")
     sp.add_argument("--json", action="store_true")
@@ -561,17 +561,24 @@ def cmd_work(args: argparse.Namespace) -> int:
     try:
         fields = json.loads(args.data)
         if not isinstance(fields, dict):
-            raise ValueError
-    except ValueError:
+            raise TypeError
+    except (ValueError, TypeError):
         return _usage("--data must be a JSON object")
-    if args.action in ("get", "update", "comment"):
+    if args.action in ("get", "update", "comment", "discussion"):
         if not args.task_id:
             return _usage("this work action requires a task ID")
         fields["task_id"] = args.task_id
+    elif args.action in ("repository", "locations", "context"):
+        if not args.task_id:
+            return _usage("this work action requires a repository ID")
+        fields["repository_id"] = args.task_id
     elif args.task_id:
         return _usage("this work action does not take a task ID")
     names = {"boards": "work_list_boards", "list": "work_list_tasks", "get": "work_get_task",
-             "create": "work_create_task", "update": "work_update_task", "comment": "work_comment_task"}
+             "create": "work_create_task", "update": "work_update_task", "comment": "work_comment_task",
+             "repositories": "work_list_repositories", "repository": "work_get_repository",
+             "locations": "work_list_locations", "context": "work_get_location_context",
+             "discussion": "work_get_github_discussion"}
     gate = Gate(args)
     try:
         result = gate.call(names[args.action], fields)
