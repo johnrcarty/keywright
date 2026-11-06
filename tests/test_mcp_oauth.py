@@ -5,6 +5,7 @@ import json
 import logging
 import time
 from base64 import urlsafe_b64encode
+from dataclasses import replace
 from datetime import timedelta
 from urllib.parse import parse_qs, urlsplit
 
@@ -13,8 +14,8 @@ import httpx2
 import pytest
 from sqlalchemy import select, update
 
+from keywright_server import integrations, mcp_proxy
 from keywright_server import mcp_oauth as oauth
-from keywright_server import mcp_proxy
 from keywright_server.config import settings
 from keywright_server.db import session
 from keywright_server.models import AuditEvent, MCPOAuthConnection, MCPOAuthFlow, Resource, now
@@ -41,29 +42,39 @@ async def provider(db, monkeypatch):
     async def handler(request):
         state["calls"].append(request)
         path = request.url.path
-        if request.method == "GET" and path == "/mcp":
+        server_path = urlsplit(state.get("resource", SERVER)).path
+        # Some providers advertise their origin as resource, with /mcp as transport.
+        server_path = server_path or "/mcp"
+        if request.method == "GET" and path == server_path:
+            if state.get("get_not_allowed"):
+                return httpx2.Response(405)
             return httpx2.Response(401, headers={"WWW-Authenticate":
-                f'Bearer resource_metadata="{ISSUER}/.well-known/oauth-protected-resource/mcp", scope="read write"'})
-        if path == "/.well-known/oauth-protected-resource/mcp":
+                f'Bearer resource_metadata="{ISSUER}/.well-known/oauth-protected-resource/mcp", '
+                f'scope="{state.get("scope", "read write")}"'})
+        if path == "/.well-known/oauth-protected-resource" + server_path:
             if state.get("root_metadata"):
                 return httpx2.Response(404)
             return httpx2.Response(200, json={"resource": state.get("resource", SERVER),
+                                             "scopes_supported": state.get("scopes_supported", []),
                                              "authorization_servers": [state.get("issuer", ISSUER)]})
         if path == "/.well-known/oauth-protected-resource":
-            return httpx2.Response(200, json={"resource": SERVER,
+            return httpx2.Response(200, json={"resource": state.get("resource", SERVER),
                                              "authorization_servers": [state.get("issuer", ISSUER)]})
         if path == "/.well-known/oauth-authorization-server" and state.get("oidc_metadata"):
             return httpx2.Response(404)
         if path in ("/.well-known/oauth-authorization-server", "/.well-known/openid-configuration"):
             return httpx2.Response(200, json=metadata)
-        if path == "/register":
+        if path == "/.well-known/oauth-authorization-server" + urlsplit(state.get("issuer", ISSUER)).path:
+            return httpx2.Response(200, json=metadata)
+        if path == urlsplit(metadata["registration_endpoint"]).path:
             state["registrations"] += 1
             body = json.loads(request.content)
+            state["registration_body"] = body
             assert body["redirect_uris"] == [ORIGIN + oauth.CALLBACK_PATH]
             return httpx2.Response(201, json={**body, "client_id": "registered-client"})
-        if path == "/token":
+        if path == urlsplit(metadata["token_endpoint"]).path:
             form = parse_qs(request.content.decode())
-            assert form["resource"] == [SERVER]
+            assert form["resource"] == [state.get("resource", SERVER)]
             state["token_form"] = form
             if form["grant_type"] == ["authorization_code"]:
                 state["exchanges"] += 1
@@ -87,7 +98,7 @@ async def provider(db, monkeypatch):
             if state["refreshes"] and state.get("omit_refresh"):
                 body.pop("refresh_token")
             return httpx2.Response(200, json=body)
-        if path == "/mcp" and request.method == "POST":
+        if path == server_path and request.method == "POST":
             assert request.headers["authorization"] == "Bearer " + state.get("expected_access", "access-secret")
             message = json.loads(request.content)
             if "id" not in message:
@@ -110,7 +121,7 @@ async def provider(db, monkeypatch):
             else:
                 raise AssertionError(message)
             return httpx2.Response(200, json={"jsonrpc": "2.0", "id": message["id"], "result": result})
-        if path == "/mcp" and request.method in ("GET", "DELETE"):
+        if path == server_path and request.method in ("GET", "DELETE"):
             return httpx2.Response(405)
         raise AssertionError(f"Unexpected request {request.method} {request.url}")
 
@@ -152,14 +163,16 @@ async def begin(browser, state, resource):
     params = parse_qs(urlsplit(unescape(link[1])).query)
     state["authorize"] = params
     assert params["code_challenge_method"] == ["S256"]
-    assert params["resource"] == [SERVER]
-    assert params["scope"] == ["read write"]
+    assert params["resource"] == [state.get("resource", SERVER)]
+    assert params["scope"] == [state.get("scope", "read write")]
     return params["state"][0]
 
 
 async def connect(browser, state, resource):
     value = await begin(browser, state, resource)
-    response = await browser.get(oauth.CALLBACK_PATH, params={"state": value, "code": "code-secret", "iss": ISSUER})
+    response = await browser.get(oauth.CALLBACK_PATH, params={
+        "state": value, "code": "code-secret", "iss": state.get("issuer", ISSUER),
+    })
     assert response.status_code == 303, response.text
     return value
 
@@ -383,6 +396,86 @@ async def test_untrusted_authorization_origin_is_not_contacted(provider):
     response = await browser.post(f"/ui/mcp-oauth/{resource.id}/connect", headers={"Origin": ORIGIN})
     assert response.status_code == 400
     assert all(r.url.host != "untrusted.test" for r in state["calls"])
+
+
+@pytest.mark.parametrize("grants", [None, ["authorization_code"], ["authorization_code", "refresh_token"]])
+async def test_coinstats_preset_cross_origin_oauth_and_registration(provider, monkeypatch, grants):
+    """Model CoinStats' three origins and root resource using an isolated provider."""
+    import re
+    from html import unescape
+
+    browser, state = provider
+    issuer = "https://api.example.test"
+    consent = "https://consent.example.test"
+    monkeypatch.setitem(integrations.PRESET_BY_ID, "coinstats", replace(
+        integrations.PRESET_BY_ID["coinstats"], url=SERVER, oauth_origins=(issuer, consent),
+    ))
+    state.update(root_metadata=True, resource=ISSUER, issuer=issuer, scope="coinstats")
+    state["metadata"].update(issuer=issuer, authorization_endpoint=consent + "/consent",
+                             token_endpoint=issuer + "/token", registration_endpoint=issuer + "/register")
+    if grants is not None:
+        state["metadata"]["grant_types_supported"] = grants
+    resource = await save(browser, name="CoinStats", integration="coinstats")
+    response = await browser.post(f"/ui/mcp-oauth/{resource.id}/connect", headers={"Origin": ORIGIN})
+    assert response.status_code == 200
+    link = re.search(r'id="oauth-continue"[^>]*href="([^"]+)"', response.text)
+    assert link
+    url = urlsplit(unescape(link[1]))
+    assert url.hostname == "consent.example.test"
+    params = parse_qs(url.query)
+    state["authorize"] = params
+    assert params["resource"] == [ISSUER]
+    assert params["scope"] == ["coinstats"]
+    assert params["code_challenge_method"] == ["S256"]
+    assert state["registration_body"]["grant_types"] == (grants or ["authorization_code", "refresh_token"])
+    response = await browser.get(oauth.CALLBACK_PATH, params={
+        "state": params["state"][0], "code": "code-secret", "iss": issuer,
+    })
+    assert response.status_code == 303 and await oauth.status(resource.config) == "connected"
+    assert all("authorization" not in r.headers for r in state["calls"] if r.method == "GET")
+    with pytest.raises(oauth.ConnectionError, match="another OAuth origin"):
+        oauth.checked_url("https://untrusted.test/token", resource.config)
+
+
+async def test_robinhood_path_issuer_discovery_and_approval(provider, db, agent, log_notifier, monkeypatch):
+    """Reproduce Robinhood's GET 405, path issuer, and separate consent/token origins."""
+    from keywright_server import approvals, mcp_server
+
+    browser, state = provider
+    server = ISSUER + "/mcp/trading"
+    consent = "https://consent.example.test"
+    api = "https://api.example.test"
+    monkeypatch.setitem(integrations.PRESET_BY_ID, "robinhood", replace(
+        integrations.PRESET_BY_ID["robinhood"], url=server, oauth_origins=(consent, api),
+    ))
+    state.update(resource=server, issuer=server, get_not_allowed=True, scope="internal",
+                 scopes_supported=["internal"])
+    state["metadata"].update(
+        issuer=server, authorization_endpoint=consent + "/oauth",
+        registration_endpoint=ISSUER + "/oauth/trading/register", token_endpoint=api + "/oauth2/token/",
+        grant_types_supported=["authorization_code", "refresh_token"], token_endpoint_auth_methods_supported=["none"],
+    )
+    resource = await save(browser, name="Robinhood", integration="robinhood")
+    await connect(browser, state, resource)
+    assert await oauth.status(resource.config) == "connected"
+    assert state["registration_body"]["client_name"] == "Keywright"
+    assert state["registration_body"]["token_endpoint_auth_method"] == "none"
+    assert any(str(r.url) == ISSUER + "/.well-known/oauth-authorization-server/mcp/trading"
+               for r in state["calls"])
+    assert any(str(r.url) == api + "/oauth2/token/" for r in state["calls"])
+    assert all("authorization" not in r.headers for r in state["calls"] if r.method == "GET")
+    await expire(resource.config)
+    args = {"query": "synthetic account", "_wait_seconds": 0}
+    denied = await mcp_server._proxy_call(db, agent, None, resource.name, "search", args)
+    assert denied.structured_content["error"] == "approval_required"
+    assert state["tool_calls"] == state["refreshes"] == 0
+    await approvals.decide(db, denied.structured_content["request_id"], "once", via="ui")
+    state["expected_access"] = "refreshed-secret"
+    result = await mcp_server._proxy_call(db, agent, None, resource.name, "search", args)
+    assert not result.is_error and state["tool_calls"] == state["refreshes"] == 1
+    assert "access-secret" not in json.dumps(resource.config)
+    with pytest.raises(oauth.ConnectionError, match="another OAuth origin"):
+        oauth.checked_url("https://untrusted.test/token", resource.config)
 
 
 async def test_oauth_refresh_still_requires_broker_approval(provider, db, agent, log_notifier):

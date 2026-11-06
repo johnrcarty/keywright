@@ -13,7 +13,7 @@ from mcp import Client
 from mcp.client.streamable_http import streamable_http_client
 from mcp.shared._httpx_utils import create_mcp_http_client
 
-from . import inventory_mcp, knowledge_mcp, mcp_oauth, omada
+from . import homelab, inventory_mcp, knowledge_mcp, mcp_oauth, omada
 
 TOOL_CACHE_TTL = 60.0
 SEP = "__"
@@ -50,6 +50,8 @@ async def _client(config: dict[str, Any]):
 
 
 async def list_tools(resource_name: str, config: dict[str, Any], *, force: bool = False) -> list[types.Tool]:
+    if config.get("adapter") in homelab.CONNECTORS:
+        return homelab.list_tools(config["adapter"])
     if config.get("adapter") == "knowledge":
         return knowledge_mcp.list_tools()
     if config.get("adapter") == "keywright":
@@ -75,6 +77,8 @@ async def list_tools(resource_name: str, config: dict[str, Any], *, force: bool 
 
 
 async def call_tool(config: dict[str, Any], tool: str, arguments: dict[str, Any] | None) -> types.CallToolResult:
+    if config.get("adapter") in homelab.CONNECTORS:
+        return await homelab.call_tool(config, tool, arguments or {})
     if config.get("adapter") in ("keywright", "knowledge"):
         raise ValueError("Internal inventory calls require the broker's gated transaction.")
     if config.get("adapter") == "omada":
@@ -84,6 +88,8 @@ async def call_tool(config: dict[str, Any], tool: str, arguments: dict[str, Any]
 
 
 async def probe(config: dict[str, Any]) -> tuple[bool, str]:
+    if config.get("adapter") in homelab.CONNECTORS:
+        return await homelab.probe(config)
     if config.get("adapter") == "knowledge":
         return True, "Built-in knowledge collection: search, get, list and propose."
     if config.get("adapter") == "keywright":

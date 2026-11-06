@@ -1,0 +1,13 @@
+{% set revision = proposal.revision %}
+<article class="tile req-tile" id="proposal-{{ revision.id }}" data-proposal="{{ revision.id }}">
+<div class="tile-summary">
+<div class="tile-head"><span class="tile-dot" aria-hidden="true"></span>
+<b>{{ proposal.agent_name or revision.attribution }}</b><span class="pill pending">Knowledge review</span>
+<span class="tile-meta mut small"><time data-since="{{ revision.created_at.isoformat() }}" datetime="{{ revision.created_at.isoformat() }}">{{ revision.created_at.strftime('%H:%M:%S') }}</time></span></div>
+<div class="tile-line">{{ revision.title }}</div>
+<div class="tile-line small mut">{{ proposal.collection.name }} / {{ proposal.document.path }}</div>
+{% if revision.rationale %}<div class="tile-reason small">{{ revision.rationale }}</div>{% endif %}
+</div>
+<div class="tile-quick"><a class="btn p sm" href="/ui/knowledge/proposals/{{ revision.id }}?next=/ui">Review &amp; approve</a>
+<span class="small mut">{{ revision.kind }} · {{ 'Update' if revision.base_revision else 'New document' }} · Awaiting publication</span></div>
+</article>

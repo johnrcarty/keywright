@@ -1,4 +1,5 @@
 {% extends "base.html" %}{% from "_icons.html" import icon %}
+{% from "_integration_mark.html" import integration_mark %}
 {% block title %}Add a resource · Keywright{% endblock %}
 {% block body %}
 {% include "_integration_style.html" %}
@@ -15,7 +16,7 @@
 <div class="integration-list">
 {% for entry in entries %}{% set item = entry.item %}
 <a class="integration-choice" data-integration data-search="{{ item.search_text }}" href="/ui/resources/new?{{ 'kind=' ~ item.kind if custom else 'integration=' ~ item.id }}" {% if not entry.matches %}hidden{% endif %}>
-<span class="integration-mark {{ item.icon }}">{% if item.icon == 'notion' %}N{% else %}{{ icon(item.icon) }}{% endif %}</span>
+{{ integration_mark(item.icon) }}
 <div class="integration-copy"><strong>{{ item.title }}</strong><p>{{ item.description }}</p></div>
 <span class="integration-method">{{ item.badge }}</span><span class="integration-arrow">{{ icon('chevron') }}</span>
 </a>
@@ -25,6 +26,7 @@
 {% endfor %}
 <div class="integration-empty" id="integration-empty" {% if matches %}hidden{% endif %}><h2>No matching integrations</h2><p>Try a different name, or use a custom connection.</p><a class="btn" href="/ui/resources/new">Show all connections</a></div>
 <p class="integration-count" id="integration-count" role="status" aria-live="polite">{{ matches }} connection{{ '' if matches == 1 else 's' }} available</p>
+<p class="integration-credits"><a href="/assets/brands/ATTRIBUTION.txt">Icon credits</a></p>
 </div>
 {% endblock %}
 {% block scripts %}

@@ -55,7 +55,10 @@ class NotifierManager:
         scopes = offered_scopes(req)
         links = decision_links(req.id, scopes)
         try:
-            await self.active.send(req, agent, links, [b for b in self.buttons if b in scopes])
+            buttons = ["shopping20", "deny"] if req.detail.get("shopping_session") else [b for b in self.buttons if b in scopes]
+            if req.detail.get("checkout"):
+                buttons = ["once", "deny"]
+            await self.active.send(req, agent, links, buttons)
             self.last_error = ""
         except Exception as e:
             self.last_error = f"{type(e).__name__}: {e}"

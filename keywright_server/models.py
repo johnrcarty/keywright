@@ -67,6 +67,23 @@ class KnowledgeRevision(Base):
     reviewed_at: Mapped[datetime | None] = mapped_column(UTCDateTime, nullable=True)
     expires_at: Mapped[datetime | None] = mapped_column(UTCDateTime, nullable=True)
 
+    link_version: Mapped[int | None] = mapped_column(Integer, nullable=True)
+
+
+class KnowledgeLink(Base):
+    __tablename__ = "knowledge_links"
+    __table_args__ = (Index("knowledge_link_source_revision", "source_document_id", "source_revision_id"),)
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: new_id("link"))
+    source_document_id: Mapped[str] = mapped_column(ForeignKey("knowledge_documents.id", ondelete="CASCADE"))
+    source_revision_id: Mapped[str] = mapped_column(ForeignKey("knowledge_revisions.id", ondelete="CASCADE"))
+    target_document_id: Mapped[str | None] = mapped_column(
+        ForeignKey("knowledge_documents.id", ondelete="SET NULL"), nullable=True, index=True)
+    target_ref: Mapped[str] = mapped_column(String)
+    syntax: Mapped[str] = mapped_column(String)
+    relation: Mapped[str] = mapped_column(String, default="references")
+    origin: Mapped[str] = mapped_column(String, default="explicit")
+    line_number: Mapped[int] = mapped_column(Integer)
+
 
 class KnowledgeChunk(Base):
     __tablename__ = "knowledge_chunks"
@@ -247,6 +264,17 @@ class Grant(Base):
         if self.scope == "session":
             return bool(self.session_id) and self.session_id == session_id
         return True
+
+
+class ShoppingCart(Base):
+    """Provider-observed linkage and durable submit reservation. A timeout never clears it."""
+    __tablename__ = "shopping_carts"
+    resource_id: Mapped[str] = mapped_column(ForeignKey("resources.id", ondelete="CASCADE"), primary_key=True)
+    cart_id: Mapped[str] = mapped_column(String, primary_key=True)
+    link: Mapped[dict[str, Any] | None] = mapped_column(JSON, nullable=True)
+    submit_state: Mapped[str | None] = mapped_column(String, nullable=True)
+    submitted_at: Mapped[datetime | None] = mapped_column(UTCDateTime, nullable=True)
+    request_ids: Mapped[list[Any] | None] = mapped_column(JSON, nullable=True)
 
 
 class LlmKey(Base):

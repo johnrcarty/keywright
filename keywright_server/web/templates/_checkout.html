@@ -1,0 +1,21 @@
+<section aria-label="Order to approve" class="card">
+<h2>Review DoorDash order</h2>
+<p><b>{{ checkout.store.name if checkout.store else 'DoorDash' }}</b> · {{ 'Pickup' if checkout.pickup else 'Delivery' }}</p>
+{% for line in checkout['items'] %}
+<div style="margin-bottom:12px"><b>{{ line.quantity }} × {{ line.item.name }}</b>
+<div>Preparation instructions: <strong>{{ line.special_instructions or 'None specified' }}</strong></div>
+{% if line.nested_options or line.options %}<details><summary>Selected options</summary><pre>{{ (line.nested_options or line.options) | tojson(indent=2) }}</pre></details>{% endif %}
+</div>
+{% endfor %}
+{% if checkout.destination %}<p>Destination: <b>{{ checkout.destination.printable_address or checkout.destination.address or checkout.destination | tojson }}</b></p>{% endif %}
+<p>Order before tip: ${{ '%.2f' | format(checkout.before_tip_cents / 100) }}<br>
+Tip: ${{ '%.2f' | format(checkout.tip_cents / 100) }}<br>
+<b>Total: ${{ '%.2f' | format(checkout.total_cents / 100) }} {{ checkout.currency }}</b><br>
+Payment: <b>{{ checkout.payment.display_name }}</b></p>
+{% if checkout.options %}<p>{{ 'Priority delivery · ' if checkout.options.priority else '' }}{{ 'Credits not applied · ' if checkout.options.no_apply_credits else '' }}{{ checkout.options.scheduled_time or 'As soon as possible' }}</p>{% endif %}
+{% if checkout.link %}<p><b>DoubleDash linked to your placed order</b>. <span data-until="{{ checkout.link.expires_at }}">Offer expires {{ checkout.link.expires_at }}</span>.</p>{% endif %}
+{% if checkout.dropoff %}<p><b>Handoff requirements</b></p><pre>{{ checkout.dropoff | tojson(indent=2) }}</pre>{% endif %}
+{% if checkout.warning %}<p>{{ checkout.warning }}</p>{% endif %}
+<details><summary>Price breakdown and full item details</summary><pre>{{ {'charges': checkout.charges, 'items': checkout['items']} | tojson(indent=2) }}</pre></details>
+<p class="help">Approves this quoted order once. Keywright rechecks it before submission; changed items, instructions, prices or payment details require a new approval. DoorDash determines the final charge when it processes the order.</p>
+</section>

@@ -48,6 +48,7 @@ async def init_db() -> None:
     async with engine().begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
         await conn.run_sync(_upgrade_knowledge_columns)
+        await conn.run_sync(_upgrade_knowledge_graph_columns)
         from .knowledge_index import init_local
         await conn.run_sync(init_local)
         await conn.run_sync(_upgrade_access_columns)
@@ -63,6 +64,13 @@ def _upgrade_knowledge_columns(conn) -> None:
     columns = {c["name"] for c in inspect(conn).get_columns("knowledge_chunks")}
     if "section_path" not in columns:
         conn.execute(text("ALTER TABLE knowledge_chunks ADD COLUMN section_path JSON"))
+
+
+def _upgrade_knowledge_graph_columns(conn) -> None:
+    """Track derived link coverage without modifying publication or source identity."""
+    columns = {c["name"] for c in inspect(conn).get_columns("knowledge_revisions")}
+    if "link_version" not in columns:
+        conn.execute(text("ALTER TABLE knowledge_revisions ADD COLUMN link_version INTEGER"))
 
 
 def _upgrade_access_columns(conn) -> None:

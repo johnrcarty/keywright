@@ -23,7 +23,8 @@ class LogNotifier(Notifier):
 
     async def send(self, req: AccessRequest, agent: Agent, links: dict[str, str], buttons: list[str]) -> None:
         title, body = request_summary(req, agent)
-        log.warning("ACCESS REQUEST %s\n%s\n%s\ndecide: %s", req.id, title, body, links.get("once", "").rsplit("/", 1)[0])
+        link = links.get("once") or links.get("shopping20") or ""
+        log.warning("ACCESS REQUEST %s\n%s\n%s\ndecide: %s", req.id, title, body, link.rsplit("/", 1)[0])
 
     async def send_nudge(self, nudge: Nudge, agent: Agent, url: str) -> None:
         title, body = nudge_summary(nudge, agent)

@@ -100,6 +100,16 @@ Never point test configuration at a production database.
 
 ## Optional integrations
 
+- [DoorDash](docs/DOORDASH.md): guided `dd-cli` setup through a managed SSH host,
+  including headless authentication (source checkout, unreleased).
+- [Robinhood](docs/ROBINHOOD.md): accounts, market data, and trading through browser
+  sign-in (source checkout, unreleased).
+- [Coinbase](docs/COINBASE.md): guided Coinbase CLI setup through a managed SSH host
+  (source checkout, unreleased).
+- [CoinStats](docs/FEATURES.md#oauth-for-upstream-mcp-servers-including-notion-and-coinstats):
+  crypto data and portfolios through browser sign-in (source checkout, unreleased).
+- [Homelab connectors](docs/CONNECTORS.md): Proxmox VE, Pi-hole v6, Home Assistant,
+  Jellyfin, Sonarr, Radarr and authentik setup and read-only tools (source checkout, unreleased).
 - [Feature and configuration reference](docs/FEATURES.md): permissions, notifications,
   LLM gateways, OIDC, inventory, shared knowledge and result inspection.
 - [Deployment guide](deploy/README.md): base stack, optional LLM/knowledge services and

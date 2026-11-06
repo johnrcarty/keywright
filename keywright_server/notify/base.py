@@ -101,6 +101,16 @@ def request_summary(req: AccessRequest, agent: Agent) -> tuple[str, str]:
     lines += [p for p in req.patterns if p not in grouped]
     pats = "\n".join(lines)
     body = f"{pats}\n{req.reason}".strip()
+    if req.detail.get("shopping_session"):
+        return f"Keywright shopping: {agent.name}", body + "\nAllow browsing and cart preparation for 20 minutes in this session. Purchases require a separate priced approval."
+    if req.detail.get("checkout"):
+        quote = req.detail["checkout"]
+        lines = [f"{item['quantity']} × {item['item']['name']}" +
+                 (f" — {item['special_instructions']}" if item.get("special_instructions") else "") for item in quote["items"]]
+        body += f"\nTotal ${quote['total_cents'] / 100:.2f} {quote['currency']} including ${quote['tip_cents'] / 100:.2f} tip"
+        body += "\n" + quote["payment"]["display_name"] + "\n" + "\n".join(lines)
+        body += "\nReview destination, options and full price breakdown in the request. This priced order only, once."
+        return f"Keywright checkout: {agent.name}", body
     if level:
         body = f"FLAGGED {level}: {describe(hazards_of(req.detail))}\n" + body
     jev = semantic.describe(getattr(req, "semantic", None))
@@ -142,6 +152,11 @@ def nudge_summary(nudge: Nudge, agent: Agent) -> tuple[str, str]:
 def operation_line(op: dict) -> str:
     """One line per operation, as the phone shows it: a command line, a file write as path, size and
     digest (never the contents), a file read as its path, or a tool call's arguments."""
+    if op.get("checkout"):
+        quote = op["checkout"]
+        return f"DoorDash order · ${quote['total_cents'] / 100:.2f} {quote['currency']} · {quote['payment']['display_name']}"
+    if op.get("shopping_session"):
+        return "Browse and prepare a DoorDash cart · 20 minutes · purchases approved separately"
     if op.get("command"):
         if op.get("to_path"):
             how = "append to" if op.get("append") else "write"

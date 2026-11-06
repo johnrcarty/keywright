@@ -2,6 +2,7 @@
 <h1 class="brand">{{ icon('shield') }}Keywright</h1>
 {% if req %}
 <div class="card">
+{% if req.expires_at %}<p><span data-until="{{ req.expires_at.isoformat() }}">Expires {{ req.expires_at }}</span></p>{% endif %}
 {% include "_hazards.html" %}
 <div><b>{{ req.agent.name }}</b> asks for:</div>
 <div style="margin:8px 0">{% include "_patterns.html" %}</div>
@@ -16,7 +17,7 @@
 {% else %}
 <form method="post" class="card">
 <div>Confirm: <b>{{ scope_labels[scope] }}</b></div>
-<p class="small">{% if hazard_blocks(hazard_level(req.detail)) %}Flagged destructive: this allows the exact operation shown once, or denies it. {% endif %}{% if binds_exactly(req.detail) %}This decision covers the exact operation{% if operations(req.detail)|length > 1 %}s{% endif %} shown, for the selected duration.{% else %}This decision covers the listed permission patterns.{% endif %} <a href="/ui/requests/{{ req.id }}">Review other scope and duration choices</a> in the admin UI.</p>
+<p class="small">{% if req.detail.shopping_session %}This allows browsing and cart preparation for 20 minutes in this agent session; each purchase requires a separate priced approval. {% elif req.detail.checkout %}This allows the priced order shown above once, after a fresh quote check. {% else %}{% if hazard_blocks(hazard_level(req.detail)) %}Flagged destructive: this allows the exact operation shown once, or denies it. {% endif %}{% if binds_exactly(req.detail) %}This decision covers the exact operation{% if operations(req.detail)|length > 1 %}s{% endif %} shown, for the selected duration.{% else %}This decision covers the listed permission patterns.{% endif %} <a href="/ui/requests/{{ req.id }}">Review other scope and duration choices</a> in the admin UI.{% endif %}</p>
 <p class="help">{% if scope == 'session' %}Session access uses the client-supplied ID and expires within {{ session_cap_minutes }} minutes. {% endif %}Expiry and revocation prevent future calls; running operations continue.</p>
 {% if scope == 'deny' %}<label>Reason (optional, shown to the agent)</label><input type="text" name="deny_reason">{% endif %}
 <div style="margin-top:12px" class="row"><button class="btn {{ 'bad' if scope == 'deny' else 'ok' }}">{{ scope_labels[scope] }}</button></div>
@@ -24,3 +25,4 @@
 {% endif %}
 {% endif %}
 {% endblock %}
+{% block scripts %}{% include "_expiry_script.html" %}{% endblock %}

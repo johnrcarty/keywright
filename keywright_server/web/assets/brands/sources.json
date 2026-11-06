@@ -1,0 +1,78 @@
+{
+  "reviewed_on": "2026-11-03",
+  "use": "Identify supported third-party connectors inside Keywright. Not Keywright branding or an endorsement claim.",
+  "assets": [
+    {
+      "file": "pihole.svg",
+      "source_url": "https://raw.githubusercontent.com/pi-hole/graphics/6a48f16c62c3d22e52324ddb5cf8759d854a1523/Vortex/Vortex.svg",
+      "source_commit": "6a48f16c62c3d22e52324ddb5cf8759d854a1523",
+      "sha256": "1ff8a882324ee496c6555bd68f9b043e6447435bc90420ce4c23e0cc1a956cd6",
+      "license": "MIT",
+      "credit": "Pi-hole",
+      "brand_guidelines": "https://pi-hole.net/trademark-rules-and-brand-guidelines/",
+      "modifications": "None; original upstream bytes."
+    },
+    {
+      "file": "PI-HOLE-LICENSE.txt",
+      "source_url": "https://raw.githubusercontent.com/pi-hole/graphics/6a48f16c62c3d22e52324ddb5cf8759d854a1523/LICENSE",
+      "source_commit": "6a48f16c62c3d22e52324ddb5cf8759d854a1523",
+      "sha256": "14c335de044b52b6de376af8e6895051bca667a319008dfe2fa0eda60c13fd86",
+      "license": "MIT",
+      "credit": "Pi-hole",
+      "brand_guidelines": "https://pi-hole.net/trademark-rules-and-brand-guidelines/",
+      "modifications": "None; original upstream bytes."
+    },
+    {
+      "file": "jellyfin-dark.svg",
+      "source_url": "https://raw.githubusercontent.com/jellyfin/jellyfin-ux/69a2b7b1237732a134dd501ff55b9404cf2d1601/logos/SVG/jellyfin-icon--color-on-dark.svg",
+      "source_commit": "69a2b7b1237732a134dd501ff55b9404cf2d1601",
+      "sha256": "cf3262b0eee6a47b8a09515ef01dd9a2151cb58022645e68acbf09efc9d0ed20",
+      "license": "CC-BY-SA-4.0",
+      "credit": "Jellyfin Project",
+      "brand_guidelines": "https://jellyfin.org/docs/general/contributing/branding/",
+      "modifications": "None; original upstream bytes."
+    },
+    {
+      "file": "jellyfin-light.svg",
+      "source_url": "https://raw.githubusercontent.com/jellyfin/jellyfin-ux/69a2b7b1237732a134dd501ff55b9404cf2d1601/logos/SVG/jellyfin-icon--color-on-light.svg",
+      "source_commit": "69a2b7b1237732a134dd501ff55b9404cf2d1601",
+      "sha256": "cf3262b0eee6a47b8a09515ef01dd9a2151cb58022645e68acbf09efc9d0ed20",
+      "license": "CC-BY-SA-4.0",
+      "credit": "Jellyfin Project",
+      "brand_guidelines": "https://jellyfin.org/docs/general/contributing/branding/",
+      "modifications": "None; original upstream bytes."
+    },
+    {
+      "file": "JELLYFIN-LICENSE.txt",
+      "source_url": "https://raw.githubusercontent.com/jellyfin/jellyfin-ux/69a2b7b1237732a134dd501ff55b9404cf2d1601/LICENSE",
+      "source_commit": "69a2b7b1237732a134dd501ff55b9404cf2d1601",
+      "sha256": "6d4e2239c9605f95e1031309e8bd156dec62c55817427655003c57baceafb1e2",
+      "license": "CC-BY-SA-4.0",
+      "credit": "Jellyfin Project",
+      "brand_guidelines": "https://jellyfin.org/docs/general/contributing/branding/",
+      "modifications": "None; original upstream bytes."
+    }
+  ],
+  "not_selected": [
+    {
+      "brand": "Proxmox",
+      "reason": "Published logo guidance requires linking the logo to proxmox.com; the connector tile opens local setup. No broader grant assumed.",
+      "source": "https://www.proxmox.com/en/about/company-details/media-kit"
+    },
+    {
+      "brand": "Home Assistant",
+      "reason": "Published logo guidance restricts commercial use without written permission. Prefer a neutral icon for a redistributable integration catalog.",
+      "source": "https://contributors.home-assistant.io/brand/name-and-logo/"
+    },
+    {
+      "brand": "Sonarr",
+      "reason": "Upstream artwork is in the GPL-3.0 repository; no separate permissive artwork grant identified. Prefer a neutral icon rather than introducing GPL artwork for this cosmetic change.",
+      "source": "https://github.com/Sonarr/Sonarr/blob/develop/LICENSE.md"
+    },
+    {
+      "brand": "Radarr",
+      "reason": "Upstream artwork is in the GPL-3.0 repository; no separate permissive artwork grant identified. Prefer a neutral icon rather than introducing GPL artwork for this cosmetic change.",
+      "source": "https://github.com/Radarr/Radarr/blob/develop/LICENSE"
+    }
+  ]
+}

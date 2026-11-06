@@ -32,7 +32,11 @@
 </details>
 <form method="post" action="/ui/requests/{{ req.id }}/decide" class="tile-quick">
 <input type="hidden" name="next" value="/ui">
-{% if flagged %}<input type="hidden" name="extent" value="exact">
+{% if req.detail.checkout %}<a class="btn ok sm" href="/ui/requests/{{ req.id }}">Review priced order</a>
+<button class="btn bad sm" name="scope" value="deny">Deny</button>
+{% elif req.detail.shopping_session %}<button class="btn ok sm" name="scope" value="shopping20">Shop for 20 minutes</button>
+<button class="btn bad sm" name="scope" value="deny">Deny</button>
+{% elif flagged %}<input type="hidden" name="extent" value="exact">
 <button class="btn ok sm" name="scope" value="once">Allow once (exact)</button>
 <button class="btn bad sm" name="scope" value="deny">Deny</button>
 <span class="small mut">Destructive · open to read the flags</span>

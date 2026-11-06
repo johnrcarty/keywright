@@ -31,11 +31,11 @@ from .models import AccessRequest, Agent, Grant, Policy, Resource, now
 log = logging.getLogger(__name__)
 
 TTL_PRESETS = {"ttl15": 900, "ttl30": 1800, "ttl": 3600}
-SCOPES = ("once", "session", "ttl15", "path15", "ttl30", "ttl", "always", "deny", "deny_always")
-PHONE_SCOPES = ("once", "session", "ttl15", "path15", "ttl30", "ttl", "deny")
+SCOPES = ("once", "session", "shopping20", "ttl15", "path15", "ttl30", "ttl", "always", "deny", "deny_always")
+PHONE_SCOPES = ("once", "session", "shopping20", "ttl15", "path15", "ttl30", "ttl", "deny")
 SCOPE_LABELS = {"once": "Allow once", "session": "This session", "ttl15": "15 minutes", "path15": "This path, 15 min",
                 "ttl30": "30 minutes", "ttl": "1 hour", "always": "Always allow",
-                "deny": "Deny", "deny_always": "Always deny"}
+                "deny": "Deny", "deny_always": "Always deny", "shopping20": "Shop for 20 minutes"}
 
 
 def decision_label(req: AccessRequest) -> str:
@@ -118,6 +118,11 @@ def offered_scopes(req: AccessRequest, scopes: tuple[str, ...] = PHONE_SCOPES) -
     id cannot be granted 'this session': there is nothing to bind the grant to, and an agent-wide
     grant would outlive the conversation that asked for it. A request flagged destructive can only
     be allowed once: nothing timed, nothing standing. An LLM lease is always timed."""
+    if req.detail.get("shopping_session"):
+        return tuple(s for s in scopes if s in ("shopping20", "deny") and (s != "shopping20" or req.session_id))
+    scopes = tuple(s for s in scopes if s != "shopping20")
+    if req.detail.get("checkout"):
+        return tuple(s for s in scopes if s in ("once", "deny"))
     if blocks(hazard_level(req.detail)):
         scopes = tuple(s for s in scopes if s in HAZARD_SCOPES)
     if llm_only(list(req.patterns)):
@@ -185,6 +190,14 @@ async def create(
         semantic=semantic,
         expires_at=now() + timedelta(seconds=settings.request_timeout_s),
     )
+    if req.detail.get("checkout"):
+        from .shopping_mcp import remaining
+
+        cap = 300
+        link = req.detail["checkout"].get("link")
+        if link:
+            cap = min(cap, remaining(link.get("expires_at")) or 0)
+        req.expires_at = min(req.expires_at, now() + timedelta(seconds=cap))
     db.add(req)
     await db.commit()
     await db.refresh(req)
@@ -261,6 +274,12 @@ async def decide(
         raise LookupError("no such request")
     if req.status != "pending":
         return req
+    shopping_session = bool(req.detail.get("shopping_session"))
+    if shopping_session or req.detail.get("checkout") or scope == "shopping20":
+        if scope not in offered_scopes(req, SCOPES) or via == "jev":
+            raise ValueError("Shopping requires a human decision: 20 minutes for preparation, once for checkout")
+        if req.detail.get("checkout") and extent not in (None, "exact"):
+            raise ValueError("Checkout approval must bind the exact quoted order")
     if path_grant:
         if not path_scoped(req.detail):
             raise ValueError("Path access is only offered for a single file write")
@@ -276,6 +295,11 @@ async def decide(
     # One (patterns, constraints) pair per operation; a pattern request is one pair with none.
     bound = [(pats if pats is not None else list(req.patterns), operation_constraints(op, extent), op)
              for pats, op in operations(req.detail)] or [(list(req.patterns), None, None)]
+    if shopping_session:
+        target = await db.get(Resource, req.detail["resource_id"])
+        if target is None:
+            raise ValueError("Shopping resource no longer exists")
+        bound = [(list(req.patterns), {**operation_constraints(req.detail, "patterns"), "shopping": True}, req.detail)]
     if scope == "session" and not req.session_id:
         raise ValueError("This request has no session id; choose Allow once or 1 hour instead")
     if scope not in LLM_SCOPES and any(p.split("/", 1)[0] == "llm" for p in req.patterns):
@@ -313,7 +337,7 @@ async def decide(
         (AccessRequest.expires_at.is_(None)) | (AccessRequest.expires_at > decided_at),
     ).values(status="denied" if scope in ("deny", "deny_always") else "approved", decided_at=decided_at,
              decision_scope=scope, decided_via=via,
-             decision_options={"extent": extent, "ttl_s": ttl_s if scope == "ttl" else None}
+             decision_options={"extent": extent, "ttl_s": 1200 if scope == "shopping20" else ttl_s if scope == "ttl" else None}
              ).execution_options(synchronize_session=False))
     if changed.rowcount != 1:
         await db.rollback()
@@ -343,9 +367,11 @@ async def decide(
                     agent_id=req.agent_id,
                     pattern=p,
                     constraints=constraints,
-                    scope=scope,
-                    session_id=req.session_id if scope == "session" else None,
+                    scope="session" if scope == "shopping20" else scope,
+                    session_id=req.session_id if scope in ("session", "shopping20") else None,
                     expires_at=(decided_at + timedelta(seconds=ttl_s)) if scope == "ttl"
+                    else (decided_at + timedelta(seconds=1200)) if scope == "shopping20"
+                    else min(req.expires_at, decided_at + timedelta(minutes=5)) if req.detail.get("checkout")
                     else (decided_at + timedelta(seconds=settings.session_grant_ttl_s)) if scope == "session"
                     else None,
                     uses_remaining=1 if scope == "once" else None,

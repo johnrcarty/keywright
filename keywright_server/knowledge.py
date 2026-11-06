@@ -125,7 +125,8 @@ async def create_collection(db, name, description=""):
         raise KnowledgeError("A resource already uses that name.")
     res = Resource(name=name, kind="mcp", description=description[:2000], default_mode="locked",
                    config={"adapter": "knowledge", "bundles": {
-                       "read-only": ["tools/knowledge_search", "tools/knowledge_get", "tools/knowledge_list"],
+                       "read-only": ["tools/knowledge_search", "tools/knowledge_get", "tools/knowledge_list",
+                                     "tools/knowledge_neighbors"],
                        "contribute": ["tools/knowledge_propose"]}})
     db.add(res)
     await db.flush()
@@ -181,6 +182,10 @@ async def review(db, revision_id, approve):
         doc.current_revision = rev.id
         rev.status = "published"
         db.add_all(_revision_chunks(doc.resource_id, rev, body))
+        await db.flush()
+        from . import knowledge_graph
+
+        await knowledge_graph.index_revision(db, doc, rev, body)
     else:
         rev.status = "rejected"
     rev.reviewed_at = now()

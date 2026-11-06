@@ -117,10 +117,13 @@ def decide(
     if agent.disabled:
         return Verdict(status="deny", denied=list(required)), []
     v = Verdict(hazard=worst(operation.get("hazards")) if operation else None)
-    fresh_only = blocks(v.hazard)
+    checkout = bool(operation and operation.get("checkout"))
+    fresh_only = blocks(v.hazard) or checkout
 
     def eligible(g: Grant, op: dict) -> bool:
         req = requests.get(g.request_id)
+        if checkout and (not req or req.decided_via == "jev" or not (g.constraints or {}).get("checkout")):
+            return False
         if req and req.session_id and req.session_id != session_id:
             return False
         return discovery or operation_matches(grant_constraints(g, req), op)

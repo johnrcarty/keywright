@@ -109,6 +109,8 @@ def operation_matches(constraints: dict | None, operation: dict | None) -> bool:
 def constraint_label(constraints: dict[str, Any] | None) -> str:
     if not constraints:
         return "Permission patterns · any matching arguments"
+    if constraints.get("shopping") and not constraints.get("command"):
+        return "Shopping session · browsing and cart preparation"
     if "command" in constraints:
         return "Exact command"
     if "arguments" in constraints:

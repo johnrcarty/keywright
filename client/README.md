@@ -52,6 +52,40 @@ that do not supply it retain the fallback. Compare `kw session` inside and outsi
 to check attribution. Process fallback is per process, not necessarily per conversation.
 Switching from process to thread identity requires fresh session-scoped approvals.
 
+## Bug reports and connector requests
+
+Available in the source checkout, ahead of the next published package. `kw issue`
+works without a configured or reachable broker. Preview a public report first:
+
+```bash
+kw issue bug --title "Describe the failure" --body-file report.txt
+kw issue connector --title "Add a service connector" --body-file request.txt --json
+```
+
+For bugs, include reproduction steps, expected/actual behavior and relevant versions.
+For connectors, include upstream API/MCP/CLI documentation, authentication details
+(without credentials), versions and the operations you want. Search existing
+[issues](https://github.com/johnrcarty/keywright/issues) before submitting.
+
+To publish, install [GitHub CLI](https://cli.github.com/), sign in with
+`gh auth login --hostname github.com`, and repeat the command with `--submit`.
+It creates an issue in `johnrcarty/keywright` using that login. `--body-file -` reads
+stdin; `--body` accepts inline text. `--dry-run` explicitly selects the default
+preview behavior. `--json` gives machine-readable results. Publishing uses
+[`gh issue create`](https://cli.github.com/manual/gh_issue_create).
+
+Only your supplied title, body and client version are included. The command does
+not collect logs, config files, broker credentials or conversation history, and
+does not automatically sanitize your text. Review the preview for private data.
+Security vulnerabilities belong in the repository's private security reporting
+process, not a public bug report. Agents should publish only when authorized to
+file a public report.
+
+Exit codes: 0 previewed/submitted, 2 invalid input, 6 submission failed or outcome
+unknown. Submission is never retried automatically; after a timeout or uncertain
+failure, check GitHub before retrying to avoid duplicate issues. Broker-side MCP
+does not acquire a GitHub credential; shell-capable agents use this client command.
+
 ## License
 
 Keywright is licensed under [Apache-2.0](LICENSE). Copyright 2026 Keywright
@@ -59,3 +93,10 @@ contributors. See [NOTICE](NOTICE) and [third-party notices](THIRD_PARTY_NOTICES
 Commercial use and proprietary extensions are permitted under the license's terms.
 Unless explicitly stated otherwise, contributions intentionally submitted for
 inclusion in Keywright are provided under Apache-2.0.
+
+### DoorDash shopping
+
+Use `kw shop DoorDash guide` for the reviewed CLI contract, then `kw shop DoorDash start`
+for a 20-minute browsing/cart session. `kw shop DoorDash status` reports the remaining time.
+Checkout uses `kw shop DoorDash checkout --cart-uuid ID --card-id ID --tip-cents CENTS`: a live
+priced approval, rechecked before submission. See [DoorDash setup and ordering](../docs/DOORDASH.md).

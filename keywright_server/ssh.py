@@ -12,7 +12,7 @@ import ipaddress
 import re
 import shlex
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 import asyncssh
@@ -31,6 +31,7 @@ class RunResult:
     truncated: bool
     duration_ms: int
     learned_host_key: str | None = None  # set when we pinned the host key on this call
+    timing: dict[str, int] = field(default_factory=dict)
 
 
 class HostKeyMismatch(Exception):
@@ -53,6 +54,9 @@ def _known_hosts_for(pinned: str):
 
 async def run(config: dict[str, Any], command: str, *, timeout: int = 300, user: str | None = None,
               stdin: bytes | None = None) -> RunResult:
+    from .cli_setup import runtime_command
+
+    command = runtime_command(config, command)
     timeout = max(1, min(int(timeout or 300), MAX_TIMEOUT))
     host = config["host"]
     port = int(config.get("port") or 22)
@@ -77,6 +81,7 @@ async def run(config: dict[str, Any], command: str, *, timeout: int = 300, user:
 
     learned = None
     async with asyncssh.connect(**options) as conn:
+        connected = time.monotonic()
         if not pinned:
             learned = _server_key_line(conn)
         # Drain both streams concurrently, retaining at most MAX_OUTPUT bytes in total.
@@ -117,6 +122,8 @@ async def run(config: dict[str, Any], command: str, *, timeout: int = 300, user:
         truncated=truncated,
         duration_ms=int((time.monotonic() - started) * 1000),
         learned_host_key=learned,
+        timing={"ssh_connect_ms": int((connected - started) * 1000),
+                "remote_process_ms": int((time.monotonic() - connected) * 1000)},
     )
 
 

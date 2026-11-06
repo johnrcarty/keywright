@@ -11,7 +11,7 @@ import mcp_types as types
 import pytest
 from sqlalchemy import delete, func, select, text
 
-from keywright_server import audit, mcp_proxy
+from keywright_server import audit, events, mcp_proxy
 from keywright_server import knowledge as k
 from keywright_server import knowledge_index as idx
 from keywright_server.db import session
@@ -308,10 +308,61 @@ async def test_mcp_auth_policy_isolation_and_revocation(db, collection, agent):
     assert result.structured_content["error"] == "unauthorized"
 
 
+async def test_shared_feedback_access_covers_future_agents_and_keeps_review_boundary(live_server, db, agent):
+    from keywright_server.mcp_server import hash_token
+
+    shared = await k.create_collection(db, "CLIFeedback", "Sanitized beta call notes")
+    guidance = await publish(db, shared, "Capture useful call talking points", path="guides/feedback.md")
+    private = await k.create_collection(db, "PrivateProject")
+    await publish(db, private, "Private project information")
+    tools = ("knowledge_search", "knowledge_get", "knowledge_list", "knowledge_neighbors", "knowledge_propose")
+    form = {"resource": shared.id, "agent": "", "scope": ""}
+    form.update({f"s:{tool}": "allow" for tool in tools})
+    async with httpx.AsyncClient(base_url=live_server, headers={"Origin": live_server}, follow_redirects=True) as http:
+        await http.post("/ui/login", data={"password": "adminpass123"})
+        assert (await http.post("/ui/access", data=form)).status_code == 200
+        policies = list(await db.scalars(select(Policy)))
+        assert len(policies) == len(tools)
+        assert all(p.agent_id is None and p.effect == "allow" for p in policies)
+
+        future = Agent(name="future-agent", token_hash=hash_token("future-token"), token_prefix="future")
+        db.add(future)
+        await db.commit()
+        ctx = SimpleNamespace(request=SimpleNamespace(headers={"authorization": "Bearer future-token"}))
+        discovery = await on_call_tool(ctx, types.CallToolRequestParams(name="access_list_resources", arguments={}))
+        assert [r["resource"] for r in discovery.structured_content["resources"]] == ["mcp/CLIFeedback"]
+        for enrolled in (agent, future):
+            assert (await call(enrolled, shared, "knowledge_get", {"document_id": guidance.document_id}))["markdown"]
+            assert (await call(enrolled, private, "knowledge_list"))["error"] == "locked"
+
+        note = await call(agent, shared, "knowledge_propose", {
+            "path": "feedback/doordash/example.md", "title": "Example call note", "kind": "memory",
+            "body": "pendingfeedbackneedle", "rationale": "Synthetic workflow observation",
+        })
+        assert note["status"] == "pending"
+        rev = await db.get(k.Revision, note["proposal_id"])
+        assert rev.proposed_by == agent.id
+        assert not (await call(future, shared, "knowledge_search", {"query": "pendingfeedbackneedle"}))["results"]
+        assert (await call(future, shared, "knowledge_get", {"document_id": rev.document_id}))["error"] == "knowledge_conflict"
+        assert len((await call(future, shared, "knowledge_list"))["documents"]) == 1
+        assert (await http.post(f"/ui/knowledge/proposals/{rev.id}", data={"action": "approve"})).status_code == 200
+        assert (await call(future, shared, "knowledge_search", {"query": "pendingfeedbackneedle"}))["results"]
+
+        db.add(Policy(agent_id=agent.id, pattern="mcp/CLIFeedback/**", effect="deny"))
+        await db.commit()
+        assert (await call(agent, shared, "knowledge_list"))["error"] == "denied"
+        assert (await call(future, shared, "knowledge_list"))["documents"]
+        form.update({f"s:{tool}": "ask" for tool in tools})
+        assert (await http.post("/ui/access", data=form)).status_code == 200
+        assert (await call(future, shared, "knowledge_list"))["error"] == "locked"
+
+
 async def test_mcp_proposal_attribution_and_no_promotion(db, collection, agent):
     await allow(db, agent, collection, "knowledge_propose", "knowledge_search")
     args = {"path": "lessons.md", "title": "Lesson", "body": "Use transactions", "rationale": "Session discovery"}
-    result = await call(agent, collection, "knowledge_propose", args)
+    async with events.subscribe() as updates:
+        result = await call(agent, collection, "knowledge_propose", args)
+        assert await updates.get() == {"type": "knowledge.proposed", "id": result["proposal_id"]}
     assert result["status"] == "pending"
     rev = await db.get(k.Revision, result["proposal_id"])
     assert rev.proposed_by == agent.id and rev.attribution == "agent:" + agent.id
@@ -341,8 +392,10 @@ async def test_proposal_rolls_back_when_audit_fails(db, collection, agent, monke
     async def fail(*args, **kwargs):
         raise RuntimeError("Audit unavailable")
     monkeypatch.setattr(audit, "record", fail)
-    with pytest.raises(RuntimeError):
-        await call(agent, collection, "knowledge_propose", {"path": "new.md", "title": "New", "body": "Text", "rationale": "Useful"})
+    async with events.subscribe() as updates:
+        with pytest.raises(RuntimeError):
+            await call(agent, collection, "knowledge_propose", {"path": "new.md", "title": "New", "body": "Text", "rationale": "Useful"})
+        assert updates.waiting == 0
     async with session() as fresh:
         assert await fresh.scalar(select(func.count()).select_from(k.Revision)) == 0
         assert await fresh.scalar(select(func.count()).select_from(k.Document)) == 0

@@ -6,6 +6,14 @@ container base images, optional services and embedding models retain their own
 licenses. This file is a guide to those components, not a replacement for their
 license texts or a complete inventory of a particular image.
 
+Connector artwork
+-----------------
+Bundled connector artwork is documented separately in
+keywright_server/web/assets/brands/ATTRIBUTION.txt, with full licenses,
+unmodified SVG source and pinned provenance in that directory. Pi-hole artwork
+is MIT-licensed; Jellyfin artwork is CC-BY-SA-4.0. These asset licenses and
+trademark guidelines remain in effect independently of Keywright's license.
+
 Python dependencies
 -------------------
 Keywright distributions declare dependencies rather than vendoring them. pip

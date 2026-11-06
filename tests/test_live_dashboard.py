@@ -9,7 +9,7 @@ import pytest
 import websockets
 from starlette.requests import Request
 
-from keywright_server import approvals, events, nudges
+from keywright_server import approvals, events, knowledge, nudges
 from keywright_server.models import Agent, Grant, Policy, Resource, now
 
 
@@ -218,3 +218,69 @@ async def test_a_nudge_arrives_as_a_card_and_the_resync_matches(live_server, db,
         r = await http.post(f"/ui/nudges/{ping.nudge.id}/dismiss", follow_redirects=False)
         assert r.status_code == 303
         assert (await http.get("/ui/live")).json()["counts"]["nudges"] == 0
+
+
+@pytest.mark.parametrize("action,status", [("approve", "published"), ("reject", "rejected")])
+async def test_knowledge_proposals_arrive_and_resolve_on_dashboard(live_server, db, agent, action, status):
+    from keywright_server.mcp_server import _proxy_call
+
+    collection = await knowledge.create_collection(db, "SharedKnowledge")
+    collection.default_mode = "open"
+    await db.commit()
+    cookie = await admin_cookie(live_server)
+    async with await open_dashboard(live_server, cookie=cookie) as ws:
+        assert json.loads(await asyncio.wait_for(ws.recv(), 10))["counts"]["pending"] == 0
+        result = await _proxy_call(db, agent, None, collection.name, "knowledge_propose", {
+            "path": "lesson.md", "title": "A <script>lesson</script>", "body": "Full proposed content",
+            "rationale": "Useful <b>discovery</b>", "_wait_seconds": 0,
+        })
+        revision_id = result.structured_content["proposal_id"]
+        update = json.loads(await asyncio.wait_for(ws.recv(), 10))
+        assert update["type"] == "knowledge.proposed" and update["id"] == revision_id
+        assert update["counts"]["pending"] == 1 and update["counts"]["leases"] == 0
+        assert agent.name in update["html"] and "SharedKnowledge / lesson.md" in update["html"]
+        assert "&lt;script&gt;lesson&lt;/script&gt;" in update["html"]
+        assert "&lt;b&gt;discovery&lt;/b&gt;" in update["html"]
+        assert "Full proposed content" not in update["html"]
+        review_url = f"/ui/knowledge/proposals/{revision_id}?next=/ui"
+        assert f'href="{review_url}"' in update["html"]
+        async with httpx.AsyncClient(base_url=live_server, headers={"Origin": live_server},
+                                     cookies={"kw_admin": cookie}) as http:
+            html = (await http.get("/ui")).text
+            assert f'id="proposal-{revision_id}"' in html and 'data-count="pending">1<' in html
+            assert 'id="pending-empty" hidden' in html
+            state = (await http.get("/ui/live")).json()
+            assert state["counts"]["pending"] == 1 and f'id="proposal-{revision_id}"' in state["html"]
+            review_page = await http.get(review_url)
+            assert "Full proposed content" in review_page.text
+            assert 'name="next" value="/ui"' in review_page.text
+            rejected = await http.post(review_url, data={"action": action, "next": "/ui"},
+                                       headers={"Origin": "https://evil.invalid"})
+            assert rejected.status_code == 403
+            response = await http.post(review_url, data={"action": action, "next": "/ui"})
+            assert response.status_code == 303 and response.headers["location"] == "/ui"
+            decision = json.loads(await asyncio.wait_for(ws.recv(), 10))
+            assert decision["type"] == "knowledge.reviewed" and decision["id"] == revision_id
+            assert decision["status"] == status and decision["counts"]["pending"] == 0
+            state = (await http.get("/ui/live")).json()
+            assert f'id="proposal-{revision_id}"' not in state["html"]
+            assert state["counts"]["pending"] == 0
+
+
+async def test_pending_count_includes_access_and_knowledge_and_ignores_resolved(db, agent, protected, log_notifier):
+    from keywright_server.web.admin import _counts, _live_payload, _waiting
+
+    collection = await knowledge.create_collection(db, "SharedKnowledge")
+    proposal = await knowledge.propose(db, collection.id, path="a.md", title="Pending", body="Content")
+    published = await knowledge.propose(db, collection.id, path="b.md", title="Published", body="Content")
+    await knowledge.review(db, published.id, True)
+    rejected = await knowledge.propose(db, collection.id, path="c.md", title="Rejected", body="Content")
+    await knowledge.review(db, rejected.id, False)
+    await db.commit()
+    await approvals.create(db, agent, None, ["ssh/nvr/exec/uptime"], "check", operation(protected, "uptime"))
+    assert (await _counts(db))["pending"] == 2
+    waiting = await _waiting(db)
+    assert len(waiting["pending"]) == 1
+    assert [p["revision"].id for p in waiting["proposals"]] == [proposal.id]
+    assert await _live_payload(db, {"type": "knowledge.proposed", "id": published.id}) is None
+    assert await _live_payload(db, {"type": "knowledge.proposed", "id": "missing"}) is None
