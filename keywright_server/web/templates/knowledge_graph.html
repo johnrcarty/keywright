@@ -35,14 +35,14 @@
 <div class="kg-stage">
 <canvas id="knowledge-canvas" tabindex="0" aria-label="Knowledge graph. Drag to pan, scroll or use plus and minus to zoom. Use the document list to select a note."></canvas>
 <div class="kg-camera"><button type="button" class="btn sm" id="kg-in" aria-label="Zoom in">+</button><button type="button" class="btn sm" id="kg-out" aria-label="Zoom out">−</button><button type="button" class="btn sm" id="kg-fit">Fit</button></div>
-<div class="kg-empty" id="kg-empty" hidden><h2>No published documents</h2><p>Publish a note to start. Connect notes with <code>[[wikilinks]]</code> or Markdown links.</p></div>
+<div class="kg-empty" id="kg-empty" hidden><h2>No published documents</h2><p>Publish a note to start. Connect notes with <code>[[wikilinks]]</code>, Markdown links, or plain collection paths.</p></div>
 </div>
 <aside class="card kg-details" aria-label="Document and relationships">
 <div id="kg-selection"><h2>Explore your knowledge</h2><p class="mut">Select a node to see its references, backlinks and source. Links connect notes within each collection.</p></div>
 <details open><summary>Documents in this view</summary><ul class="kg-list" id="kg-documents"></ul></details>
 </aside>
 </div>
-<details class="card" style="margin-top:16px"><summary>Index links in existing documents</summary><p>New publications update the graph automatically. Rebuild links for older documents or after restoring a backup. This reads approved Markdown without changing its content or approval history.</p><form method="post" action="/ui/knowledge/graph/rebuild"><input type="hidden" name="collection" id="kg-rebuild-collection" value="{{ collection }}"><button class="btn">Rebuild document links</button></form></details>
+<details class="card" style="margin-top:16px"><summary>Index links in existing documents</summary><p>New publications update the graph automatically. Rebuild links for older documents, newly supported reference formats, or after restoring a backup. Plain collection paths in note text and source metadata are included. This reads approved Markdown without changing its content or approval history.</p><form method="post" action="/ui/knowledge/graph/rebuild"><input type="hidden" name="collection" id="kg-rebuild-collection" value="{{ collection }}"><button class="btn">Rebuild document links</button></form></details>
 <p class="small mut">Only current, published, unexpired documents appear. A reference is not proof of dependency or authority. Semantic suggestions and extracted entities are not part of this graph.</p>
 {% endblock %}
 {% block scripts %}<script>{% include "_knowledge_graph.js" %}</script>{% endblock %}

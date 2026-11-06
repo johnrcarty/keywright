@@ -238,3 +238,67 @@ async def test_graph_ui_auth_preview_scope_and_rebuild(live_server, db, collecti
         await k.archive(db, collection.id, doc.id, doc.current_revision)
         await db.commit()
         assert (await client.get("/ui/knowledge/graph/preview/" + doc.id)).status_code == 404
+
+
+def test_plain_collection_paths_ignore_code_urls_host_paths_and_link_destinations():
+    body = '''Preparation note: feedback/example/preparation.md
+Source note: guides/review.md@rev_example; current document feedback/example/checkout.md
+[linked](guides/linked.md) [[guides/wiki]] ![image](guides/image.md)
+https://example.test/guides/web.md /srv/guides/host.md git:guides/git.md
+`guides/code.md`
+```text
+guides/fenced.md
+```
+<!-- guides/comment.md -->
+../../../escape.md
+'''
+    refs = graph.extract(body, 'feedback/example/checkout.md')
+    assert [(r.target_ref, r.syntax, r.line_number) for r in refs] == [
+        ('feedback/example/preparation.md', 'path', 1),
+        ('guides/review.md', 'path', 2),
+        ('guides/linked.md', 'markdown', 3), ('guides/wiki', 'wiki', 3),
+    ]
+    assert graph.target_path('feedback/example/checkout.md', 'guides/review.md', 'path') == 'guides/review.md'
+    assert graph.target_path('feedback/example/checkout.md', '../preparation.md', 'path') == 'feedback/preparation.md'
+
+
+async def test_existing_plain_paths_and_source_metadata_rebuild_without_rewriting_notes(db, collection):
+    target, _ = await publish(db, collection, 'feedback/example/preparation.md')
+    source, rev = await publish(db, collection, 'feedback/example/checkout.md',
+        'Preparation note: feedback/example/preparation.md',
+        source='Continuation of feedback/example/preparation.md; observed follow-up')
+    before = (rev.id, rev.sha256, rev.reviewed_at, rev.source, k.markdown(rev))
+    await db.execute(text('DELETE FROM knowledge_links'))
+    rev.link_version = 1
+    await db.commit()
+    assert (await graph.snapshot(db, collection.id))['unindexed_documents'] == 1
+    await k.lock_writes(db)
+    result = await graph.rebuild(db, collection.id)
+    await db.commit()
+    assert result == {'documents': 2, 'links': 2}
+    snapshot = await graph.neighbors(db, collection.id, source.id)
+    assert {n['id'] for n in snapshot['nodes']} == {source.id, target.id}
+    assert {(e['source_field'], e['relation']) for e in snapshot['edges']} == {
+        ('markdown', 'references'), ('source', 'source_reference')}
+    assert before == (rev.id, rev.sha256, rev.reviewed_at, rev.source, k.markdown(rev))
+    await graph.rebuild(db, collection.id)
+    await db.commit()
+    assert await db.scalar(select(func.count()).select_from(graph.Link)) == 2
+
+
+async def test_plain_and_source_references_respect_current_collection_visibility(db, collection):
+    other = await k.create_collection(db, 'OtherPlainReferences')
+    hidden, _ = await publish(db, other, 'notes/private.md', title='Private target')
+    source, _ = await publish(db, collection, 'notes/source.md', 'See notes/private.md',
+                              source='Source notes/private.md@rev_example')
+    initial = await graph.snapshot(db)
+    assert not initial['edges'] and len(initial['unresolved']) == 2
+    local, rev = await publish(db, collection, 'notes/private.md')
+    linked = await graph.neighbors(db, collection.id, source.id)
+    assert {e['target'] for e in linked['edges']} == {local.id}
+    assert hidden.id not in json.dumps(linked) and 'Private target' not in json.dumps(linked)
+    await k.archive(db, collection.id, local.id, rev.id)
+    await db.commit()
+    after = await graph.neighbors(db, collection.id, source.id)
+    assert not after['edges'] and len(after['unresolved']) == 2
+    assert local.id not in json.dumps(after) and hidden.id not in json.dumps(after)

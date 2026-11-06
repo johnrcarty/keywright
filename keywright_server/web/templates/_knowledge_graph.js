@@ -132,8 +132,9 @@
       const target = byId.get(incoming ? edge.source : edge.target), item = element('li');
       if (target) item.append(button(target.title, () => select(target.id)));
       else item.append(element('span', edge.target_ref));
-      item.append(element('div', 'references · ' + (incoming && target ? target.path + ', ' : '') +
-                          'line ' + edge.line_number, 'small mut'));
+      item.append(element('div', (edge.source_field === 'source' ? 'source reference · ' : 'references · ') +
+                          (incoming && target ? target.path + ', ' : '') +
+                          (edge.source_field === 'source' ? 'source metadata' : 'line ' + edge.line_number), 'small mut'));
       list.append(item);
     });
     if (!edges.length) list.append(element('li', 'None in this view.', 'mut small'));
@@ -193,6 +194,7 @@
         data.unresolved.length + ' unresolved' + (data.center ? ' · ' + data.depth + '-hop local graph' : '');
       const warnings = [];
       if (data.unindexed_documents) warnings.push(data.unindexed_documents + ' older documents need their links indexed. Use “Index links in existing documents” below.');
+      if (nodes.length && !data.edges.length && !data.unresolved.length && !data.unindexed_documents) warnings.push('No explicit references found. Connect notes with [[wikilinks]], Markdown links, or a plain collection path such as projects/example/overview.md. Shared topics alone do not create links.');
       if (data.truncated) warnings.push('This view is limited. Choose a collection or a local graph to explore further.');
       $('kg-warning').hidden = !warnings.length; $('kg-warning').textContent = warnings.join(' ');
       listDocuments(); fit(); redraw();

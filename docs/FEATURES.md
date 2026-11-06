@@ -252,7 +252,12 @@ Colors identify documentation, decisions, memory and operational notes. Solid ar
 explicit references. The canvas is self-contained; no remote scripts or graph database are needed.
 
 Approved publication indexes `[[wikilinks]]`, display aliases, heading/block fragments,
-inline Markdown links and reference-style Markdown links. Code fences, indented/inline code,
+inline Markdown links and reference-style Markdown links. Whitespace-delimited, qualified
+collection paths such as `feedback/example/preparation.md` are also recognized in prose
+and in a revision's source metadata, including a trailing `@revision` citation. These paths
+start at the collection root; explicit `./` and `../` paths are relative to the note.
+Source-metadata references are labeled as such instead of presenting a Markdown line number.
+Host paths, URLs and `git:` sources are not treated as collection paths. Code fences, indented/inline code,
 HTML comments and leading YAML front matter are ignored. This is a focused parser, not a
 complete CommonMark renderer or Obsidian importer: nested labels, HTML anchors and aliases
 defined in YAML are not supported. External URLs, images, non-Markdown attachments,
@@ -272,7 +277,9 @@ do not change source Markdown, revision identity, approval history or permission
 
 Startup adds the table and a nullable link-index version marker. For older publications,
 use **Index links in existing documents → Rebuild document links**; the graph reports missing
-coverage. Rebuilds verify canonical Markdown hashes and roll back on missing/corrupt source.
+coverage. Link-index version 2 adds plain paths and source-metadata references; rebuild
+existing documents to include them without changing approved content. An indexed graph with
+no references explains that shared topics alone do not create links. Rebuilds verify canonical Markdown hashes and roll back on missing/corrupt source.
 No embedding provider is called. New collections include `knowledge_neighbors` in their
 read-only bundle; older collections' bundles and access rules are not silently expanded.
 

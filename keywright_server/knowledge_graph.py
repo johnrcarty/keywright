@@ -18,7 +18,7 @@ from . import knowledge as k
 from .models import KnowledgeLink as Link
 from .models import Resource, now
 
-VERSION = 1
+VERSION = 2
 MAX_LINKS = 1000
 MAX_NODES = 500
 MAX_EDGES = 5000
@@ -124,7 +124,7 @@ def target_path(source_path: str, ref: str, syntax: str) -> str | None:
         return None
     if not suffix:
         path += ".md"
-    rooted = path.startswith("/") or (syntax == "wiki" and not path.startswith(("./", "../")))
+    rooted = path.startswith("/") or (syntax in {"wiki", "path", "source"} and not path.startswith(("./", "../")))
     parts = [] if rooted else source_path.split("/")[:-1]
     for segment in path.split("/"):
         if segment in ("", "."):
@@ -137,6 +137,21 @@ def target_path(source_path: str, ref: str, syntax: str) -> str | None:
             parts.append(segment)
     result = "/".join(parts)
     return result if result and len(result) <= 240 else None
+
+
+def path_references(text: str, source_path: str, syntax: str = "path") -> list[Reference]:
+    """Recognize whitespace-delimited collection paths, never URLs or host paths.
+
+    Qualified plain paths are collection-root relative; ./ and ../ remain relative
+    to the note. Markdown and wiki delimiters are handled by their existing parsers.
+    """
+    pattern = r"(?<!\S)((?:[\w.-]+/)+[\w.-]+\.md)(?=$|[\s,;.!?@])"
+    refs = []
+    for match in re.finditer(pattern, text):
+        path = target_path(source_path, match[1], syntax)
+        if path is not None and path != source_path:
+            refs.append(Reference(match[1], syntax, text.count("\n", 0, match.start()) + 1))
+    return refs
 
 
 def extract(body: str, source_path: str) -> list[Reference]:
@@ -180,6 +195,9 @@ def extract(body: str, source_path: str) -> list[Reference]:
             ref = definitions.get(" ".join(ref_label.casefold().split()))
             if ref:
                 add(ref, "markdown", match.start())
+    found.extend(path_references(text, source_path))
+    if len(found) > MAX_LINKS:
+        raise k.KnowledgeError(f"A document may contain at most {MAX_LINKS} internal links.")
     return sorted(set(found), key=lambda r: (r.line_number, r.target_ref, r.syntax))
 
 
@@ -212,13 +230,16 @@ async def _rows(db, resource_id: str | None):
 
 async def index_revision(db, doc, rev, body: str, *, paths: dict[str, str] | None = None) -> int:
     refs = extract(body, doc.path)
+    refs.extend(path_references(rev.source or "", doc.path, "source"))
+    if len(refs) > MAX_LINKS:
+        raise k.KnowledgeError(f"A document may contain at most {MAX_LINKS} internal links.")
     if paths is None:
         paths = {d.path: d.id for d, _, _ in await _rows(db, doc.resource_id)}
     await db.execute(delete(Link).where(Link.source_document_id == doc.id))
     db.add_all([Link(source_document_id=doc.id, source_revision_id=rev.id,
                      target_document_id=resolve(doc.path, ref.target_ref, ref.syntax, paths),
                      target_ref=ref.target_ref, syntax=ref.syntax, line_number=ref.line_number,
-                     origin="explicit", relation="references") for ref in refs])
+                     origin="explicit", relation="source_reference" if ref.syntax == "source" else "references") for ref in refs])
     rev.link_version = VERSION
     await db.flush()
     return len(refs)
@@ -275,6 +296,7 @@ async def snapshot(db, resource_id: str | None = None, *, document_id: str | Non
         target = resolve(source["path"], link.target_ref, link.syntax, paths[source["collection_id"]])
         edge = {"id": link.id, "source": source["id"], "target": target, "target_ref": link.target_ref,
                 "relation": link.relation, "origin": link.origin, "line_number": link.line_number,
+                "source_field": "source" if link.syntax == "source" else "markdown", "syntax": link.syntax,
                 "source_revision": link.source_revision_id}
         if target:
             edges.append(edge)
