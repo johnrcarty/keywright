@@ -1,7 +1,6 @@
 # keywright-router
 
-The source candidate is version 0.0.2. Published installation examples below remain
-on 0.0.1 until the [0.0.2 release](https://github.com/johnrcarty/keywright/blob/main/docs/releases/0.0.2.md) is published.
+Version **0.0.2** is [published](https://github.com/johnrcarty/keywright/releases/tag/v0.0.2).
 
 Acts on mail that reaches the agents' mailbox. It is an ordinary Keywright agent (`mail-router`):
 
@@ -59,7 +58,7 @@ keywright-router run        # the container's command
 4. **Rules.** Edit `./rules.yaml` (seeded from the example).
    Set `llm.gateway` to the name of the LLM gateway resource.
 5. **Start.** Deploy your chosen email MCP service separately. With Python 3.12 or newer,
-   install the published router with `pipx install keywright-router==0.0.1`, then run
+   install the published router with `pipx install keywright-router==0.0.2`, then run
    `keywright-router dry-run --config ./rules.yaml` before enabling
    `keywright-router run --config ./rules.yaml`. Supply `KW_URL` and `KW_TOKEN` through
    the environment. This optional integration is not part of the minimal Compose stack.

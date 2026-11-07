@@ -20,7 +20,7 @@ scope. Please also report relevant dependency vulnerabilities. The maintainer wi
 assess reports privately and coordinate fixes and disclosure with the reporter.
 This is a best-effort project; there is no guaranteed response time or bug bounty.
 
-Security fixes target the latest published 0.0.x release, currently v0.0.1. Older patch
+Security fixes target the latest published 0.0.x release, currently v0.0.2. Older patch
 releases, arbitrary
 commits and preview images have no separate maintenance commitment. Upgrade to the
 latest release when a fix is published. See [support scope](SUPPORT.md).

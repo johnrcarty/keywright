@@ -4,13 +4,13 @@ Give AI agents temporary access to infrastructure without handing them your cred
 Keywright is a self-hosted broker for SSH hosts and MCP tools, with human approval,
 scoped access, revocation and an audit trail.
 
-**[v0.0.1 is available](https://github.com/johnrcarty/keywright/releases/tag/v0.0.1).**
-This first experimental release includes public prebuilt images for Linux x86-64 and
-ARM64, Python packages, and verified source and license materials. Keywright is Apache-2.0.
+**[v0.0.2 is available](https://github.com/johnrcarty/keywright/releases/tag/v0.0.2).**
+This experimental release expands integrations, GitHub repository and issue imports,
+native task boards, and knowledge graph functionality. DoorDash is Beta and waitlist-only.
+See the [release notes](docs/releases/0.0.2.md).
 
-**0.0.2 is in preparation:** expanded integrations, GitHub repository and issue imports,
-native task boards, and knowledge graph improvements. See the [release candidate notes](docs/releases/0.0.2.md).
-The installation instructions below use the latest published release until 0.0.2 is published.
+Prebuilt images support Linux x86-64 and ARM64. Python packages and verified source and
+license materials are available. Keywright is Apache-2.0.
 
 ## Install the prebuilt broker
 
@@ -18,7 +18,7 @@ You need Docker Engine with the Compose plugin. No Git checkout, Python installa
 or local image build is needed.
 
 1. Download `keywright-install.tar.gz` and `SHA256SUMS` from the
-   [v0.0.1 release](https://github.com/johnrcarty/keywright/releases/tag/v0.0.1)
+   [v0.0.2 release](https://github.com/johnrcarty/keywright/releases/tag/v0.0.2)
    into a dedicated installation directory. The bundle pins the exact multi-platform image digest.
 2. Verify the archive, extract it, verify its files, and start the broker:
    ```bash
@@ -59,7 +59,7 @@ needs no cloud account, model provider, identity provider or external database.
 With Python 3.12 or newer and pipx:
 
 ```bash
-pipx install keywright==0.0.1
+pipx install keywright==0.0.2
 kw login http://localhost:8700 --paste
 kw setup check
 ```
@@ -106,17 +106,16 @@ Never point test configuration at a production database.
 
 - [DoorDash (Beta)](docs/DOORDASH.md): guided `dd-cli` setup through a managed SSH host,
   including headless authentication. Waitlist-only. Full functionality requires an approved account.
-  [Join the waitlist here](https://forms.gle/gvCQZvu9C1EKA6aM6) (0.0.2 candidate).
+  [Join the waitlist here](https://forms.gle/gvCQZvu9C1EKA6aM6).
 - [Robinhood](docs/ROBINHOOD.md): accounts, market data, and trading through browser
-  sign-in (0.0.2 candidate).
-- [Coinbase](docs/COINBASE.md): guided Coinbase CLI setup through a managed SSH host
-  (0.0.2 candidate).
+  sign-in.
+- [Coinbase](docs/COINBASE.md): guided Coinbase CLI setup through a managed SSH host.
 - [CoinStats](docs/FEATURES.md#oauth-for-upstream-mcp-servers-including-notion-and-coinstats):
-  crypto data and portfolios through browser sign-in (0.0.2 candidate).
+  crypto data and portfolios through browser sign-in.
 - [Homelab connectors](docs/CONNECTORS.md): Proxmox VE, Pi-hole v6, Home Assistant,
-  Jellyfin, Sonarr, Radarr and authentik setup and read-only tools (0.0.2 candidate).
+  Jellyfin, Sonarr, Radarr and authentik setup and read-only tools.
 - [GitHub and Work](docs/WORK_BOARDS.md): repository discovery, inbound issue sync, environment
-  locations, project boards, All tasks and Needs you views (0.0.2 candidate).
+  locations, project boards, All tasks and Needs you views.
 - [Feature and configuration reference](docs/FEATURES.md): permissions, notifications,
   LLM gateways, OIDC, inventory, shared knowledge and result inspection.
 - [Deployment guide](deploy/README.md): base stack, optional LLM/knowledge services and
@@ -133,7 +132,7 @@ covered by the minimal-stack installation check.
 Keywright is a credential trust boundary. Protect its host and backups. Command scope
 matching is not a shell sandbox, and output inspection cannot prove arbitrary text is
 secret-free. The [historical source security review](docs/SECURITY_REVIEW.md) records
-prior findings; it is not a certification of this candidate.
+prior findings; it is not a certification of this release.
 
 ## License
 

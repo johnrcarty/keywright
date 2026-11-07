@@ -1,7 +1,6 @@
 # keywright
 
-The source candidate is version 0.0.2. Published installation examples below remain
-on 0.0.1 until the [0.0.2 release](https://github.com/johnrcarty/keywright/blob/main/docs/releases/0.0.2.md) is published.
+Version **0.0.2** is [published](https://github.com/johnrcarty/keywright/releases/tag/v0.0.2).
 
 The client half of [Keywright](https://github.com/johnrcarty/keywright), a just-in-time credential broker for AI agents.
 
@@ -9,10 +8,10 @@ The client half of [Keywright](https://github.com/johnrcarty/keywright), a just-
 - `kw hazards --hook` is the destructive-command tripwire, usable as a Claude Code PreToolUse hook.
 - `kw setup claude-code|codex|check` configures the agent machine.
 
-Install the published v0.0.1 client with Python 3.12 or newer and pipx:
+Install the published v0.0.2 client with Python 3.12 or newer and pipx:
 
 ```bash
-pipx install keywright==0.0.1
+pipx install keywright==0.0.2
 kw login https://keywright.example.org/mcp --paste
 kw setup claude-code
 kw setup check
@@ -23,7 +22,7 @@ an older system Python, [uv](https://docs.astral.sh/uv/guides/tools/) can instal
 separate runtime for the client:
 
 ```bash
-uv tool install --python 3.13 keywright==0.0.1
+uv tool install --python 3.13 keywright==0.0.2
 ```
 
 Run agent setup as the user who runs the agents. `kw setup check` validates the

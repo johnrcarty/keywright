@@ -1,29 +1,28 @@
-# Keywright 0.0.2 release preparation
+# Keywright 0.0.2 release record
 
-Status: candidate prepared from the work following v0.0.1. Publication is pending.
+Status: v0.0.2 published from frozen commit `cc5203bd3bcb8ff710ee0f89980203f3a872a630`.
 The release emphasizes expanded integrations, with DoorDash explicitly marked Beta
-and waitlist-only. [Release notes](releases/0.0.2.md) are the source for the draft
-GitHub Release and its release-notes asset.
+and waitlist-only. [Release notes](releases/0.0.2.md) describe the published GitHub Release and its release-notes asset.
 
 - [x] Align server, client, router and bundled client guide at 0.0.2; raise internal
       client dependency minimums and advance the development image tag.
 - [x] Add the DoorDash beta label and upstream account/waitlist notice in setup and docs.
 - [x] Prepare integration highlights, upgrade instructions and current limitations.
-- [x] Record [local candidate validation](releases/0.0.2-validation.md): tests,
+- [x] Record [release validation](releases/0.0.2-validation.md): tests,
       wheel/source builds, clean installs and artifact hashes.
-- [ ] Pass CI for the exact reviewed commit on Python 3.12–3.14, including isolated
+- [x] Pass CI for the exact reviewed commit on Python 3.12–3.14, including isolated
       PostgreSQL/pgvector tests and both supported image architectures.
-- [ ] Review changed source, distributions and image/source materials for this candidate;
+- [x] Review changed source, distributions and image/source materials for this candidate;
       v0.0.1 audit records below are historical evidence, not 0.0.2 certification.
-- [ ] Merge the reviewed candidate and freeze its commit; obtain publication approval.
-- [ ] Create the v0.0.2 tag, verify image/source publication and draft installer assets,
+- [x] Merge the reviewed candidate and freeze its commit; obtain publication approval.
+- [x] Create the v0.0.2 tag, verify image/source publication and draft installer assets,
       rehearse Python publication through TestPyPI, and verify the exact downloaded bytes.
-- [ ] Publish the reviewed Python artifacts and GitHub Release, verify anonymous installs,
+- [x] Publish the reviewed Python artifacts and GitHub Release, verify anonymous installs,
       and update the published-version links and installation examples in README, client,
       router, deployment and security documentation.
 
-Do not reuse or modify v0.0.1 tags or artifacts. Preparing this candidate does not
-publish packages, push a release tag, or change a deployed broker.
+The v0.0.1 and v0.0.2 tags and published artifacts remain frozen. Publication did not
+change the deployed test broker. Subsequent documentation changes do not change release bytes.
 
 ## Historical v0.0.1 release checklist
 

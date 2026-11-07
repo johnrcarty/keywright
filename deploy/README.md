@@ -6,7 +6,7 @@ The database, SSH keys and signing secret live in the `keywright-data` volume.
 The core broker needs no external service.
 
 Download `keywright-install.tar.gz` and `SHA256SUMS` from the
-[v0.0.1 release](https://github.com/johnrcarty/keywright/releases/tag/v0.0.1).
+[v0.0.2 release](https://github.com/johnrcarty/keywright/releases/tag/v0.0.2).
 It contains `compose.yaml`, `image.txt`, `SHA256SUMS`, this guide, and the optional LLM
 and knowledge overlays, schema and environment examples. The broker image is pinned to
 its exact digest. Use a dedicated installation directory; no source checkout is needed.
@@ -23,11 +23,10 @@ The image and corresponding source materials are public. Registry login is not r
 
 ## Image versions and updates
 
-- `0.0.2-preview` is the candidate development tag, produced by successful builds after
-  the 0.0.2 preparation changes land on `main`. The latest published stable release is 0.0.1.
+- `0.0.2-preview` follows successful development builds on `main`. The latest published stable release is 0.0.2.
 - `sha-<full commit>` identifies the source revision. Pin the registry digest to select exact image bytes.
-- A matching `v0.0.1` Git tag publishes image tag `0.0.1` after tests and both native image checks pass.
-  The `0.0.1` tag is published. The workflow does not publish a `latest` alias.
+- The `v0.0.2` Git tag publishes image tag `0.0.2` after tests and both native image checks pass.
+  The `0.0.2` tag is published. The workflow does not publish a `latest` alias.
 
 The downloadable install file pins the multi-platform digest and supports either architecture.
 To update it, back up the stopped broker's full data volume, download a new successful install
